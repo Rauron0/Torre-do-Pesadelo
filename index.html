@@ -222,6 +222,34 @@ section { padding-top:1rem; }
   .atributos-grid { grid-template-columns:repeat(2,1fr); }
 }
 
+/* INPUTS NAS TABELAS DE FICHA — bordas visíveis por coluna */
+.table-wrapper td { border-right: 1px solid var(--border); position: relative; }
+.table-wrapper td:last-child { border-right: none; }
+.table-wrapper td input[type="text"],
+.table-wrapper td input[type="number"],
+.table-wrapper td textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(100,100,120,.35);
+  color: var(--text);
+  width: 100%;
+  outline: none;
+  padding: .3rem .4rem;
+  font-family: inherit;
+  font-size: .88rem;
+  transition: border-color .2s, background .15s;
+}
+.table-wrapper td input[type="text"]:focus,
+.table-wrapper td input[type="number"]:focus,
+.table-wrapper td textarea:focus {
+  border-bottom-color: var(--accent-light);
+  background: rgba(156,42,42,.06);
+}
+.table-wrapper td textarea {
+  resize: vertical;
+  min-height: 44px;
+}
+
 /* TECNICAS */
 .poder-tecnica { background:var(--bg-elevated); border:1px solid var(--border); margin-bottom:.75rem; }
 .poder-tecnica-header { display:flex; align-items:center; gap:.75rem; padding:.6rem .9rem; border-bottom:1px solid var(--border); background:rgba(156,42,42,.05); }
@@ -560,6 +588,7 @@ section { padding-top:1rem; }
         <table>
           <thead><tr><th>Capítulo</th><th>Conteúdo</th></tr></thead>
           <tbody>
+            <tr><td><a onclick="navTo('ficha')" style="color:var(--accent-light);cursor:pointer">Ficha</a></td><td>Minha Ficha de Personagem</td></tr>
             <tr><td><a onclick="navTo('cap1')" style="color:var(--accent-light);cursor:pointer">Cap. 1</a></td><td>A Ficha de Personagem</td></tr>
             <tr><td><a onclick="navTo('cap2')" style="color:var(--accent-light);cursor:pointer">Cap. 2</a></td><td>Ficha Base</td></tr>
             <tr><td><a onclick="navTo('cap3')" style="color:var(--accent-light);cursor:pointer">Cap. 3</a></td><td>Atributos</td></tr>
@@ -815,9 +844,15 @@ function renderizarPersonagensNaSidebar() {
 }
 
 function navFichaPersonagem(nome) {
-  if (nome !== personagemAtual) ativarPersonagem(nome);
-  else navTo('ficha');
   document.getElementById('sidebar').classList.remove('open');
+  if (nome !== personagemAtual) {
+    ativarPersonagem(nome);
+  } else {
+    setTimeout(() => {
+      const el = document.getElementById('ficha');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
 }
 
 // criarNovoPersonagem (chamado pelo submenu sidebar) — abre o painel e dispara adicionarPersonagemNovo
@@ -1229,7 +1264,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       <div class="table-wrapper"><table>
         <thead><tr><th style="min-width:130px">Nome</th><th>Bônus Atq.</th><th>Dano</th><th>Crítico</th><th>Tipo</th><th>Alcance</th><th>Notas</th></tr></thead>
         <tbody>
-          ${[1,2,3,4,5,6].map(n=>`<tr>${['nome','bat','dano','crit','tipo','alc','obs'].map(f=>`<td><input type="text" id="arm${n}-${f}" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;min-width:${f==='nome'?'120':'55'}px;padding:.2rem .3rem" oninput="salvarLocal()"></td>`).join('')}</tr>`).join('')}
+          ${[1,2,3,4,5,6].map(n=>`<tr>${['nome','bat','dano','crit','tipo','alc','obs'].map(f=>`<td><input type="text" id="arm${n}-${f}" style="min-width:${f==='nome'?'120':'55'}px" oninput="salvarLocal()"></td>`).join('')}</tr>`).join('')}
         </tbody>
       </table></div>
     </div>
@@ -1255,8 +1290,8 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         <thead><tr><th style="min-width:160px">Nome da Passiva</th><th>Descrição / Efeito</th></tr></thead>
         <tbody id="passivas-tbody">
           ${[1,2,3,4].map(n=>`<tr>
-            <td><input type="text" id="pass${n}-nome" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;min-width:140px;padding:.2rem .3rem" placeholder="Nome..." oninput="salvarLocal()"></td>
-            <td><textarea id="pass${n}-desc" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;resize:vertical;min-height:44px;padding:.2rem .3rem;font-family:inherit;font-size:.85rem" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
+            <td><input type="text" id="pass${n}-nome" style="min-width:140px" placeholder="Nome..." oninput="salvarLocal()"></td>
+            <td><textarea id="pass${n}-desc" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
           </tr>`).join('')}
         </tbody>
       </table></div>
@@ -1267,9 +1302,9 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         <thead><tr><th style="min-width:160px">Nome do Despertar</th><th>Condição / Gatilho</th><th>Efeito</th></tr></thead>
         <tbody>
           ${[1,2,3].map(n=>`<tr>
-            <td><input type="text" id="desp${n}-nome" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;padding:.2rem .3rem" placeholder="Nome..." oninput="salvarLocal()"></td>
-            <td><input type="text" id="desp${n}-cond" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;padding:.2rem .3rem" placeholder="Gatilho..." oninput="salvarLocal()"></td>
-            <td><textarea id="desp${n}-efei" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;resize:vertical;min-height:44px;padding:.2rem .3rem;font-family:inherit;font-size:.85rem" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
+            <td><input type="text" id="desp${n}-nome" placeholder="Nome..." oninput="salvarLocal()"></td>
+            <td><input type="text" id="desp${n}-cond" placeholder="Gatilho..." oninput="salvarLocal()"></td>
+            <td><textarea id="desp${n}-efei" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
           </tr>`).join('')}
         </tbody>
       </table></div>
@@ -1322,10 +1357,10 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         <thead><tr><th style="min-width:200px">Nome do Item</th><th>Qtd.</th><th>Espaços</th><th>Descrição / Efeito</th></tr></thead>
         <tbody>
           ${Array.from({length:12},(_,i)=>i+1).map(n=>`<tr>
-            <td><input type="text" id="item${n}-nome" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;padding:.2rem .3rem" oninput="salvarLocal()"></td>
-            <td><input type="number" id="item${n}-qtd" style="background:transparent;border:none;color:var(--text);width:50px;outline:none;padding:.2rem .3rem;text-align:center" oninput="salvarLocal()"></td>
-            <td><input type="number" id="item${n}-esp" style="background:transparent;border:none;color:var(--text);width:50px;outline:none;padding:.2rem .3rem;text-align:center" oninput="salvarLocal()"></td>
-            <td><input type="text" id="item${n}-desc" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;padding:.2rem .3rem" oninput="salvarLocal()"></td>
+            <td><input type="text" id="item${n}-nome" oninput="salvarLocal()"></td>
+            <td><input type="number" id="item${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
+            <td><input type="number" id="item${n}-esp" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
+            <td><input type="text" id="item${n}-desc" oninput="salvarLocal()"></td>
           </tr>`).join('')}
         </tbody>
       </table></div>
@@ -1336,9 +1371,9 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         <thead><tr><th style="min-width:180px">Nome</th><th>Qtd.</th><th>Efeito</th></tr></thead>
         <tbody>
           ${Array.from({length:6},(_,i)=>i+1).map(n=>`<tr>
-            <td><input type="text" id="cons${n}-nome" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;padding:.2rem .3rem" oninput="salvarLocal()"></td>
-            <td><input type="number" id="cons${n}-qtd" style="background:transparent;border:none;color:var(--text);width:50px;outline:none;padding:.2rem .3rem;text-align:center" oninput="salvarLocal()"></td>
-            <td><input type="text" id="cons${n}-efei" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;padding:.2rem .3rem" oninput="salvarLocal()"></td>
+            <td><input type="text" id="cons${n}-nome" oninput="salvarLocal()"></td>
+            <td><input type="number" id="cons${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
+            <td><input type="text" id="cons${n}-efei" oninput="salvarLocal()"></td>
           </tr>`).join('')}
         </tbody>
       </table></div>
@@ -1351,8 +1386,8 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <thead><tr><th>Material</th><th>Qtd.</th></tr></thead>
             <tbody>
               ${Array.from({length:6},(_,i)=>i+1).map(n=>`<tr>
-                <td><input type="text" id="mat${n}-nome" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;padding:.2rem .3rem" oninput="salvarLocal()"></td>
-                <td><input type="number" id="mat${n}-qtd" style="background:transparent;border:none;color:var(--text);width:50px;outline:none;padding:.2rem .3rem;text-align:center" oninput="salvarLocal()"></td>
+                <td><input type="text" id="mat${n}-nome" oninput="salvarLocal()"></td>
+                <td><input type="number" id="mat${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
               </tr>`).join('')}
             </tbody>
           </table></div>
@@ -1363,9 +1398,9 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <thead><tr><th>Nome</th><th>Tipo</th><th>Efeito</th></tr></thead>
             <tbody>
               ${Array.from({length:4},(_,i)=>i+1).map(n=>`<tr>
-                <td><input type="text" id="nuc${n}-nome" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;padding:.2rem .3rem" oninput="salvarLocal()"></td>
-                <td><input type="text" id="nuc${n}-tipo" style="background:transparent;border:none;color:var(--text);width:70px;outline:none;padding:.2rem .3rem" oninput="salvarLocal()"></td>
-                <td><input type="text" id="nuc${n}-efei" style="background:transparent;border:none;color:var(--text);width:100%;outline:none;padding:.2rem .3rem" oninput="salvarLocal()"></td>
+                <td><input type="text" id="nuc${n}-nome" oninput="salvarLocal()"></td>
+                <td><input type="text" id="nuc${n}-tipo" style="width:70px" oninput="salvarLocal()"></td>
+                <td><input type="text" id="nuc${n}-efei" oninput="salvarLocal()"></td>
               </tr>`).join('')}
             </tbody>
           </table></div>
@@ -1692,20 +1727,46 @@ function gerarCamposInline(user, role) {
 
 function carregarDadosInline(user, container) { /* dados já carregados via gerarCamposInline */ }
 
-function salvarFichaPlayer(user) {
+async function salvarFichaPlayer(user) {
+
   const raw = localStorage.getItem(getChave(user));
   const d = raw ? JSON.parse(raw) : {};
 
-  // coleta todos os campos inline do GM
   const prefixo = user + '-';
+
   document.querySelectorAll(`[id^="${prefixo}"]`).forEach(el => {
+
     const id = el.id.replace(prefixo, '');
-    d[id] = el.tagName === 'TEXTAREA' ? el.value : el.value;
+
+    d[id] = el.value;
+
   });
 
-  localStorage.setItem(getChave(user), JSON.stringify(d));
-  alert(`✓ Ficha de ${USUARIOS[user].nome} salva com sucesso!`);
+  try {
+
+    await setDoc(
+      doc(db, "fichas", user),
+      d
+    );
+
+    alert(`✓ Ficha de ${USUARIOS[user].nome} salva no Firestore!`);
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    alert("Erro ao salvar.");
+
+  }
+
 }
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "firebase/firestore";
 
 // ─── ADM: lista players (só mecânico) ───
 function renderADMPlayers() {
