@@ -99,6 +99,17 @@ tr:hover td { background:rgba(156,42,42,.05); }
 .ficha-panel { background:var(--bg-surface); border:1px solid var(--border); margin-bottom:1.5rem; position:relative; }
 .ficha-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(to right,var(--accent),transparent); }
 .ficha-panel-title { font-family:'Playfair Display',serif; font-size:.8rem; letter-spacing:3px; text-transform:uppercase; color:var(--accent-light); padding:.8rem 1.2rem; border-bottom:1px solid var(--border); background:rgba(156,42,42,.06); }
+
+/* ═══ SEÇÕES EXPANSÍVEIS (Poder / Lore) ═══ */
+.ficha-expand-toggle { cursor:pointer; user-select:none; display:flex; align-items:center; gap:.6rem; transition:background .2s; }
+.ficha-expand-toggle:hover { background:rgba(156,42,42,.12); }
+.ficha-expand-seta { display:inline-block; font-size:.75rem; transition:transform .25s; flex-shrink:0; }
+.ficha-expand-seta.aberta { transform:rotate(90deg); }
+.ficha-expand-resumo { font-family:'Source Sans 3',sans-serif; text-transform:none; letter-spacing:normal; font-size:.78rem; color:var(--text-muted); font-weight:400; margin-left:.25rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
+.ficha-expand-area { display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
+.ficha-expand-area > .ficha-panel-body { overflow:hidden; min-height:0; }
+.ficha-expand-area.aberta { grid-template-rows:1fr; }
+
 .ficha-panel-body { padding:1.2rem; }
 .field-row { display:grid; gap:.75rem; margin-bottom:.75rem; }
 .field-row.cols-2 { grid-template-columns:1fr 1fr; }
@@ -112,15 +123,37 @@ tr:hover td { background:rgba(156,42,42,.05); }
 /* campos bloqueados */
 .field-group input[readonly],.field-group textarea[readonly] { opacity:.55; cursor:not-allowed; border-style:dashed; }
 
-/* ATRIBUTOS */
-.atributos-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:.6rem; }
-.atributo-box { background:var(--bg-input); border:1px solid var(--border); text-align:center; padding:.5rem .3rem; }
-.atributo-box label { font-size:.6rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent-light); display:block; margin-bottom:.3rem; }
-.atributo-box input { width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); text-align:center; font-size:1.4rem; font-family:'Playfair Display',serif; padding:.2rem 0; outline:none; }
+/* ATRIBUTOS — redesign impactante */
+.atributos-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:.75rem; }
+.atributo-box {
+  background:linear-gradient(160deg,#1c1c22,#141418);
+  border:1px solid var(--border);
+  border-top:2px solid var(--accent);
+  text-align:center;
+  padding:1.1rem .5rem .9rem;
+  position:relative;
+  transition:border-color .2s, box-shadow .2s;
+}
+.atributo-box:hover { border-top-color:var(--accent-light); box-shadow:0 0 18px rgba(156,42,42,.18); }
+.atributo-box label {
+  font-size:.6rem; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--accent-light); display:block; margin-bottom:.55rem; font-weight:600;
+}
+.atributo-box input {
+  width:100%; background:transparent; border:none;
+  border-bottom:1px solid rgba(156,42,42,.35);
+  color:#f5f5f7; text-align:center; font-size:2rem;
+  font-family:'Playfair Display',serif; padding:.2rem 0; outline:none;
+  line-height:1;
+}
 .atributo-box input:focus { border-bottom-color:var(--accent-light); }
-.atributo-mod { font-size:.85rem; color:var(--silver); margin-top:.4rem; font-weight:600; min-height:1.2em; }
+.atributo-mod {
+  font-size:1rem; color:var(--silver); margin-top:.5rem;
+  font-weight:700; min-height:1.4em;
+  font-family:'Playfair Display',serif;
+}
 
-/* RECURSOS */
+/* RECURSOS — redesign aberto e impactante */
 .recursos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.6rem; }
 .recurso-box { background:var(--bg-input); border:1px solid var(--border); padding:.7rem; text-align:center; }
 .recurso-box label { font-size:.62rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:.3rem; }
@@ -129,14 +162,123 @@ tr:hover td { background:rgba(156,42,42,.05); }
 .recurso-bonus span { font-size:.7rem; color:var(--text-muted); }
 .recurso-bonus input { background:var(--bg-elevated); border:1px solid var(--border); color:var(--text); width:50px; text-align:center; font-size:.85rem; padding:.2rem; outline:none; font-family:inherit; }
 
-/* PERÍCIAS */
-.pericias-grid { display:grid; grid-template-columns:1fr 1fr; gap:.4rem; }
-.pericia-row { display:flex; align-items:center; gap:.5rem; background:var(--bg-input); border:1px solid var(--border); padding:.4rem .6rem; font-size:.83rem; }
-.pericia-check { display:flex; gap:.25rem; }
-.pericia-check input[type="checkbox"] { accent-color:var(--accent-light); cursor:pointer; }
-.pericia-name { flex:1; color:var(--text-muted); }
-.pericia-attr { font-size:.65rem; color:var(--accent-light); min-width:30px; }
-.pericia-valor { font-weight:600; color:var(--silver); min-width:28px; text-align:right; font-size:.9rem; }
+/* RECURSO TRACKER — redesign mais espaçado e impactante */
+.recurso-tracker {
+  background: linear-gradient(160deg,#1c1c22,#141418);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  padding: 1.1rem 1rem 1rem;
+  position: relative;
+}
+.recurso-tracker-title {
+  font-size:.62rem; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text-muted); margin-bottom:.7rem; display:flex; align-items:center; gap:.4rem;
+}
+.recurso-tracker-max {
+  font-size:.75rem; color:var(--text-muted); margin-bottom:.75rem;
+  display:flex; align-items:center; gap:.35rem; flex-wrap:wrap;
+}
+.recurso-tracker-max strong {
+  font-family:'Playfair Display',serif; font-size:2rem;
+  color:var(--accent-light); line-height:1;
+}
+.recurso-tracker-row { display:flex; align-items:center; gap:.6rem; margin-bottom:.35rem; }
+.recurso-tracker-label { font-size:.6rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); min-width:36px; }
+.recurso-tracker-input {
+  background:var(--bg-input); border:1px solid var(--border);
+  color:#f5f5f7; text-align:center; font-family:'Playfair Display',serif;
+  font-size:1.35rem; padding:.25rem .5rem; outline:none;
+  width:100%; transition:border-color .2s;
+}
+.recurso-tracker-input:focus { border-color:var(--accent-light); }
+
+/* compact stat boxes */
+.recurso-box-compact {
+  background:linear-gradient(160deg,#1c1c22,#141418);
+  border:1px solid var(--border); padding:.9rem .75rem; text-align:center;
+}
+.recurso-box-compact-label {
+  font-size:.6rem; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text-muted); margin-bottom:.5rem; display:flex; align-items:center; justify-content:center; gap:.35rem;
+}
+.recurso-box-compact-val {
+  font-family:'Playfair Display',serif; font-size:1.8rem;
+  color:var(--silver); line-height:1;
+}
+
+/* PERÍCIAS — novo sistema de slots */
+.pericias-slots-section { margin-bottom:1.5rem; }
+.pericias-slots-title {
+  font-size:.65rem; letter-spacing:2px; text-transform:uppercase;
+  color:var(--accent-light); margin-bottom:.75rem; display:flex; align-items:center; gap:.5rem;
+}
+.pericias-slots-title::after { content:''; flex:1; height:1px; background:linear-gradient(to right,var(--accent),transparent); opacity:.3; }
+.pericias-slot {
+  background:linear-gradient(160deg,#1c1c22,#141418);
+  border:1px solid var(--border); margin-bottom:.5rem;
+  display:flex; align-items:center; gap:.75rem; padding:.65rem .9rem;
+  cursor:pointer; transition:border-color .2s, background .2s; position:relative;
+}
+.pericias-slot:hover { border-color:var(--accent-light); background:rgba(156,42,42,.07); }
+.pericias-slot.preenchido { border-left:3px solid var(--accent-light); }
+.pericias-slot-num {
+  font-family:'Playfair Display',serif; font-size:.75rem;
+  color:var(--accent); min-width:18px; flex-shrink:0;
+}
+.pericias-slot-nome {
+  flex:1; font-size:.88rem; color:var(--text-muted); font-style:italic;
+  letter-spacing:.5px;
+}
+.pericias-slot.preenchido .pericias-slot-nome { color:var(--text); font-style:normal; font-weight:600; }
+.pericias-slot-attr {
+  font-size:.65rem; color:var(--accent-light); min-width:30px; text-align:right;
+}
+.pericias-slot-bonus {
+  font-family:'Playfair Display',serif; font-size:1rem; color:var(--silver);
+  min-width:36px; text-align:right; font-weight:700;
+}
+.pericias-slot-clear {
+  background:none; border:none; color:#555; font-size:.8rem; cursor:pointer;
+  padding:.15rem .35rem; transition:color .2s; flex-shrink:0;
+}
+.pericias-slot-clear:hover { color:#f5a0a0; }
+
+/* dropdown de seleção de perícia */
+.pericias-dropdown-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:9000;
+  display:flex; align-items:center; justify-content:center;
+}
+.pericias-dropdown-modal {
+  background:var(--bg-elevated); border:1px solid var(--border);
+  width:100%; max-width:480px; max-height:80vh; overflow:hidden;
+  display:flex; flex-direction:column;
+  border-top:2px solid var(--accent-light);
+}
+.pericias-dropdown-header {
+  padding:1rem 1.25rem; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.pericias-dropdown-titulo {
+  font-family:'Playfair Display',serif; font-size:1rem; color:#f0f0f5;
+}
+.pericias-dropdown-close {
+  background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;
+}
+.pericias-dropdown-search {
+  margin:.75rem 1.25rem; background:var(--bg-input); border:1px solid var(--border);
+  color:var(--text); padding:.5rem .75rem; font-family:inherit; font-size:.88rem; outline:none;
+  width:calc(100% - 2.5rem); transition:border-color .2s;
+}
+.pericias-dropdown-search:focus { border-color:var(--accent-light); }
+.pericias-dropdown-list { overflow-y:auto; padding:.25rem .75rem .75rem; }
+.pericias-dropdown-item {
+  display:flex; align-items:center; gap:.75rem; padding:.6rem .75rem;
+  cursor:pointer; border-radius:2px; transition:background .15s;
+}
+.pericias-dropdown-item:hover { background:rgba(156,42,42,.12); }
+.pericias-dropdown-item-attr { font-size:.65rem; color:var(--accent-light); min-width:30px; }
+.pericias-dropdown-item-nome { flex:1; font-size:.88rem; color:var(--text); }
+.pericias-dropdown-item-bonus { font-family:'Playfair Display',serif; font-size:.95rem; color:var(--silver); font-weight:700; }
 
 /* SAVE BAR */
 .save-bar { position:sticky; bottom:0; background:rgba(12,12,15,.97); backdrop-filter:blur(10px); border-top:1px solid var(--border); padding:.8rem 1.2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; z-index:100; }
@@ -149,6 +291,67 @@ tr:hover td { background:rgba(156,42,42,.05); }
 .info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:rgba(156,42,42,.2); border:1px solid var(--accent); color:var(--accent-light); font-size:.62rem; cursor:pointer; vertical-align:middle; margin-left:4px; font-style:normal; font-family:serif; position:relative; }
 .info-btn:hover .tooltip { opacity:1; pointer-events:auto; }
 .tooltip { position:absolute; bottom:125%; left:50%; transform:translateX(-50%); background:#1a1a22; border:1px solid var(--border); color:var(--text-muted); font-size:.78rem; padding:.5rem .7rem; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .2s; z-index:999; font-family:'Source Sans 3',sans-serif; font-style:normal; min-width:200px; text-align:left; line-height:1.5; }
+
+/* ═══ SIDEBAR PERSONAGEM CARDS ═══ */
+.sb-char-card {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .45rem .6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  border: 1px solid transparent;
+  margin-bottom: .2rem;
+  position: relative;
+}
+.sb-char-card:hover { background: rgba(156,42,42,.1); border-color: rgba(156,42,42,.25); }
+.sb-char-card.ativo {
+  background: rgba(156,42,42,.18);
+  border-color: var(--accent);
+}
+.sb-char-avatar {
+  width: 32px; height: 32px; border-radius: 4px;
+  object-fit: cover; border: 1px solid var(--border);
+  background: var(--bg-input); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; color: var(--accent);
+  overflow: hidden;
+}
+.sb-char-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sb-char-info { flex: 1; min-width: 0; }
+.sb-char-name {
+  font-size: .84rem; color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color .15s;
+}
+.sb-char-card:hover .sb-char-name { color: var(--text); }
+.sb-char-card.ativo .sb-char-name { color: #fff; font-weight: 600; }
+.sb-char-poder {
+  font-size: .68rem; color: var(--accent-light);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  opacity: .8;
+}
+.sb-char-card.ativo .sb-char-indicator {
+  width: 4px; height: 24px; border-radius: 2px;
+  background: var(--accent-light); flex-shrink: 0;
+}
+
+/* ═══ DESPERTAR BADGE ═══ */
+.despertar-badge {
+  display: inline-block;
+  font-size: .62rem; letter-spacing: 1px; text-transform: uppercase;
+  padding: .15rem .55rem; border-radius: 2px;
+  background: rgba(156,42,42,.2); color: var(--accent-light);
+  border: 1px solid rgba(156,42,42,.4);
+  font-weight: 600;
+}
+
+/* ═══ RANKING REDESIGN ═══ */
+.ranking-card-despertar {
+  font-size: .68rem; color: var(--accent-light);
+  margin-top: .2rem; letter-spacing: .5px;
+}
 
 section { padding-top:1rem; }
 .section-anchor { padding-top:4rem; margin-top:-3rem; }
@@ -212,11 +415,15 @@ section { padding-top:1rem; }
   .pericias-grid { grid-template-columns:1fr; }
   .field-row.cols-4 { grid-template-columns:1fr 1fr; }
   .formula-row { grid-template-columns:1fr; }
+  /* ficha cols stack on tablet */
+  .ficha-layout-cols { grid-template-columns:1fr; }
+  .ficha-col-left, .ficha-col-right { display:contents; }
 }
 @media (max-width:640px) {
   .field-row.cols-3 { grid-template-columns:1fr 1fr; }
   .field-row.cols-2 { grid-template-columns:1fr; }
   .atributos-grid { grid-template-columns:repeat(2,1fr); }
+  .ficha-expand-resumo { display:none; }
 }
 
 /* INPUTS NAS TABELAS DE FICHA — bordas visíveis por coluna */
@@ -253,20 +460,7 @@ section { padding-top:1rem; }
 .poder-tecnica-num { font-family:'Playfair Display',serif; color:var(--accent-light); font-size:.9rem; min-width:24px; }
 .poder-tecnica-body { padding:.8rem .9rem; display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
 
-/* RECURSO TRACKER (PV/STA/PE) */
-.recurso-tracker { background:var(--bg-input); border:1px solid var(--border); padding:.7rem .8rem; border-top:2px solid var(--accent); }
-.recurso-tracker-title { font-size:.62rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent-light); margin-bottom:.35rem; }
-.recurso-tracker-max { font-size:.78rem; color:var(--text-muted); margin-bottom:.4rem; }
-.recurso-tracker-max strong { color:#f0f0f5; font-family:'Playfair Display',serif; font-size:1.1rem; }
-.recurso-tracker-row { display:flex; align-items:center; gap:.5rem; }
-.recurso-tracker-label { font-size:.65rem; color:var(--text-muted); min-width:52px; letter-spacing:.5px; text-transform:uppercase; }
-.recurso-tracker-input { flex:1; background:var(--bg-elevated); border:1px solid var(--border); color:var(--text); padding:.35rem .5rem; font-family:'Playfair Display',serif; font-size:1.1rem; text-align:center; outline:none; transition:border-color .2s; width:100%; }
-.recurso-tracker-input:focus { border-color:var(--accent-light); }
-
-/* RECURSO BOX COMPACT (CA/Init/Maestria) */
-.recurso-box-compact { background:var(--bg-input); border:1px solid var(--border); padding:.6rem .75rem; text-align:center; }
-.recurso-box-compact-label { font-size:.62rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:.3rem; }
-.recurso-box-compact-val { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--accent-light); }
+/* recurso-tracker and recurso-box-compact defined above in RECURSOS section */
 
 /* PERSONAGEM ACCORDION */
 .personagem-item { border:1px solid var(--border); margin-bottom:.5rem; background:var(--bg-elevated); transition:border-color .2s; }
@@ -562,6 +756,49 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   letter-spacing: 1px; gap: .4rem; transition: all .2s;
 }
 .personagem-foto-placeholder:hover { border-color: var(--accent-light); color: var(--accent-light); }
+
+/* NOVA GALERIA 1 principal + 5 miniaturas */
+.foto-galeria-nova { display: flex; flex-direction: column; align-items: center; gap: .6rem; width: 100%; }
+.foto-principal-wrap { position: relative; width: 120px; height: 120px; }
+.foto-principal-wrap img, .foto-principal-wrap .foto-principal-placeholder {
+  width: 120px; height: 120px; border-radius: 6px;
+  object-fit: cover; border: 2px solid var(--border);
+  background: var(--bg-input); cursor: pointer; display: block;
+  transition: border-color .2s;
+}
+.foto-principal-wrap img:hover, .foto-principal-wrap .foto-principal-placeholder:hover { border-color: var(--accent-light); }
+.foto-principal-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: .75rem; letter-spacing: 1px; gap: .4rem; border: 2px dashed var(--border); }
+.foto-miniaturas { display: grid; grid-template-columns: repeat(5, 1fr); gap: .3rem; width: 120px; }
+.foto-miniatura-item { position: relative; aspect-ratio: 1; }
+.foto-miniatura-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  border: 1px solid var(--border); border-radius: 3px;
+  cursor: pointer; transition: border-color .2s, opacity .2s;
+}
+.foto-miniatura-item img:hover { border-color: var(--accent-light); opacity: .85; }
+.foto-miniatura-vazia {
+  width: 100%; aspect-ratio: 1;
+  background: var(--bg-input); border: 1px dashed var(--border);
+  border-radius: 3px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  color: var(--text-muted); font-size: .65rem; transition: all .2s;
+}
+.foto-miniatura-vazia:hover { border-color: var(--accent-light); color: var(--accent-light); }
+.foto-miniatura-item .btn-remove-mini {
+  display: none; position: absolute; top: 1px; right: 1px;
+  background: rgba(0,0,0,.75); border: none; color: #f5a0a0;
+  font-size: .6rem; cursor: pointer; padding: .05rem .25rem; border-radius: 2px; line-height: 1.4;
+}
+.foto-miniatura-item:hover .btn-remove-mini { display: block; }
+
+/* lightbox da galeria */
+.foto-lightbox-overlay {
+  position: fixed; inset: 0; z-index: 980; background: rgba(0,0,0,.92);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.foto-lightbox-overlay img { max-width: 90vw; max-height: 90vh; object-fit: contain; border: 1px solid var(--border); }
+
+/* legado */
 .foto-galeria { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; margin-top: .75rem; width: 100%; }
 .foto-galeria-item { position: relative; aspect-ratio: 1; }
 .foto-galeria-item img { width: 100%; height: 100%; object-fit: cover; border: 1px solid var(--border); border-radius: 3px; }
@@ -571,6 +808,128 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   font-size: .7rem; cursor: pointer; padding: .1rem .3rem; border-radius: 2px;
 }
 .foto-galeria-item:hover .btn-remove-foto { display: block; }
+
+/* ═══ MODAL CONFIRMAÇÃO EXCLUSÃO ═══ */
+.modal-confirm-overlay {
+  position: fixed; inset: 0; z-index: 970;
+  background: rgba(0,0,0,.8);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-confirm {
+  background: var(--bg-surface); border: 1px solid var(--accent);
+  padding: 2rem 2.5rem; width: min(95vw, 420px); text-align: center; position: relative;
+}
+.modal-confirm::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(to right,var(--accent),transparent); }
+.modal-confirm-title { font-family:'Playfair Display',serif; font-size:1.15rem; color:#f0f0f5; margin-bottom:.75rem; }
+.modal-confirm-sub { font-size:.85rem; color:var(--text-muted); margin-bottom:1.5rem; line-height:1.6; }
+.modal-confirm-btns { display:flex; gap:.75rem; justify-content:center; }
+.modal-confirm-cancel { background:none; border:1px solid var(--border); color:var(--text-muted); padding:.55rem 1.4rem; font-family:inherit; font-size:.9rem; cursor:pointer; transition:all .2s; }
+.modal-confirm-cancel:hover { border-color:var(--text-muted); color:var(--text); }
+.modal-confirm-ok { background:var(--accent); border:none; color:#fff; padding:.55rem 1.4rem; font-family:'Playfair Display',serif; font-size:.9rem; cursor:pointer; letter-spacing:1px; transition:background .2s; }
+.modal-confirm-ok:hover { background:var(--accent-light); }
+
+/* ═══ HERO DA FICHA — REDESIGN ═══ */
+.ficha-hero {
+  background: linear-gradient(160deg, #1a0a0a 0%, #0c0c0f 100%);
+  border: 1px solid var(--border); border-top: 3px solid var(--accent);
+  margin-bottom: 1.25rem;
+  position: relative; overflow: hidden;
+}
+.ficha-hero::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 50%,rgba(156,42,42,.1),transparent 65%); pointer-events:none; }
+
+/* Hero mobile: foto grande em cima, info abaixo */
+.ficha-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem 1rem;
+  text-align: center;
+  gap: .75rem;
+}
+.ficha-hero-foto-wrap { flex-shrink: 0; }
+.ficha-hero-foto-img {
+  width: 120px; height: 120px; border-radius: 8px;
+  object-fit: cover; border: 3px solid var(--accent);
+  background: var(--bg-input); cursor:pointer; transition:border-color .2s;
+  display: block;
+}
+.ficha-hero-foto-img:hover { border-color:var(--accent-light); }
+.ficha-hero-foto-placeholder {
+  width: 120px; height: 120px; border-radius: 8px;
+  background: var(--bg-input); border: 2px dashed var(--border);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text-muted); font-size:.7rem; gap:.4rem;
+  transition:all .2s;
+}
+.ficha-hero-foto-placeholder:hover { border-color:var(--accent-light); color:var(--accent-light); }
+.ficha-hero-info { flex:1; min-width:0; }
+.ficha-hero-nome {
+  font-family:'Playfair Display',serif; font-size:2rem; color:#f5f5f7;
+  line-height:1.1; margin-bottom:.2rem;
+}
+.ficha-hero-alcunha { font-size:.88rem; color:var(--text-muted); font-style:italic; letter-spacing:.5px; margin-bottom:.35rem; min-height:1.2em; }
+.ficha-hero-poder { font-size:.9rem; color:var(--accent-light); letter-spacing:1.5px; text-transform:uppercase; font-weight:600; }
+
+/* Mini-fotos abaixo do hero */
+.ficha-hero-minis-row {
+  display: flex; gap: .4rem; justify-content: center;
+  padding: .6rem 1rem;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,.2);
+  flex-wrap: wrap;
+}
+.ficha-hero-mini-img {
+  width: 36px; height: 36px; border-radius: 4px; object-fit:cover;
+  border:1px solid var(--border); cursor:pointer; transition:all .2s;
+}
+.ficha-hero-mini-img:hover { border-color:var(--accent-light); transform:scale(1.08); }
+.ficha-hero-mini-placeholder {
+  width: 36px; height: 36px; border-radius: 4px;
+  background:var(--bg-input); border:1px dashed var(--border);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:.65rem; color:var(--text-muted); transition:all .2s;
+}
+.ficha-hero-mini-placeholder:hover { border-color:var(--accent-light); color:var(--accent-light); }
+
+/* Recursos compactos no hero (abaixo do nome, mobile) */
+.ficha-hero-recursos {
+  display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; margin-top: .25rem;
+}
+.ficha-hero-recurso-pill {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  padding: .2rem .6rem; font-size: .72rem; color: var(--text-muted);
+  letter-spacing: .5px;
+}
+.ficha-hero-recurso-pill strong { color: var(--accent-light); font-family:'Playfair Display',serif; }
+
+/* ═══ FICHA DOIS PAINÉIS (desktop) ═══ */
+.ficha-layout-cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* ═══ NOVO LAYOUT DESKTOP ═══ */
+@media (min-width: 900px) {
+  .ficha-hero-inner {
+    flex-direction: row;
+    text-align: left;
+    padding: 2rem 2rem 1.25rem;
+    gap: 2rem;
+  }
+  .ficha-hero-foto-img { width: 140px; height: 140px; }
+  .ficha-hero-foto-placeholder { width: 140px; height: 140px; }
+  .ficha-hero-nome { font-size: 2.6rem; }
+  .ficha-hero-recursos { justify-content: flex-start; }
+
+  .ficha-layout-cols {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .ficha-col-left  { display: flex; flex-direction: column; gap: 1rem; }
+  .ficha-col-right { display: flex; flex-direction: column; gap: 1rem; }
+  .ficha-full-row  { grid-column: 1 / -1; }
+}
 
 @media (max-width: 1024px) {
   #editor-bar { left: 0; }
@@ -630,23 +989,15 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 
     <!-- Player/GM ficha -->
     <div id="sb-ficha-section">
-      <div class="sidebar-section-label">Ficha</div>
-      <ul>
-
-  <li>
-    <a onclick="navTo('ficha')" style="display:flex;align-items:center;justify-content:space-between">
-      Minha Ficha
-    </a>
-
-    <ul id="submenu-personagens" style="display:block; margin-left:15px; margin-top:4px;">
-      <div id="listaPersonagens"></div>
-      <li>
-        <a onclick="criarNovoPersonagem()">+ Novo Personagem</a>
-      </li>
-    </ul>
-  </li>
-
-</ul>
+      <div class="sidebar-section-label">Personagens</div>
+      <div id="sb-personagens-lista">
+        <!-- Preenchido por renderizarPersonagensNaSidebar() -->
+      </div>
+      <div style="margin-top:.3rem">
+        <a onclick="criarNovoPersonagem()" style="display:flex;align-items:center;gap:.4rem;color:var(--accent-light);font-size:.83rem;padding:.35rem .5rem;border-radius:3px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='rgba(156,42,42,.12)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size:1rem;line-height:1">+</span> Novo Personagem
+        </a>
+      </div>
     </div>
 
     <div class="sidebar-section-label">Regras</div>
@@ -1143,7 +1494,27 @@ async function carregarCapitulosExtras() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// ═══ RANKING ═══════════════════════════════════════════════════════════
+// ═══ SISTEMA DE DESPERTAR ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
+// 4 opções configuráveis por ADM/GM. Apenas "Desperto" está preenchida.
+// As outras 3 ficam vazias até expansão futura.
+const OPCOES_DESPERTAR = [
+  'Desperto',   // Opção 1 — padrão de todos os personagens
+  '',           // Opção 2 — vazia (expansão futura)
+  '',           // Opção 3 — vazia (expansão futura)
+  '',           // Opção 4 — vazia (expansão futura)
+];
+
+// Retorna o label do Despertar de um personagem.
+// Se o campo 'f-despertar' não estiver preenchido ou não existir, retorna o padrão (Desperto).
+function getDespertar(dados) {
+  const val = dados['f-despertar'];
+  if (val && val.trim()) return val.trim();
+  return OPCOES_DESPERTAR[0]; // padrão: Desperto
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ═══ RANKING — todos os personagens de todos os usuários ═══════════════
 // ═══════════════════════════════════════════════════════════════════════
 async function carregarRanking() {
   const grid = document.getElementById('ranking-grid');
@@ -1153,51 +1524,92 @@ async function carregarRanking() {
     return;
   }
 
+  grid.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;grid-column:1/-1">☁ Carregando ranking...</p>';
+
+  // Todos os usuários que têm personagens (players + adm)
   const todos = Object.entries(USUARIOS).filter(([u, d]) => d.role === 'player' || d.role === 'adm');
-  const fichas = [];
+  const fichas = []; // cada entrada = 1 personagem individual
 
   for (const [user, info] of todos) {
     try {
-      // pega primeiro personagem
+      // Carrega lista de personagens do usuário
       const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
-      let primeiroPerso = '_default';
+      let listaPersonagens = [];
       if (listaSnap.exists()) {
-        const lista = JSON.parse(listaSnap.data().lista || '[]');
-        if (lista.length > 0) primeiroPerso = lista[0];
+        listaPersonagens = JSON.parse(listaSnap.data().lista || '[]');
       }
-      const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', user + '_' + primeiroPerso));
-      let dados = {};
-      if (fichaSnap.exists()) dados = JSON.parse(fichaSnap.data().dados);
+      // Se não tem nenhum personagem na nuvem, pula
+      if (listaPersonagens.length === 0) continue;
 
-      // pega foto principal
-      const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', user));
-      let fotoPrincipal = null;
-      if (fotoSnap.exists()) fotoPrincipal = fotoSnap.data().principal || null;
+      // Itera CADA personagem individualmente
+      for (const nomePersonagem of listaPersonagens) {
+        try {
+          const fichaDocId = user + '_' + nomePersonagem;
+          const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
+          let dados = {};
+          if (fichaSnap.exists()) {
+            const raw = fichaSnap.data().dados;
+            dados = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+          }
 
-      // conta núcleos (campo f-nucleo ex: "3/5")
-      const nucleoRaw = dados['f-nucleo'] || '0';
-      const nucleos = parseInt(nucleoRaw.split('/')[0]) || 0;
+          // Pula personagens arquivados
+          if (fichaSnap.exists() && fichaSnap.data().status === 'arquivado') continue;
 
-      fichas.push({
-        user, info,
-        nome: dados['f-nome'] || info.nome,
-        nivel: dados['f-nivel'] || '1',
-        poder: dados['p-principal'] || '—',
-        nucleos,
-        foto: fotoPrincipal
-      });
-    } catch(e) { console.warn('[Ranking] erro:', user, e); }
+          // Foto principal do personagem
+          let fotoPrincipal = null;
+          try {
+            const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', fichaDocId));
+            if (fotoSnap.exists()) fotoPrincipal = fotoSnap.data().principal || null;
+          } catch(e) {}
+
+          // Conta núcleos absorvidos (campo f-nucleo, formato "atual/máx" ou só número)
+          const nucleoRaw = dados['f-nucleo'] || '0';
+          const nucleos = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
+
+          // Nome do personagem: prioriza o campo da ficha, depois o nome da lista
+          const nomeExibido = dados['f-nome'] || nomePersonagem;
+
+          // Não inclui personagens sem nome preenchido na ficha (fichas em branco)
+          if (!nomeExibido || nomeExibido === nomePersonagem && !dados['f-nome']) {
+            // Inclui mesmo assim se o nome da lista está preenchido
+          }
+
+          fichas.push({
+            user,
+            info,
+            nome: nomeExibido,
+            nomePersonagem,
+            nivel: dados['f-nivel'] || '1',
+            poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
+            nucleos,
+            foto: fotoPrincipal,
+            despertar: getDespertar(dados),
+          });
+        } catch(e) {
+          console.warn('[Ranking] Erro ao carregar personagem:', user, nomePersonagem, e);
+        }
+      }
+    } catch(e) {
+      console.warn('[Ranking] Erro ao carregar usuário:', user, e);
+    }
   }
 
+  // Ordena por núcleos absorvidos (decrescente)
   fichas.sort((a, b) => b.nucleos - a.nucleos);
 
   grid.innerHTML = '';
+
+  if (fichas.length === 0) {
+    grid.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;grid-column:1/-1">Nenhum personagem encontrado no ranking.</p>';
+    return;
+  }
+
   fichas.forEach((f, i) => {
     const pos = i + 1;
     const posClass = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : '';
     const posLabel = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`;
     const maxNucleos = fichas[0].nucleos || 1;
-    const pct = Math.round((f.nucleos / maxNucleos) * 100);
+    const pct = Math.max(4, Math.round((f.nucleos / maxNucleos) * 100));
 
     const card = document.createElement('div');
     card.className = 'ranking-card';
@@ -1208,16 +1620,13 @@ async function carregarRanking() {
         ? `<img class="ranking-avatar" src="${f.foto}" alt="${f.nome}">`
         : `<div class="ranking-avatar-placeholder">⚔</div>`}
       <div class="ranking-nome">${f.nome}</div>
-      <div class="ranking-poder">${f.poder}</div>
-      <div class="ranking-nucleos">◆ ${f.nucleos} núcleos</div>
+      <div class="ranking-poder">${f.poder !== '—' ? f.poder : '<span style="color:#555">—</span>'}</div>
+      <div class="ranking-nucleos">◆ ${f.nucleos} núcleo${f.nucleos !== 1 ? 's' : ''}</div>
+      <div class="ranking-card-despertar">${f.despertar}</div>
       <div class="ranking-bar" style="width:${pct}%"></div>
     `;
     grid.appendChild(card);
   });
-
-  if (fichas.length === 0) {
-    grid.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;grid-column:1/-1">Nenhum personagem encontrado.</p>';
-  }
 }
 
 function abrirPerfilPublico(f) {
@@ -1237,23 +1646,29 @@ function abrirPerfilPublico(f) {
         <div class="modal-perfil-nome">${f.nome}</div>
         <div class="modal-perfil-nivel">Nível ${f.nivel} • ${f.info.nome}</div>
         <div class="modal-perfil-poder">${f.poder !== '—' ? '⚡ ' + f.poder : '—'}</div>
-        <div style="text-align:center;color:var(--gold);font-size:.82rem">◆ ${f.nucleos} núcleos absorvidos</div>
+        <div style="text-align:center;margin-bottom:.5rem"><span class="despertar-badge">${f.despertar || 'Desperto'}</span></div>
+        <div style="text-align:center;color:var(--gold);font-size:.82rem">◆ ${f.nucleos} núcleo${f.nucleos !== 1 ? 's' : ''} absorvido${f.nucleos !== 1 ? 's' : ''}</div>
         <div id="modal-perfil-galeria" class="modal-perfil-fotos" style="margin-top:1.25rem"></div>
       </div>
     </div>`;
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
-  // carrega galeria do player
-  carregarGaleriaPublica(f.user);
+  // carrega galeria do personagem
+  carregarGaleriaPublica(f.user, f.nomePersonagem || f.personagem);
 }
 
-async function carregarGaleriaPublica(user) {
+async function carregarGaleriaPublica(user, personagem) {
   const container = document.getElementById('modal-perfil-galeria');
   if (!container || !window.db || !window.doc || !window.getDoc) return;
   try {
-    const snap = await window.getDoc(window.doc(window.db, 'fotos', user));
+    // Tenta chave nova (user_personagem), com fallback para chave legada (user)
+    const docId = personagem ? (user + '_' + personagem) : user;
+    let snap = await window.getDoc(window.doc(window.db, 'fotos', docId));
+    if (!snap.exists() && personagem) {
+      snap = await window.getDoc(window.doc(window.db, 'fotos', user));
+    }
     if (snap.exists()) {
-      const galeria = snap.data().galeria || [];
+      const galeria = (snap.data().galeria || []).filter(Boolean);
       galeria.forEach(src => {
         const img = document.createElement('img');
         img.className = 'modal-perfil-foto';
@@ -1268,22 +1683,38 @@ async function carregarGaleriaPublica(user) {
 // ═══════════════════════════════════════════════════════════════════════
 // ═══ FOTOS DO PERSONAGEM ════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════════
-async function salvarFotosPerfil(user, principal, galeria) {
+// ═══════════════════════════════════════════════════════════════════════
+// ═══ FOTOS DO PERSONAGEM — CHAVE POR USUÁRIO+PERSONAGEM ═════════════
+// ═══════════════════════════════════════════════════════════════════════
+// Chave Firestore: fotos/{user}_{personagem}
+// Cada personagem tem seu próprio doc, nunca compartilham referência.
+
+function _fotoDocId(user, personagem) {
+  return (user || usuarioAtual) + '_' + (personagem || personagemAtual || '_default');
+}
+
+async function salvarFotosPerfil(user, personagem, principal, galeria) {
   if (!window.db || !window.doc || !window.setDoc) return;
+  const docId = _fotoDocId(user, personagem);
   try {
-    await window.setDoc(window.doc(window.db, 'fotos', user || usuarioAtual), {
-      principal: principal || null,
+    await window.setDoc(window.doc(window.db, 'fotos', docId), {
+      principal: principal !== undefined ? principal : null,
       galeria: galeria || [],
       ts: Date.now()
     });
+    console.log('[Fotos] salvo:', docId);
   } catch(e) { console.warn('[Fotos] erro ao salvar:', e); }
 }
 
-async function carregarFotosPerfil(user) {
+async function carregarFotosPerfil(user, personagem) {
   if (!window.db || !window.doc || !window.getDoc) return null;
+  const docId = _fotoDocId(user, personagem);
   try {
-    const snap = await window.getDoc(window.doc(window.db, 'fotos', user || usuarioAtual));
-    if (snap.exists()) return snap.data();
+    const snap = await window.getDoc(window.doc(window.db, 'fotos', docId));
+    if (snap.exists()) {
+      console.log('[Fotos] carregado:', docId);
+      return snap.data();
+    }
   } catch(e) {}
   return null;
 }
@@ -1297,9 +1728,9 @@ function imageToBase64(file) {
   });
 }
 
-// variáveis de estado das fotos
+// variáveis de estado das fotos — resetadas ao trocar de personagem
 let _fotoPrincipal = null;
-let _galeriaFotos = [];
+let _galeriaFotos = [null, null, null, null, null]; // 5 slots
 
 async function abrirSeletorFotoPrincipal() {
   const input = document.createElement('input');
@@ -1310,66 +1741,181 @@ async function abrirSeletorFotoPrincipal() {
     const b64 = await imageToBase64(input.files[0]);
     _fotoPrincipal = b64;
     renderFotoPersonagem();
-    await salvarFotosPerfil(usuarioAtual, _fotoPrincipal, _galeriaFotos);
+    atualizarFichaHero();
+    await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
   };
   input.click();
 }
 
-async function adicionarFotoGaleria() {
+async function adicionarFotoGaleria(slot) {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
-  input.multiple = true;
   input.onchange = async () => {
-    for (const file of input.files) {
-      if (_galeriaFotos.length >= 12) break;
-      const b64 = await imageToBase64(file);
-      _galeriaFotos.push(b64);
-    }
+    if (!input.files[0]) return;
+    const b64 = await imageToBase64(input.files[0]);
+    _galeriaFotos[slot] = b64;
     renderFotoPersonagem();
-    await salvarFotosPerfil(usuarioAtual, _fotoPrincipal, _galeriaFotos);
+    atualizarFichaHero();
+    await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
   };
   input.click();
 }
 
-async function removerFotoGaleria(idx) {
-  _galeriaFotos.splice(idx, 1);
+async function removerFotoGaleria(slot) {
+  _galeriaFotos[slot] = null;
   renderFotoPersonagem();
-  await salvarFotosPerfil(usuarioAtual, _fotoPrincipal, _galeriaFotos);
+  atualizarFichaHero();
+  await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
+}
+
+function abrirLightbox(src) {
+  const ov = document.createElement('div');
+  ov.className = 'foto-lightbox-overlay';
+  ov.onclick = () => ov.remove();
+  ov.innerHTML = `<img src="${src}" alt="Foto ampliada">`;
+  document.body.appendChild(ov);
 }
 
 function renderFotoPersonagem() {
   const area = document.getElementById('personagem-foto-area');
   if (!area) return;
+
+  // Foto principal
+  const principal = _fotoPrincipal
+    ? `<img src="${_fotoPrincipal}" class="personagem-foto-display" onclick="abrirSeletorFotoPrincipal()" title="Clique para trocar">`
+    : `<div class="personagem-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><span style="font-size:1.8rem">📷</span><span>Foto Principal</span></div>`;
+
+  // 5 miniaturas
+  const minis = _galeriaFotos.map((src, i) => {
+    if (src) {
+      return `<div class="foto-miniatura-item">
+        <img src="${src}" onclick="abrirLightbox('${src.replace(/'/g,"\\'")}');_fotoPrincipal='${src.replace(/'/g,"\\'")}';renderFotoPersonagem();atualizarFichaHero()" title="Clique para ampliar / definir como principal">
+        <button class="btn-remove-mini" onclick="event.stopPropagation();removerFotoGaleria(${i})">✕</button>
+      </div>`;
+    }
+    return `<div class="foto-miniatura-vazia" onclick="adicionarFotoGaleria(${i})" title="Adicionar foto">+</div>`;
+  }).join('');
+
   area.innerHTML = `
     <div style="font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem;align-self:flex-start">Foto do Personagem</div>
-    ${_fotoPrincipal
-      ? `<img src="${_fotoPrincipal}" class="personagem-foto-display" onclick="abrirSeletorFotoPrincipal()" title="Clique para trocar">`
-      : `<div class="personagem-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><span style="font-size:1.8rem">📷</span><span>Adicionar Foto</span></div>`}
-    <div class="foto-galeria" id="foto-galeria-grid"></div>
-    <button onclick="adicionarFotoGaleria()" style="margin-top:.5rem;background:none;border:1px dashed var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.78rem;cursor:pointer;transition:all .2s;align-self:flex-start" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Foto na Galeria</button>
+    ${principal}
+    <div class="foto-miniaturas" style="margin-top:.4rem">${minis}</div>
   `;
-  const galGrid = document.getElementById('foto-galeria-grid');
-  if (galGrid) {
-    _galeriaFotos.forEach((src, i) => {
-      const div = document.createElement('div');
-      div.className = 'foto-galeria-item';
-      div.innerHTML = `<img src="${src}" onclick="window.open('${src}','_blank')"><button class="btn-remove-foto" onclick="removerFotoGaleria(${i})">✕</button>`;
-      galGrid.appendChild(div);
-    });
-  }
 }
 
 async function inicializarFotos() {
-  const dados = await carregarFotosPerfil(usuarioAtual);
+  // reset de estado — CRÍTICO para não vazar fotos entre personagens
+  _fotoPrincipal = null;
+  _galeriaFotos = [null, null, null, null, null];
+
+  const dados = await carregarFotosPerfil(usuarioAtual, personagemAtual);
   if (dados) {
     _fotoPrincipal = dados.principal || null;
-    _galeriaFotos = dados.galeria || [];
-  } else {
-    _fotoPrincipal = null;
-    _galeriaFotos = [];
+    // compatibilidade: se veio array antigo (< 5 items) ou formato legado
+    const gal = dados.galeria || [];
+    if (Array.isArray(gal)) {
+      for (let i = 0; i < 5; i++) {
+        _galeriaFotos[i] = gal[i] || null;
+      }
+    }
   }
   renderFotoPersonagem();
+  atualizarFichaHero();
+
+  // Cache da foto principal na sessionStorage para a sidebar usar
+  if (usuarioAtual && personagemAtual) {
+    const fotoKey = '_sbfoto_' + usuarioAtual + '_' + personagemAtual;
+    if (_fotoPrincipal) sessionStorage.setItem(fotoKey, _fotoPrincipal);
+    else sessionStorage.removeItem(fotoKey);
+    // Atualiza sidebar para refletir foto nova
+    renderizarPersonagensNaSidebar();
+  }
+}
+
+// ─── SEÇÕES EXPANSÍVEIS (Poder / Lore) ───
+// Mesma lógica para ambas as seções: clique alterna abrir/fechar, sem modal/popup.
+let _fichaExpandidos = { poder: false, lore: false };
+
+function toggleFichaExpand(secao) {
+  _fichaExpandidos[secao] = !_fichaExpandidos[secao];
+  _aplicarEstadoFichaExpand();
+}
+
+function _aplicarEstadoFichaExpand() {
+  ['poder','lore'].forEach(secao => {
+    const area = document.getElementById(`area-${secao}`);
+    const seta = document.getElementById(`seta-${secao}`);
+    if (!area || !seta) return;
+    const aberto = !!_fichaExpandidos[secao];
+    area.classList.toggle('aberta', aberto);
+    seta.classList.toggle('aberta', aberto);
+    seta.textContent = aberto ? '▼' : '▶';
+  });
+  _atualizarResumosFichaExpand();
+}
+
+// Atualiza os resumos exibidos ao lado de "Poder" e "Lore" quando fechados
+function _atualizarResumosFichaExpand() {
+  const resumoPoder = document.getElementById('resumo-poder');
+  if (resumoPoder) {
+    const nomePoder = document.getElementById('p-principal')?.value || '';
+    resumoPoder.textContent = nomePoder || '—';
+  }
+  const resumoLore = document.getElementById('resumo-lore');
+  if (resumoLore) {
+    const historia = document.getElementById('r-historia')?.value || '';
+    const resumo = historia.replace(/\s+/g,' ').trim();
+    resumoLore.textContent = resumo ? (resumo.length > 60 ? resumo.slice(0,60) + '…' : resumo) : '—';
+  }
+}
+
+
+function atualizarFichaHero() {
+  const hero = document.getElementById('ficha-hero-dinamico');
+  if (!hero) return;
+  const nome = document.getElementById('f-nome')?.value || '—';
+  const alcunha = document.getElementById('f-alcunha')?.value || '';
+  const poder = document.getElementById('f-poder-nome')?.value || '';
+
+  // Recursos para exibição no hero
+  const pvMax = document.getElementById('r-pv')?.textContent || '0';
+  const pvAtual = document.getElementById('pv-atual')?.value || '0';
+  const peMax = document.getElementById('r-pe')?.textContent || '0';
+  const peAtual = document.getElementById('pe-atual')?.value || '0';
+  const ca = document.getElementById('r-ca')?.textContent || '10';
+  const nivel = document.getElementById('f-nivel')?.value || '1';
+
+  const fotoEl = _fotoPrincipal
+    ? `<img src="${_fotoPrincipal}" class="ficha-hero-foto-img" onclick="abrirSeletorFotoPrincipal()" title="Trocar foto">`
+    : `<div class="ficha-hero-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><span style="font-size:2rem">📷</span><span>Foto</span></div>`;
+
+  const miniHtml = _galeriaFotos.map((src, i) => {
+    if (src) return `<img class="ficha-hero-mini-img" src="${src}" onclick="abrirLightbox('${src.replace(/'/g,"\\'")}');_fotoPrincipal='${src.replace(/'/g,"\\'")}';renderFotoPersonagem();atualizarFichaHero()" title="Ver / definir como principal">`;
+    return `<div class="ficha-hero-mini-placeholder" onclick="adicionarFotoGaleria(${i})" title="Adicionar miniatura">+</div>`;
+  }).join('');
+
+  hero.innerHTML = `
+    <div class="ficha-hero">
+      <div class="ficha-hero-inner">
+        <div class="ficha-hero-foto-wrap">${fotoEl}</div>
+        <div class="ficha-hero-info">
+          <div class="ficha-hero-nome" id="ficha-hero-nome-display">${nome || '<span style="color:var(--text-muted);font-size:1rem">Nome do Personagem</span>'}</div>
+          ${alcunha ? `<div class="ficha-hero-alcunha">"${alcunha}"</div>` : '<div class="ficha-hero-alcunha"></div>'}
+          ${poder ? `<div class="ficha-hero-poder">⚡ ${poder}</div>` : ''}
+          <div class="ficha-hero-recursos">
+            <div class="ficha-hero-recurso-pill">Nv. <strong>${nivel}</strong></div>
+            <div class="ficha-hero-recurso-pill">PV <strong>${pvAtual}</strong></div>
+            <div class="ficha-hero-recurso-pill">PE <strong>${peAtual}</strong></div>
+            <div class="ficha-hero-recurso-pill">CA <strong>${ca}</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="ficha-hero-minis-row">${miniHtml}</div>
+    </div>
+  `;
+
+  _atualizarResumosFichaExpand();
 }
 
 
@@ -1384,6 +1930,9 @@ let personagensPorUsuario = {};
 let personagemAtual = null;
 
 // ─── PERSONAGENS — ACCORDION ───
+
+// Estado de QUAIS abas de personagem estão abertas no accordion (cada uma é independente)
+let _personagensAccordionAbertos = new Set();
 
 function getListaPersonagens() {
   return JSON.parse(localStorage.getItem(`chars_${usuarioAtual}`) || '[]');
@@ -1423,7 +1972,12 @@ function confirmarNovoPersonagem() {
   if (!nome) { input.focus(); return; }
 
   const lista = getListaPersonagens();
-  if (lista.includes(nome)) { alert('Já existe um personagem com esse nome.'); input.focus(); return; }
+  if (lista.includes(nome)) {
+    input.style.borderColor = 'var(--accent-light)';
+    input.title = 'Já existe um personagem com esse nome.';
+    input.focus();
+    return;
+  }
 
   lista.push(nome);
   salvarListaPersonagens(lista);
@@ -1450,31 +2004,55 @@ function renderizarPersonagensAccordion() {
   const lista = getListaPersonagens();
 
   lista.forEach(nome => {
+    const slug = slugPersonagem(nome);  // ← ID seguro, sem espaços/especiais
     const ativo = nome === personagemAtual;
+    const aberto = _personagensAccordionAbertos.has(slug);
     const item = document.createElement('div');
     item.className = 'personagem-item' + (ativo ? ' ativo' : '');
-    item.id = `acc-${nome}`;
+    item.id = `acc-${slug}`;   // ← usa slug
+    item.dataset.nome = nome;
     item.innerHTML = `
-      <div class="personagem-header" onclick="toggleAccordionPersonagem('${nome}')">
-        <span class="personagem-seta${ativo ? ' aberta' : ''}">▶</span>
-        <span class="personagem-nome-display" style="margin-left:.5rem">${nome}</span>
+      <div class="personagem-header" data-acao="toggle">
+        <span class="personagem-seta${aberto ? ' aberta' : ''}">▶</span>
+        <span class="personagem-nome-display" style="margin-left:.5rem"></span>
         ${ativo ? '<span style="font-size:.6rem;color:var(--accent-light);letter-spacing:1px;margin-left:.4rem">ATIVO</span>' : ''}
-        <div class="personagem-header-actions" onclick="event.stopPropagation()">
-          <button class="personagem-menu-btn" title="Opções" onclick="toggleDropdown('drop-${nome}')">•••</button>
-          <div class="personagem-dropdown" id="drop-${nome}">
-            <button onclick="editarNomePersonagem('${nome}');fecharDropdowns()">✏ Renomear</button>
-            <button onclick="ativarPersonagem('${nome}');fecharDropdowns()">▶ Ativar Ficha</button>
-            <button class="danger" onclick="deletarPersonagem('${nome}');fecharDropdowns()">🗑 Excluir</button>
+        <div class="personagem-header-actions" data-acao="stop">
+          <button class="personagem-menu-btn" title="Opções" data-acao="dropdown" data-drop="drop-${slug}">•••</button>
+          <div class="personagem-dropdown" id="drop-${slug}">
+            <button data-acao="renomear">✏ Renomear</button>
+            <button data-acao="ativar">▶ Ativar Ficha</button>
+            <button class="danger" data-acao="excluir">🗑 Excluir</button>
           </div>
         </div>
       </div>
-      <div class="personagem-body${ativo ? ' aberto' : ''}" id="body-${nome}">
+      <div class="personagem-body${aberto ? ' aberto' : ''}" id="body-${slug}">
         <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem">Clique em <strong style="color:var(--silver)">Ativar</strong> para carregar esta ficha.</p>
-        <button onclick="ativarPersonagem('${nome}')" style="background:var(--accent);border:none;color:#fff;padding:.45rem 1.2rem;font-family:'Playfair Display',serif;font-size:.88rem;cursor:pointer;letter-spacing:1px;transition:background .2s" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='var(--accent)'">
-          ▶ Ativar esta Ficha
-        </button>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+          <button data-acao="ativar" style="background:var(--accent);border:none;color:#fff;padding:.45rem 1.2rem;font-family:'Playfair Display',serif;font-size:.88rem;cursor:pointer;letter-spacing:1px;transition:background .2s" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='var(--accent)'">
+            ▶ Ativar Ficha
+          </button>
+          <button data-acao="renomear" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.45rem 1rem;font-family:inherit;font-size:.85rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">
+            ✏ Editar
+          </button>
+          <button data-acao="excluir" title="Excluir personagem" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.45rem .7rem;font-family:inherit;font-size:.9rem;cursor:pointer;transition:all .2s;margin-left:auto" onmouseover="this.style.background='rgba(220,60,60,.15)'" onmouseout="this.style.background='none'">
+            🗑
+          </button>
+        </div>
       </div>
     `;
+    // Define o nome (com texto seguro, evita HTML/atributo quebrado por aspas/backticks/etc.)
+    item.querySelector('.personagem-nome-display').textContent = nome;
+
+    // Listeners (sem strings interpoladas em atributos — evita SyntaxError com nomes especiais)
+    item.querySelector('.personagem-header').addEventListener('click', () => toggleAccordionPersonagem(nome));
+    item.querySelector('[data-acao="stop"]').addEventListener('click', e => e.stopPropagation());
+    item.querySelector('[data-acao="dropdown"]').addEventListener('click', () => toggleDropdown(`drop-${slug}`));
+
+    // Dropdown (menu ···)
+    item.querySelectorAll('[data-acao="renomear"]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); editarNomePersonagem(nome); fecharDropdowns(); }));
+    item.querySelectorAll('[data-acao="ativar"]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); ativarPersonagem(nome); fecharDropdowns(); }));
+    item.querySelectorAll('[data-acao="excluir"]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); confirmarExcluirPersonagem(nome); fecharDropdowns(); }));
+
     accordion.appendChild(item);
   });
 
@@ -1498,11 +2076,54 @@ function toggleDropdown(id) {
 }
 
 function editarNomePersonagem(nomeAntigo) {
-  const novoNome = prompt('Novo nome para o personagem:', nomeAntigo);
-  if (!novoNome || novoNome.trim() === nomeAntigo) return;
-  const novo = novoNome.trim();
+  // Modal inline — evita prompt() que pode ser bloqueado por alguns browsers/ambientes
+  document.getElementById('modal-renomear-overlay')?.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-confirm-overlay';
+  overlay.id = 'modal-renomear-overlay';
+  overlay.innerHTML = `
+    <div class="modal-confirm" style="max-width:400px">
+      <div class="modal-confirm-title">✏ Renomear Personagem</div>
+      <div class="modal-confirm-sub" style="margin-bottom:1rem">
+        <input id="input-renomear-personagem" type="text" value="${nomeAntigo.replace(/"/g,'&quot;')}"
+          style="width:100%;background:var(--bg-input);border:1px solid var(--accent-light);color:var(--text);padding:.6rem .8rem;font-family:inherit;font-size:.95rem;outline:none;"
+          onkeydown="if(event.key==='Enter')_confirmarRenomear('${nomeAntigo.replace(/'/g,"\\'")}');if(event.key==='Escape')document.getElementById('modal-renomear-overlay').remove()">
+      </div>
+      <div class="modal-confirm-btns">
+        <button class="modal-confirm-cancel" onclick="document.getElementById('modal-renomear-overlay').remove()">Cancelar</button>
+        <button class="modal-confirm-ok" onclick="_confirmarRenomear('${nomeAntigo.replace(/'/g,"\\'")}')">✓ Renomear</button>
+      </div>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+  setTimeout(() => {
+    const inp = document.getElementById('input-renomear-personagem');
+    if (inp) { inp.focus(); inp.select(); }
+  }, 50);
+}
+
+function _confirmarRenomear(nomeAntigo) {
+  const inp = document.getElementById('input-renomear-personagem');
+  if (!inp) return;
+  const novo = inp.value.trim();
+
+  if (!novo || novo === nomeAntigo) {
+    document.getElementById('modal-renomear-overlay')?.remove();
+    return;
+  }
   const lista = getListaPersonagens();
-  if (lista.includes(novo)) { alert('Já existe um personagem com esse nome.'); return; }
+  if (lista.includes(novo)) {
+    inp.style.borderColor = 'var(--accent-light)';
+    inp.style.outline = '1px solid var(--accent-light)';
+    const err = document.createElement('div');
+    err.style.cssText = 'color:var(--accent-light);font-size:.8rem;margin-top:.4rem;text-align:left';
+    err.textContent = 'Já existe um personagem com esse nome.';
+    inp.parentNode.appendChild(err);
+    inp.focus();
+    return;
+  }
+  document.getElementById('modal-renomear-overlay')?.remove();
+
   const idx = lista.indexOf(nomeAntigo);
   if (idx === -1) return;
   lista[idx] = novo;
@@ -1520,45 +2141,46 @@ function editarNomePersonagem(nomeAntigo) {
   renderizarPersonagensNaSidebar();
 }
 
-function toggleAccordionPersonagem(nome) {
-  const body = document.getElementById(`body-${nome}`);
-  const seta = document.querySelector(`#acc-${nome} .personagem-seta`);
-  if (!body) return;
-  const estaAberto = body.classList.contains('aberto');
-  // fecha todos
-  document.querySelectorAll('.personagem-body').forEach(b => b.classList.remove('aberto'));
-  document.querySelectorAll('.personagem-seta').forEach(s => s.classList.remove('aberta'));
-  if (!estaAberto) {
-    body.classList.add('aberto');
-    if (seta) seta.classList.add('aberta');
-    // Se não é o personagem ativo, ativa ao abrir
-    if (nome !== personagemAtual) {
-      ativarPersonagem(nome);
-    }
-  }
+// ─── SLUG SEGURO PARA IDs DE PERSONAGEM ───
+// Converte qualquer nome em ID válido para o DOM (sem espaços, acentos, caracteres especiais)
+function slugPersonagem(nome) {
+  return encodeURIComponent(nome).replace(/%/g, '_').replace(/[^a-zA-Z0-9_\-]/g, '_');
 }
 
+// Alterna a aba de QUALQUER personagem (Players, GMs, ADMs — mesma lógica para todos)
+// Abrir/fechar uma aba NÃO afeta as demais.
+function toggleAccordionPersonagem(nome) {
+  const slug = slugPersonagem(nome);
+  if (_personagensAccordionAbertos.has(slug)) {
+    _personagensAccordionAbertos.delete(slug);
+  } else {
+    _personagensAccordionAbertos.add(slug);
+  }
+  _aplicarEstadoAccordionPersonagens();
+}
+
+// Marca a aba de um personagem específico como aberta — usada ao ativar/criar/editar.
+// Não fecha as demais abas que o jogador já tenha aberto.
 function abrirAccordionPersonagem(nome) {
-  // garante que o accordion está renderizado e abre o item
-  document.querySelectorAll('.personagem-body').forEach(b => b.classList.remove('aberto'));
-  document.querySelectorAll('.personagem-seta').forEach(s => s.classList.remove('aberta'));
-  document.querySelectorAll('.personagem-item').forEach(i => i.classList.remove('ativo'));
-  const body = document.getElementById(`body-${nome}`);
-  const seta = document.querySelector(`#acc-${nome} .personagem-seta`);
-  const item = document.getElementById(`acc-${nome}`);
-  if (body) body.classList.add('aberto');
-  if (seta) seta.classList.add('aberta');
-  if (item) item.classList.add('ativo');
+  _personagensAccordionAbertos.add(slugPersonagem(nome));
+  _aplicarEstadoAccordionPersonagens();
+}
+
+// Aplica o estado salvo (_personagensAccordionAbertos) a todos os itens do accordion.
+// Mesma lógica para TODOS os personagens, sem exceções.
+function _aplicarEstadoAccordionPersonagens() {
+  document.querySelectorAll('.personagem-item').forEach(item => {
+    const slug = item.id.replace(/^acc-/, '');
+    const body = document.getElementById(`body-${slug}`);
+    const seta = item.querySelector('.personagem-seta');
+    const aberto = _personagensAccordionAbertos.has(slug);
+    if (body) body.classList.toggle('aberto', aberto);
+    if (seta) seta.classList.toggle('aberta', aberto);
+  });
 }
 
 async function ativarPersonagem(nome) {
-  if (personagemAtual && personagemAtual !== nome) {
-    // Salva imediatamente antes de trocar (sem debounce)
-    clearTimeout(_saveTimer);
-    const dadosAtuais = coletarDados();
-    localStorage.setItem('ficha_' + usuarioAtual + '_' + personagemAtual, JSON.stringify(dadosAtuais));
-    await salvarFichaFirestore(usuarioAtual, dadosAtuais);
-  }
+  if (personagemAtual) salvarLocal(); // salva o atual antes
   personagemAtual = nome;
   // recarrega ficha
   const fichaContent = document.getElementById('ficha-content');
@@ -1566,29 +2188,99 @@ async function ativarPersonagem(nome) {
     fichaContent.innerHTML = gerarFichaHTML(usuarioAtual, roleAtual);
     buildPericias();
     numTecnicas = 0; numPassivas = 4; numDespertares = 3; numPets = 1;
+    _slotsPericia = { maestrias: [], especializacoes: [] };
     await carregarDados(usuarioAtual);
     calcTudo();
+    atualizarFichaHero();
+    _fichaExpandidos = { poder: false, lore: false };
+    _aplicarEstadoFichaExpand();
   }
   renderizarPersonagensAccordion();
   abrirAccordionPersonagem(nome);
   renderizarPersonagensNaSidebar();
-  inicializarFotos();
+  await inicializarFotos(); // await garante que as fotos carregam antes de renderizar o hero
   // scroll para a ficha
   setTimeout(() => { document.getElementById('ficha')?.scrollIntoView({behavior:'smooth'}); }, 100);
 }
 
+// Modal de confirmação antes de excluir
+function confirmarExcluirPersonagem(nome) {
+  document.getElementById('modal-confirm-excluir')?.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-confirm-overlay';
+  overlay.id = 'modal-confirm-excluir';
+
+  const box = document.createElement('div');
+  box.className = 'modal-confirm';
+  box.innerHTML = `
+    <div class="modal-confirm-title">🗑 Excluir Personagem</div>
+    <div class="modal-confirm-sub" id="_excluir-nome-display"></div>
+    <div class="modal-confirm-btns">
+      <button class="modal-confirm-cancel" id="_excluir-btn-cancel">Cancelar</button>
+      <button class="modal-confirm-ok" id="_excluir-btn-ok">Confirmar Exclusão</button>
+    </div>`;
+
+  // Usa textContent para o nome — evita qualquer problema com aspas/caracteres especiais
+  const sub = box.querySelector('#_excluir-nome-sub') || box.querySelector('.modal-confirm-sub');
+  sub.innerHTML = `Tem certeza que deseja excluir este personagem?<br><strong id="_excluir-nome-forte" style="color:#f0f0f5"></strong><br><span style="font-size:.8rem;color:var(--accent-light)">Um backup será criado antes. O personagem ficará arquivado.</span>`;
+  box.querySelector('#_excluir-nome-forte').textContent = '"' + nome + '"';
+
+  overlay.appendChild(box);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  box.querySelector('#_excluir-btn-cancel').addEventListener('click', () => overlay.remove());
+  box.querySelector('#_excluir-btn-ok').addEventListener('click', () => deletarPersonagem(nome));
+
+  document.body.appendChild(overlay);
+}
+
 async function deletarPersonagem(nome) {
-  if (!confirm(`Deletar "${nome}"? Todos os dados serão perdidos.`)) return;
+  document.getElementById('modal-confirm-excluir')?.remove();
+
+  // 1. Coleta todos os dados atuais
+  const chave = 'ficha_' + usuarioAtual + '_' + nome;
+  let dadosFicha = {};
+  try { dadosFicha = JSON.parse(localStorage.getItem(chave) || '{}'); } catch(e) {}
+
+  // 2. Coleta fotos do personagem
+  let dadosFotos = null;
+  try { dadosFotos = await carregarFotosPerfil(usuarioAtual, nome); } catch(e) {}
+
+  // 3. Cria backup completo no Firebase ANTES de qualquer exclusão
+  if (window.db && window.doc && window.setDoc) {
+    try {
+      const backupDocId = usuarioAtual + '_' + nome;
+      await window.setDoc(window.doc(window.db, 'backupsPersonagens', backupDocId), {
+        nome,
+        usuario: usuarioAtual,
+        dadosFicha: JSON.stringify(dadosFicha),
+        dadosFotos: dadosFotos ? JSON.stringify(dadosFotos) : null,
+        status: 'arquivado',
+        archivedAt: Date.now(),
+        archivedBy: usuarioAtual
+      });
+      console.log('[Backup] Personagem arquivado:', backupDocId);
+    } catch(e) { console.warn('[Backup] Erro ao criar backup:', e); }
+
+    // 4. Marca a ficha com status=arquivado (não apaga fisicamente)
+    try {
+      const fichaDocId = usuarioAtual + '_' + nome;
+      const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
+      if (fichaSnap.exists()) {
+        await window.setDoc(window.doc(window.db, 'fichas', fichaDocId), {
+          ...fichaSnap.data(),
+          status: 'arquivado',
+          archivedAt: Date.now()
+        });
+      }
+    } catch(e) {}
+  }
+
+  // 5. Remove da lista ativa
   const lista = getListaPersonagens().filter(n => n !== nome);
   salvarListaPersonagens(lista);
-  localStorage.removeItem('ficha_' + usuarioAtual + '_' + nome);
-  // remove do Firestore
-  if (window.db && window.deleteDoc && window.doc) {
-    try {
-      await window.deleteDoc(window.doc(window.db, 'fichas', usuarioAtual + '_' + nome));
-      console.log('[Firestore] Personagem deletado:', nome);
-    } catch(e) { console.warn('[Firestore] Erro ao deletar personagem:', e); }
-  }
+  localStorage.removeItem(chave);
+
+  // 6. Se era o personagem ativo, carrega outro
   if (personagemAtual === nome) {
     personagemAtual = lista[0] || null;
     const fichaContent = document.getElementById('ficha-content');
@@ -1596,39 +2288,106 @@ async function deletarPersonagem(nome) {
       fichaContent.innerHTML = gerarFichaHTML(usuarioAtual, roleAtual);
       buildPericias();
       numTecnicas = 0; numPassivas = 4; numDespertares = 3; numPets = 1;
+      _slotsPericia = { maestrias: [], especializacoes: [] };
       await carregarDados(usuarioAtual);
       calcTudo();
+      await inicializarFotos();
+      _fichaExpandidos = { poder: false, lore: false };
+      _aplicarEstadoFichaExpand();
     }
   }
   renderizarPersonagensAccordion();
   renderizarPersonagensNaSidebar();
 }
+// ═══ SIDEBAR — PERSONAGENS (painel de acesso rápido) ═══
+// Regras:
+// • Lê SEMPRE de getListaPersonagens() (fonte da verdade atual)
+// • Exibe CADA personagem individualmente, sem agrupamento
+// • Remove instantaneamente ao deletar, adiciona ao criar
+// • Clique → navFichaPersonagem() → troca em tempo real sem reload
 
-// Sidebar: lista os personagens abaixo de "Minha Ficha"
 function renderizarPersonagensNaSidebar() {
-  const listaHTML = document.getElementById('listaPersonagens');
-  if (!listaHTML) return;
-  listaHTML.innerHTML = '';
-  const lista = getListaPersonagens();
+  const container = document.getElementById('sb-personagens-lista');
+  if (!container) return;
+
+  container.innerHTML = '';
+  const lista = getListaPersonagens(); // sempre atualizada
+
+  if (lista.length === 0) {
+    container.innerHTML = `<div style="font-size:.78rem;color:#555;padding:.35rem .5rem;font-style:italic">Nenhum personagem</div>`;
+    return;
+  }
+
   lista.forEach(nome => {
-    const li = document.createElement('li');
-    li.innerHTML = `<a onclick="navFichaPersonagem('${nome}')" style="${nome===personagemAtual?'color:#fff;font-weight:600':''}">
-      ${nome===personagemAtual?'▸ ':''}${nome}
-    </a>`;
-    listaHTML.appendChild(li);
+    const ativo = nome === personagemAtual;
+
+    // Tenta pegar dados básicos do localStorage para exibir o poder
+    let poderNome = '';
+    try {
+      const raw = localStorage.getItem('ficha_' + usuarioAtual + '_' + nome);
+      if (raw) {
+        const d = JSON.parse(raw);
+        poderNome = d['p-principal'] || d['f-poder-nome'] || '';
+      }
+    } catch(e) {}
+
+    // Tenta pegar foto do personagem (cache de fotos)
+    const fotoKey = '_sbfoto_' + usuarioAtual + '_' + nome;
+    const fotoCache = sessionStorage.getItem(fotoKey);
+
+    const card = document.createElement('div');
+    card.className = 'sb-char-card' + (ativo ? ' ativo' : '');
+    card.title = `Abrir ficha: ${nome}`;
+
+    // Avatar: foto se existir, ou ícone
+    const avatarContent = fotoCache
+      ? `<img src="${fotoCache}" alt="${nome}" style="width:100%;height:100%;object-fit:cover">`
+      : `<span>⚔</span>`;
+
+    card.innerHTML = `
+      <div class="sb-char-avatar">${avatarContent}</div>
+      <div class="sb-char-info">
+        <div class="sb-char-name">${nome}</div>
+        ${poderNome ? `<div class="sb-char-poder">${poderNome}</div>` : ''}
+      </div>
+      ${ativo ? '<div class="sb-char-card.ativo .sb-char-indicator" style="width:4px;height:24px;border-radius:2px;background:var(--accent-light);flex-shrink:0"></div>' : ''}
+    `;
+
+    card.addEventListener('click', () => navFichaPersonagem(nome));
+    container.appendChild(card);
   });
 }
 
-function navFichaPersonagem(nome) {
+// Atalho direto: clique no nome → ativa + scroll para ficha imediatamente
+async function navFichaPersonagem(nome) {
   document.getElementById('sidebar').classList.remove('open');
+  const btn = document.getElementById('sidebar-float-btn');
+  if (btn && window.innerWidth <= 1024) btn.style.display = 'flex';
+
   if (nome !== personagemAtual) {
-    ativarPersonagem(nome);
-  } else {
-    setTimeout(() => {
-      const el = document.getElementById('ficha');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    await ativarPersonagem(nome);
   }
+  setTimeout(() => {
+    const el = document.getElementById('ficha');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }, 150);
+}
+
+// Atalho "Minha Ficha" da Sidebar: vai DIRETO para a ficha ativa.
+// Garante que existe um personagem carregado (ativa o primeiro da lista, se necessário),
+// sem abrir menus, seletores ou exigir clique em "Ativar Ficha".
+async function irParaMinhaFicha() {
+  document.getElementById('sidebar').classList.remove('open');
+  if (!personagemAtual) {
+    const lista = getListaPersonagens();
+    if (lista.length > 0) {
+      await ativarPersonagem(lista[0]);
+    }
+  }
+  setTimeout(() => {
+    const el = document.getElementById('ficha');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }, 150);
 }
 
 // criarNovoPersonagem (chamado pelo submenu sidebar) — abre o painel e dispara adicionarPersonagemNovo
@@ -1789,20 +2548,8 @@ function calcTudo() {
   set('r-init',fmtMod(Math.round(avaliarFormula(f['init'],ctx))));
   set('r-maestria', '+' + Math.round(maestria));
 
-  // perícias
-  PERICIAS_DEF.forEach((p,i) => {
-    const mt = document.getElementById(`pm-${i}`)?.checked;
-    const es = document.getElementById(`pe-${i}`)?.checked;
-    const attrKey = p.attr.toLowerCase().replace('alm','alm');
-    const attrMap = {for:mFor,des:mDes,vig:mVig,int:mInt,alm:mAlm,car:mCar};
-    const attrMod = attrMap[p.attr.toLowerCase()] ?? 0;
-    const pCtx = {...ctx, attrMod, maestria: ctx.maestria};
-    let val;
-    if(es) val = avaliarFormula(f['per-es'], pCtx);
-    else if(mt) val = avaliarFormula(f['per-mt'], pCtx);
-    else val = avaliarFormula(f['per-base'], pCtx);
-    const el = document.getElementById(`pv-${i}`); if(el) el.textContent = fmtMod(Math.round(val));
-  });
+  // perícias — novo sistema de slots (recalcula bônus)
+  buildPericias();
 
   salvarLocal();
 }
@@ -1848,270 +2595,275 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
   </div>
 </div>
 
-  <!-- FICHA BASE -->
-  <div class="ficha-panel">
-    <div class="ficha-panel-title">◆ Ficha Base</div>
-    <div class="ficha-panel-body">
-      <div style="display:grid;grid-template-columns:140px 1fr;gap:1.25rem;align-items:start;margin-bottom:.75rem">
-        <div class="personagem-foto-area" id="personagem-foto-area">
-          <div class="personagem-foto-placeholder" onclick="abrirSeletorFotoPrincipal()">
-            <span style="font-size:1.8rem">📷</span><span>Adicionar Foto</span>
+<!-- HERO DINÂMICO DA FICHA -->
+<div id="ficha-hero-dinamico"></div>
+
+<!-- FICHA BASE — linha completa sempre -->
+<div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem">
+  <div class="ficha-panel-title">◆ Ficha Base</div>
+  <div class="ficha-panel-body">
+    <div class="field-row cols-4">
+      ${fieldGroup('Nome do Personagem','f-nome')}
+      ${fieldGroup('Alcunha / Epíteto','f-alcunha')}
+      ${fieldGroup('Poder','f-poder-nome')}
+      ${fieldGroup('Antecedente','f-antecedente')}
+    </div>
+    <div class="field-row cols-4">
+      ${fieldGroup('Raça','f-raca')}
+      ${fieldGroup('Nível','f-nivel','number',{min:1,max:20,default:1})}
+      ${fieldGroup('Progressão do Núcleo','f-nucleo-prog')}
+      <div class="field-group">
+        <label>Despertar <span style="font-size:.6rem;color:#555;letter-spacing:0">(configurável)</span></label>
+        <select id="f-despertar" oninput="salvarLocal()" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.55rem .7rem;font-family:inherit;font-size:.9rem;outline:none;transition:border-color .2s;width:100%">
+          ${OPCOES_DESPERTAR.filter(op => op).map(op => `<option value="${op}">${op}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="field-row cols-4">
+      ${fieldGroup('Idade','f-idade')}
+      ${fieldGroup('Altura','f-altura')}
+      ${fieldGroup('Peso','f-peso')}
+      ${fieldGroup('Gênero','f-genero')}
+    </div>
+  </div>
+</div>
+
+<!-- APARÊNCIA -->
+<div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem">
+  <div class="ficha-panel-title">◆ Aparência</div>
+  <div class="ficha-panel-body">
+    <div class="field-row cols-4" style="margin-bottom:.75rem">
+      ${fieldGroup('Cabelos','f-cabelos')}
+      ${fieldGroup('Olhos','f-olhos')}
+      ${fieldGroup('Pele','f-pele')}
+      ${fieldGroup('Roupas & Acessórios','f-roupas')}
+    </div>
+    ${fieldGroup('Aparência','f-aparencia','textarea')}
+  </div>
+</div>
+
+<!-- PODER — barra grande expansível igual à Lore -->
+<div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem">
+  <div class="ficha-panel-title ficha-expand-toggle" onclick="toggleFichaExpand('poder')" id="toggle-poder">
+    <span class="ficha-expand-seta" id="seta-poder">▶</span> Poder
+    <span class="ficha-expand-resumo" id="resumo-poder"></span>
+  </div>
+  <div class="ficha-expand-area" id="area-poder">
+  <div class="ficha-panel-body">
+    <div class="field-row cols-3">
+      ${fieldGroup('Poder Principal','p-principal')}
+      ${fieldGroup('Atributo Principal','p-attr')}
+      ${fieldGroup('Técnicas Máximas','p-max','number',{default:0})}
+    </div>
+    <div class="field-row cols-2">
+      ${fieldGroup('Descrição do Poder','p-descricao','textarea')}
+      ${fieldGroup('Técnica Final / Suprema','p-suprema','textarea')}
+    </div>
+
+    <!-- PASSIVAS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;margin-bottom:.5rem">
+      <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Habilidades Passivas</div>
+      <button onclick="addPassiva()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Passiva</button>
+    </div>
+    <div class="table-wrapper"><table>
+      <thead><tr><th style="min-width:160px">Nome da Passiva</th><th>Descrição / Efeito</th></tr></thead>
+      <tbody id="passivas-tbody">
+        ${[1,2,3,4].map(n=>`<tr>
+          <td><input type="text" id="pass${n}-nome" style="min-width:140px" placeholder="Nome..." oninput="salvarLocal()"></td>
+          <td><textarea id="pass${n}-desc" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+
+    <!-- DESPERTARES -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;margin-bottom:.5rem">
+      <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Despertares</div>
+      <button onclick="addDespertar()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Despertar</button>
+    </div>
+    <div class="table-wrapper"><table>
+      <thead><tr><th style="min-width:160px">Nome do Despertar</th><th>Condição / Gatilho</th><th>Efeito</th></tr></thead>
+      <tbody id="despertares-tbody">
+        ${[1,2,3].map(n=>`<tr>
+          <td><input type="text" id="desp${n}-nome" placeholder="Nome..." oninput="salvarLocal()"></td>
+          <td><input type="text" id="desp${n}-cond" placeholder="Gatilho..." oninput="salvarLocal()"></td>
+          <td><textarea id="desp${n}-efei" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+
+    <!-- TÉCNICAS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;margin-bottom:.5rem">
+      <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Técnicas</div>
+      <button onclick="addTecnica()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Técnica</button>
+    </div>
+    <div id="tecnicas-lista"></div>
+  </div>
+  </div>
+</div>
+
+<!-- LORE / REGISTRO NARRATIVO — linha completa, expansível -->
+<div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem">
+  <div class="ficha-panel-title ficha-expand-toggle" onclick="toggleFichaExpand('lore')" id="toggle-lore">
+    <span class="ficha-expand-seta" id="seta-lore">▶</span> Lore ${isAdm?'<span style="font-size:.7rem;color:#555;margin-left:.5rem">🔒 campos narrativos — somente o player pode editar</span>':''}
+    <span class="ficha-expand-resumo" id="resumo-lore"></span>
+  </div>
+  <div class="ficha-expand-area" id="area-lore">
+  <div class="ficha-panel-body">
+    <div class="field-row cols-2">
+      ${fieldGroup('Traços da Alma — Positivos','r-tracos','textarea')}
+      ${fieldGroup('Traços da Alma — Negativos','r-defeitos','textarea')}
+    </div>
+    <div class="field-row cols-2">
+      ${fieldGroup('Ideais','r-ideais','textarea')}
+      ${fieldGroup('Ligações','r-ligacoes','textarea')}
+    </div>
+    ${fieldGroup('Antecedentes','r-antecedentes','textarea')}
+    <div class="field-group" style="margin-bottom:.75rem">
+      <label>História <span style="font-size:.65rem;color:#555">(espaço livre — use para sua narrativa completa)</span></label>
+      <textarea id="r-historia" ${isAdm&&CAMPOS_NARRATIVOS.includes('r-historia')?'readonly':''} oninput="salvarLocal()" style="min-height:260px;resize:vertical"></textarea>
+    </div>
+    ${fieldGroup('Eventos & Marcos Narrativos','r-eventos','textarea')}
+    ${fieldGroup('NPCs Relevantes & Relações','r-npcs','textarea')}
+  </div>
+  </div>
+</div>
+
+<!-- LAYOUT DE DUAS COLUNAS (desktop): Atributos + Recursos | Perícias + Armas -->
+<div class="ficha-layout-cols">
+
+  <!-- COLUNA ESQUERDA: Atributos + Recursos -->
+  <div class="ficha-col-left">
+
+    <!-- ATRIBUTOS -->
+    <div class="ficha-panel">
+      <div class="ficha-panel-title">◆ Atributos</div>
+      <div class="ficha-panel-body" style="padding:1.5rem 1.2rem">
+        <div class="atributos-grid">
+          ${['FOR','DES','VIG','INT','ALM','CAR'].map(a=>`
+          <div class="atributo-box">
+            <label>${a}</label>
+            <input type="number" id="a-${a.toLowerCase()}" min="1" max="30" value="10" oninput="calcTudo()">
+            <div class="atributo-mod" id="m-${a.toLowerCase()}">+0</div>
+          </div>`).join('')}
+        </div>
+        <p style="font-size:.78rem;color:var(--text-muted);margin-top:1rem;margin-bottom:0">Total: <strong id="total-attr" style="color:var(--accent-light)">60</strong> / 80 pontos</p>
+      </div>
+    </div>
+
+    <!-- RECURSOS DE COMBATE -->
+    <div class="ficha-panel">
+      <div class="ficha-panel-title">◆ Recursos de Combate</div>
+      <div class="ficha-panel-body" style="padding:1.25rem 1.2rem">
+
+        <!-- PV / STA / PE -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+          <div class="recurso-tracker">
+            <div class="recurso-tracker-title">PV <span class="info-btn">ⓘ<span class="tooltip">(mVIG + mALM) × (2 + nível÷2)</span></span></div>
+            <div class="recurso-tracker-max">Máx: <strong id="r-pv">0</strong> <span style="font-size:.65rem;color:#555;margin-left:.25rem">+</span> <input type="number" id="b-pv" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()"></div>
+            <div class="recurso-tracker-row"><div class="recurso-tracker-label">Atual</div><input type="number" id="pv-atual" value="0" class="recurso-tracker-input" oninput="salvarLocal();atualizarFichaHero()"></div>
+            <div class="recurso-tracker-row" style="margin-top:.4rem"><div class="recurso-tracker-label">Temp.</div><input type="number" id="pv-temp" value="0" class="recurso-tracker-input" oninput="salvarLocal()"></div>
+          </div>
+          <div class="recurso-tracker">
+            <div class="recurso-tracker-title">STA <span class="info-btn">ⓘ<span class="tooltip">(nível÷2 + 2) × (mALM + mINT) + 2</span></span></div>
+            <div class="recurso-tracker-max">Máx: <strong id="r-sta">0</strong> <span style="font-size:.65rem;color:#555;margin-left:.25rem">+</span> <input type="number" id="b-sta" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()"></div>
+            <div class="recurso-tracker-row"><div class="recurso-tracker-label">Atual</div><input type="number" id="sta-atual" value="0" class="recurso-tracker-input" oninput="salvarLocal()"></div>
+            <div class="recurso-tracker-row" style="margin-top:.4rem"><div class="recurso-tracker-label">Temp.</div><input type="number" id="sta-temp" value="0" class="recurso-tracker-input" oninput="salvarLocal()"></div>
+          </div>
+          <div class="recurso-tracker">
+            <div class="recurso-tracker-title">PE <span class="info-btn">ⓘ<span class="tooltip">PVmáx ÷ (2 × STA)</span></span></div>
+            <div class="recurso-tracker-max">Máx: <strong id="r-pe">0</strong> <span style="font-size:.65rem;color:#555;margin-left:.25rem">+</span> <input type="number" id="b-pe" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()"></div>
+            <div class="recurso-tracker-row"><div class="recurso-tracker-label">Atual</div><input type="number" id="pe-atual" value="0" class="recurso-tracker-input" oninput="salvarLocal();atualizarFichaHero()"></div>
+            <div class="recurso-tracker-row" style="margin-top:.4rem"><div class="recurso-tracker-label">Gasto STA</div><input type="number" id="pe-gastosta" value="0" class="recurso-tracker-input" oninput="salvarLocal()"></div>
           </div>
         </div>
+
+        <!-- CA / Iniciativa / Maestria -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem">
+          <div class="recurso-box-compact">
+            <div class="recurso-box-compact-label">CA <span class="info-btn">ⓘ<span class="tooltip">10 + mDES + bônus + ⌈mVIG÷2⌉</span></span> <input type="number" id="b-ca" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.1rem .3rem;font-size:.75rem;outline:none;text-align:center" oninput="calcTudo()" title="Bônus CA"></div>
+            <div class="recurso-box-compact-val" id="r-ca">10</div>
+          </div>
+          <div class="recurso-box-compact">
+            <div class="recurso-box-compact-label">Iniciativa <span class="info-btn">ⓘ<span class="tooltip">Modificador de Destreza</span></span></div>
+            <div class="recurso-box-compact-val" id="r-init">+0</div>
+          </div>
+          <div class="recurso-box-compact">
+            <div class="recurso-box-compact-label">Maestria <span class="info-btn">ⓘ<span class="tooltip">1 + ⌈nível÷4⌉</span></span></div>
+            <div class="recurso-box-compact-val" id="r-maestria">+2</div>
+          </div>
+        </div>
+
+        <!-- Deslocamento -->
+        <div style="margin-bottom:1rem">
+          <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.5rem">Deslocamento</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem">
+            ${fieldGroup('Movimento (m)','f-mov','number',{default:8})}
+            ${fieldGroup('Vôo (m)','f-mov-voo','number',{default:''})}
+            ${fieldGroup('Nado (m)','f-mov-nado','number',{default:''})}
+          </div>
+        </div>
+
+        <!-- Maestrias/Es + Núcleo -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:1rem">
+          ${fieldGroup('Mt. disponíveis','f-mt','number',{default:5,min:0})}
+          ${fieldGroup('Es. disponíveis','f-es','number',{default:3,min:0})}
+          ${fieldGroup('Núcleo (atual/máx)','f-nucleo')}
+        </div>
+
+        <!-- Testes de Morte -->
         <div>
-          <div class="field-row cols-3" style="margin-bottom:.75rem">
-            ${fieldGroup('Nome do Personagem','f-nome')}
-            ${fieldGroup('Nível','f-nivel','number',{min:1,max:20,default:1})}
-            ${fieldGroup('Raça','f-raca')}
+          <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.4rem">Testes de Morte</div>
+          <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+            <span style="font-size:.8rem;color:var(--text-muted)">Sucessos:</span>
+            <input type="checkbox" id="ms1"> <input type="checkbox" id="ms2"> <input type="checkbox" id="ms3">
+            <span style="font-size:.8rem;color:var(--text-muted)">Fracassos:</span>
+            <input type="checkbox" id="mf1" style="accent-color:#c13f3f">
+            <input type="checkbox" id="mf2" style="accent-color:#c13f3f">
+            <input type="checkbox" id="mf3" style="accent-color:#c13f3f">
           </div>
-          <div class="field-row cols-3">
-            ${fieldGroup('Poder','f-poder-nome')}
-            ${fieldGroup('Antecedente','f-antecedente')}
-            ${fieldGroup('Progressão do Núcleo','f-nucleo-prog')}
-          </div>
-        </div>
-      </div>
-      <div class="field-row cols-4">
-        ${fieldGroup('Idade','f-idade')}
-        ${fieldGroup('Altura','f-altura')}
-        ${fieldGroup('Peso','f-peso')}
-        ${fieldGroup('Gênero','f-genero')}
-      </div>
-      <div class="field-row cols-4">
-        ${fieldGroup('Cabelos','f-cabelos')}
-        ${fieldGroup('Olhos','f-olhos')}
-        ${fieldGroup('Pele','f-pele')}
-        ${fieldGroup('Roupas & Acessórios','f-roupas')}
-      </div>
-      ${fieldGroup('Aparência','f-aparencia','textarea')}
-    </div>
-  </div>
-
-  <!-- ATRIBUTOS -->
-  <div class="ficha-panel">
-    <div class="ficha-panel-title">◆ Atributos</div>
-    <div class="ficha-panel-body">
-      <div class="atributos-grid">
-        ${['FOR','DES','VIG','INT','ALM','CAR'].map(a=>`
-        <div class="atributo-box">
-          <label>${a}</label>
-          <input type="number" id="a-${a.toLowerCase()}" min="1" max="30" value="10" oninput="calcTudo()">
-          <div class="atributo-mod" id="m-${a.toLowerCase()}">+0</div>
-        </div>`).join('')}
-      </div>
-      <p style="font-size:.78rem;color:var(--text-muted);margin-top:.75rem;margin-bottom:0">Total: <strong id="total-attr" style="color:var(--accent-light)">60</strong> / 80 pontos</p>
-    </div>
-  </div>
-
-  <!-- RECURSOS -->
-  <div class="ficha-panel">
-    <div class="ficha-panel-title">◆ Recursos de Combate</div>
-    <div class="ficha-panel-body">
-
-      <!-- PV / STA / PE com rastreamento de atual -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:.75rem">
-
-        <!-- PV -->
-        <div class="recurso-tracker">
-          <div class="recurso-tracker-title">Pontos de Vida (PV) <span class="info-btn">ⓘ<span class="tooltip">(mVIG + mALM) × (2 + nível÷2)</span></span></div>
-          <div class="recurso-tracker-max">Máx: <strong id="r-pv">0</strong> <span style="font-size:.65rem;color:#555">+ bônus:</span> <input type="number" id="b-pv" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()"></div>
-          <div class="recurso-tracker-row">
-            <div class="recurso-tracker-label">Atual</div>
-            <input type="number" id="pv-atual" value="0" class="recurso-tracker-input" oninput="salvarLocal()">
-          </div>
-          <div class="recurso-tracker-row" style="margin-top:.3rem">
-            <div class="recurso-tracker-label">Temp.</div>
-            <input type="number" id="pv-temp" value="0" class="recurso-tracker-input" oninput="salvarLocal()">
-          </div>
-        </div>
-
-        <!-- STA -->
-        <div class="recurso-tracker">
-          <div class="recurso-tracker-title">Stamina (STA) <span class="info-btn">ⓘ<span class="tooltip">(nível÷2 + 2) × (mALM + mINT) + 2</span></span></div>
-          <div class="recurso-tracker-max">Máx: <strong id="r-sta">0</strong> <span style="font-size:.65rem;color:#555">+ bônus:</span> <input type="number" id="b-sta" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()"></div>
-          <div class="recurso-tracker-row">
-            <div class="recurso-tracker-label">Atual</div>
-            <input type="number" id="sta-atual" value="0" class="recurso-tracker-input" oninput="salvarLocal()">
-          </div>
-          <div class="recurso-tracker-row" style="margin-top:.3rem">
-            <div class="recurso-tracker-label">Temp.</div>
-            <input type="number" id="sta-temp" value="0" class="recurso-tracker-input" oninput="salvarLocal()">
-          </div>
-        </div>
-
-        <!-- PE -->
-        <div class="recurso-tracker">
-          <div class="recurso-tracker-title">Pontos de Energia (PE) <span class="info-btn">ⓘ<span class="tooltip">PVmáx ÷ (2 × STA)</span></span></div>
-          <div class="recurso-tracker-max">Máx: <strong id="r-pe">0</strong> <span style="font-size:.65rem;color:#555">+ bônus:</span> <input type="number" id="b-pe" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()"></div>
-          <div class="recurso-tracker-row">
-            <div class="recurso-tracker-label">Atual</div>
-            <input type="number" id="pe-atual" value="0" class="recurso-tracker-input" oninput="salvarLocal()">
-          </div>
-          <div class="recurso-tracker-row" style="margin-top:.3rem">
-            <div class="recurso-tracker-label">Gasto STA</div>
-            <input type="number" id="pe-gastosta" value="0" class="recurso-tracker-input" oninput="salvarLocal()">
-          </div>
-        </div>
-
-      </div>
-
-      <!-- CA / Iniciativa / Maestria — campos compactos -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.75rem">
-        <div class="recurso-box-compact">
-          <div class="recurso-box-compact-label">CA <span class="info-btn">ⓘ<span class="tooltip">10 + mDES + bônus + ⌈mVIG÷2⌉</span></span> <input type="number" id="b-ca" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.1rem .3rem;font-size:.75rem;outline:none;text-align:center" oninput="calcTudo()" title="Bônus CA"></div>
-          <div class="recurso-box-compact-val" id="r-ca">10</div>
-        </div>
-        <div class="recurso-box-compact">
-          <div class="recurso-box-compact-label">Iniciativa <span class="info-btn">ⓘ<span class="tooltip">Modificador de Destreza</span></span></div>
-          <div class="recurso-box-compact-val" id="r-init">+0</div>
-        </div>
-        <div class="recurso-box-compact">
-          <div class="recurso-box-compact-label">Maestria <span class="info-btn">ⓘ<span class="tooltip">1 + ⌈nível÷4⌉</span></span></div>
-          <div class="recurso-box-compact-val" id="r-maestria">+2</div>
-        </div>
-      </div>
-
-      <!-- Movimento (até 3 deslocamentos) -->
-      <div style="margin-bottom:.75rem">
-        <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.4rem">Deslocamento</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem">
-          ${fieldGroup('Movimento (m)','f-mov','number',{default:8})}
-          ${fieldGroup('Vôo (m) — opcional','f-mov-voo','number',{default:''})}
-          ${fieldGroup('Nado (m) — opcional','f-mov-nado','number',{default:''})}
-        </div>
-      </div>
-
-      <!-- Maestrias/Es disponíveis + Núcleo -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.75rem">
-        ${fieldGroup('Mt. disponíveis','f-mt','number',{default:5,min:0})}
-        ${fieldGroup('Es. disponíveis','f-es','number',{default:3,min:0})}
-        ${fieldGroup('Núcleo (atual/máx)','f-nucleo')}
-      </div>
-
-      <!-- Testes de Morte -->
-      <div>
-        <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.4rem">Testes de Morte</div>
-        <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
-          <span style="font-size:.8rem;color:var(--text-muted)">Sucessos:</span>
-          <input type="checkbox" id="ms1"> <input type="checkbox" id="ms2"> <input type="checkbox" id="ms3">
-          <span style="font-size:.8rem;color:var(--text-muted)">Fracassos:</span>
-          <input type="checkbox" id="mf1" style="accent-color:#c13f3f">
-          <input type="checkbox" id="mf2" style="accent-color:#c13f3f">
-          <input type="checkbox" id="mf3" style="accent-color:#c13f3f">
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- PERÍCIAS -->
-  <div class="ficha-panel">
-    <div class="ficha-panel-title">◆ Perícias <span style="font-size:.7rem;color:var(--text-muted);margin-left:.5rem">(Mt = Maestria | Es = Especialização)</span></div>
-    <div class="ficha-panel-body">
-      <div class="pericias-grid" id="pericias-grid"></div>
+  </div><!-- /ficha-col-left -->
+
+  <!-- COLUNA DIREITA: Perícias + Armas -->
+  <div class="ficha-col-right">
+
+    <!-- PERÍCIAS — novo sistema de slots -->
+    <div class="ficha-panel">
+      <div class="ficha-panel-title">◆ Perícias</div>
+      <div class="ficha-panel-body" id="pericias-panel-body">
+        <!-- gerado por buildPericias() -->
+      </div>
     </div>
-  </div>
 
-  <!-- ARMAS -->
-  <div class="ficha-panel">
-    <div class="ficha-panel-title">◆ Armas</div>
-    <div class="ficha-panel-body">
-      <div class="table-wrapper"><table>
-        <thead><tr><th style="min-width:130px">Nome</th><th>Bônus Atq.</th><th>Dano</th><th>Crítico</th><th>Tipo</th><th>Alcance</th><th>Notas</th></tr></thead>
-        <tbody>
-          ${[1,2,3,4,5,6].map(n=>`<tr>${['nome','bat','dano','crit','tipo','alc','obs'].map(f=>`<td><input type="text" id="arm${n}-${f}" style="min-width:${f==='nome'?'120':'55'}px" oninput="salvarLocal()"></td>`).join('')}</tr>`).join('')}
-        </tbody>
-      </table></div>
+    <!-- ARMAS -->
+    <div class="ficha-panel">
+      <div class="ficha-panel-title">◆ Armas</div>
+      <div class="ficha-panel-body">
+        <div class="table-wrapper"><table>
+          <thead><tr><th style="min-width:130px">Nome</th><th>Bônus Atq.</th><th>Dano</th><th>Crítico</th><th>Tipo</th><th>Alcance</th><th>Notas</th></tr></thead>
+          <tbody>
+            ${[1,2,3,4,5,6].map(n=>`<tr>${['nome','bat','dano','crit','tipo','alc','obs'].map(f=>`<td><input type="text" id="arm${n}-${f}" style="min-width:${f==='nome'?'120':'55'}px" oninput="salvarLocal()"></td>`).join('')}</tr>`).join('')}
+          </tbody>
+        </table></div>
+      </div>
     </div>
-  </div>
 
-  <!-- PODER -->
-  <div class="ficha-panel">
-    <div class="ficha-panel-title">◆ Poder</div>
-    <div class="ficha-panel-body">
-      <div class="field-row cols-3">
-        ${fieldGroup('Poder Principal','p-principal')}
-        ${fieldGroup('Atributo Principal','p-attr')}
-        ${fieldGroup('Técnicas Máximas','p-max','number',{default:0})}
-      </div>
-      <div class="field-row cols-2">
-        ${fieldGroup('Descrição do Poder','p-descricao','textarea')}
-        ${fieldGroup('Técnica Final / Suprema','p-suprema','textarea')}
-      </div>
+  </div><!-- /ficha-col-right -->
 
-      <!-- HABILIDADES PASSIVAS -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;margin-bottom:.5rem">
-        <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Habilidades Passivas</div>
-        <button onclick="addPassiva()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Passiva</button>
-      </div>
-      <div class="table-wrapper"><table>
-        <thead><tr><th style="min-width:160px">Nome da Passiva</th><th>Descrição / Efeito</th></tr></thead>
-        <tbody id="passivas-tbody">
-          ${[1,2,3,4].map(n=>`<tr>
-            <td><input type="text" id="pass${n}-nome" style="min-width:140px" placeholder="Nome..." oninput="salvarLocal()"></td>
-            <td><textarea id="pass${n}-desc" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
-          </tr>`).join('')}
-        </tbody>
-      </table></div>
+</div><!-- /ficha-layout-cols -->
 
-      <!-- DESPERTARES -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;margin-bottom:.5rem">
-        <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Despertares</div>
-        <button onclick="addDespertar()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Despertar</button>
-      </div>
-      <div class="table-wrapper"><table>
-        <thead><tr><th style="min-width:160px">Nome do Despertar</th><th>Condição / Gatilho</th><th>Efeito</th></tr></thead>
-        <tbody id="despertares-tbody">
-          ${[1,2,3].map(n=>`<tr>
-            <td><input type="text" id="desp${n}-nome" placeholder="Nome..." oninput="salvarLocal()"></td>
-            <td><input type="text" id="desp${n}-cond" placeholder="Gatilho..." oninput="salvarLocal()"></td>
-            <td><textarea id="desp${n}-efei" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
-          </tr>`).join('')}
-        </tbody>
-      </table></div>
-
-      <!-- TÉCNICAS -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;margin-bottom:.5rem">
-        <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Técnicas</div>
-        <button onclick="addTecnica()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Técnica</button>
-      </div>
-      <div id="tecnicas-lista"></div>
-    </div>
-  </div>
-
-  <!-- REGISTRO -->
-  <div class="ficha-panel">
-    <div class="ficha-panel-title">◆ Registro Narrativo ${isAdm?'<span style="font-size:.7rem;color:#555;margin-left:.5rem">🔒 campos narrativos — somente o player pode editar</span>':''}</div>
-    <div class="ficha-panel-body">
-      <div class="field-row cols-2">
-        ${fieldGroup('Traços da Alma — Positivos','r-tracos','textarea')}
-        ${fieldGroup('Traços da Alma — Negativos','r-defeitos','textarea')}
-      </div>
-      <div class="field-row cols-2">
-        ${fieldGroup('Ideais','r-ideais','textarea')}
-        ${fieldGroup('Ligações','r-ligacoes','textarea')}
-      </div>
-      ${fieldGroup('Antecedentes','r-antecedentes','textarea')}
-      <div class="field-group" style="margin-bottom:.75rem">
-        <label>História <span style="font-size:.65rem;color:#555">(espaço livre — use para sua narrativa completa)</span></label>
-        <textarea id="r-historia" ${isAdm&&CAMPOS_NARRATIVOS.includes('r-historia')?'readonly':''} oninput="salvarLocal()" style="min-height:260px;resize:vertical"></textarea>
-      </div>
-      ${fieldGroup('Eventos & Marcos Narrativos','r-eventos','textarea')}
-      ${fieldGroup('NPCs Relevantes & Relações','r-npcs','textarea')}
-    </div>
-  </div>
 
   <!-- INVENTÁRIO -->
-  <div class="ficha-panel">
+  <div class="ficha-panel ficha-full-row">
     <div class="ficha-panel-title">◆ Inventário</div>
     <div class="ficha-panel-body">
-
-      <!-- Moeda -->
       <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap">
         <span style="font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light)">Espíritos:</span>
         <input type="text" id="inv-espiritos" placeholder="Ex: 500" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.45rem .7rem;font-family:'Playfair Display',serif;font-size:1rem;outline:none;width:140px" oninput="salvarLocal()">
       </div>
-
-      <!-- Itens gerais -->
       <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0;margin-bottom:.5rem">Itens & Equipamentos</div>
       <div class="table-wrapper"><table>
         <thead><tr><th style="min-width:200px">Nome do Item</th><th>Qtd.</th><th>Espaços</th><th>Descrição / Efeito</th></tr></thead>
@@ -2124,8 +2876,6 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           </tr>`).join('')}
         </tbody>
       </table></div>
-
-      <!-- Consumíveis -->
       <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0;margin:.75rem 0 .5rem">Consumíveis</div>
       <div class="table-wrapper"><table>
         <thead><tr><th style="min-width:180px">Nome</th><th>Qtd.</th><th>Efeito</th></tr></thead>
@@ -2137,8 +2887,6 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           </tr>`).join('')}
         </tbody>
       </table></div>
-
-      <!-- Materiais e Núcleos -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem">
         <div>
           <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0;margin-bottom:.5rem">Materiais & Recursos</div>
@@ -2170,7 +2918,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
   </div>
 
   <!-- PETS -->
-  <div class="ficha-panel">
+  <div class="ficha-panel ficha-full-row">
     <div class="ficha-panel-title">◆ Pets & Montarias</div>
     <div class="ficha-panel-body">
       <div id="pets-lista">
@@ -2204,17 +2952,154 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
   </div>`;
 }
 
-// ─── PERÍCIAS BUILD ───
+// ─── PERÍCIAS — NOVO SISTEMA DE SLOTS ───
+// Estado dos slots: { maestrias: [{idx, nome, attr},...], especializacoes: [{idx, nome, attr},...] }
+let _slotsPericia = { maestrias: [], especializacoes: [] };
+
 function buildPericias() {
-  const grid = document.getElementById('pericias-grid');
-  if(!grid) return;
-  grid.innerHTML = '';
-  PERICIAS_DEF.forEach((p,i) => {
+  const body = document.getElementById('pericias-panel-body');
+  if (!body) return;
+
+  // calcula quantos slots baseado nos valores da ficha
+  const numMt = parseInt(document.getElementById('f-mt')?.value) || 5;
+  const numEs = parseInt(document.getElementById('f-es')?.value) || 3;
+
+  body.innerHTML = `
+    <!-- MAESTRIAS -->
+    <div class="pericias-slots-section">
+      <div class="pericias-slots-title">Maestrias</div>
+      <div id="slots-maestria"></div>
+    </div>
+    <!-- ESPECIALIZAÇÕES -->
+    <div class="pericias-slots-section">
+      <div class="pericias-slots-title">Especializações</div>
+      <div id="slots-especializacao"></div>
+    </div>
+  `;
+
+  _renderSlots('maestria', numMt);
+  _renderSlots('especializacao', numEs);
+}
+
+function _renderSlots(tipo, total) {
+  const container = document.getElementById(`slots-${tipo}`);
+  if (!container) return;
+  const slots = _slotsPericia[tipo === 'maestria' ? 'maestrias' : 'especializacoes'];
+  container.innerHTML = '';
+
+  for (let i = 0; i < total; i++) {
+    const slot = slots[i] || null;
     const div = document.createElement('div');
-    div.className = 'pericia-row';
-    div.innerHTML = `<div class="pericia-check"><input type="checkbox" id="pm-${i}" title="Maestria" onchange="calcTudo()"><input type="checkbox" id="pe-${i}" title="Especialização" onchange="calcTudo()"></div><span class="pericia-attr">${p.attr}</span><span class="pericia-name">${p.nome}</span><span class="pericia-valor" id="pv-${i}">+0</span>`;
-    grid.appendChild(div);
+    div.className = 'pericias-slot' + (slot ? ' preenchido' : '');
+    div.id = `slot-${tipo}-${i}`;
+
+    let bonus = '';
+    if (slot) {
+      const f = getFormulas();
+      const ctx = _getCalcCtx();
+      const attrMap = {FOR:ctx.mFor,DES:ctx.mDes,VIG:ctx.mVig,INT:ctx.mInt,ALM:ctx.mAlm,CAR:ctx.mCar};
+      const attrMod = attrMap[slot.attr] ?? 0;
+      const pCtx = {...ctx, attrMod, maestria: ctx.maestria};
+      const formula = tipo === 'maestria' ? f['per-mt'] : f['per-es'];
+      const val = Math.round(avaliarFormula(formula, pCtx));
+      bonus = fmtMod(val);
+    }
+
+    div.innerHTML = slot
+      ? `<span class="pericias-slot-num">${i+1}</span>
+         <span class="pericias-slot-nome">${slot.nome}</span>
+         <span class="pericias-slot-attr">${slot.attr}</span>
+         <span class="pericias-slot-bonus">${bonus}</span>
+         <button class="pericias-slot-clear" onclick="event.stopPropagation();limparSlotPericia('${tipo}',${i})" title="Remover">✕</button>`
+      : `<span class="pericias-slot-num">${i+1}</span>
+         <span class="pericias-slot-nome">Selecionar ${tipo === 'maestria' ? 'Maestria' : 'Especialização'}…</span>`;
+
+    if (!slot) div.onclick = () => abrirSeletorPericia(tipo, i);
+    div.querySelector?.('.pericias-slot-nome')?.addEventListener?.('click', () => { if (slot) abrirSeletorPericia(tipo, i); });
+
+    container.appendChild(div);
+  }
+}
+
+function _getCalcCtx() {
+  const f = getFormulas();
+  const nivel = parseInt(document.getElementById('f-nivel')?.value) || 1;
+  const aFor=parseInt(document.getElementById('a-for')?.value)||10;
+  const aDes=parseInt(document.getElementById('a-des')?.value)||10;
+  const aVig=parseInt(document.getElementById('a-vig')?.value)||10;
+  const aInt=parseInt(document.getElementById('a-int')?.value)||10;
+  const aAlm=parseInt(document.getElementById('a-alm')?.value)||10;
+  const aCar=parseInt(document.getElementById('a-car')?.value)||10;
+  const mFor=getMod(aFor), mDes=getMod(aDes), mVig=getMod(aVig), mInt=getMod(aInt), mAlm=getMod(aAlm), mCar=getMod(aCar);
+  const maestria = Math.max(2, avaliarFormula(f['maestria'], {nivel, floor:Math.floor, ceil:Math.ceil, round:Math.round}));
+  const pvBase = avaliarFormula(f['pv'], {aFor,aDes,aVig,aInt,aAlm,aCar,mFor,mDes,mVig,mInt,mAlm,mCar,nivel,bonusPV:0,bonusSTA:0,bonusPE:0,bonusCA:0,floor:Math.floor,ceil:Math.ceil,round:Math.round});
+  const staBase = Math.max(1, Math.round(avaliarFormula(f['sta'], {aFor,aDes,aVig,aInt,aAlm,aCar,mFor,mDes,mVig,mInt,mAlm,mCar,nivel,bonusPV:0,bonusSTA:0,bonusPE:0,bonusCA:0,pvBase,floor:Math.floor,ceil:Math.ceil,round:Math.round})));
+  return {aFor,aDes,aVig,aInt,aAlm,aCar,mFor,mDes,mVig,mInt,mAlm,mCar,nivel,maestria,pvBase,staBase,bonusPV:0,bonusSTA:0,bonusPE:0,bonusCA:0,floor:Math.floor,ceil:Math.ceil,round:Math.round};
+}
+
+function abrirSeletorPericia(tipo, slotIdx) {
+  document.getElementById('pericias-dropdown-overlay')?.remove();
+  const f = getFormulas();
+  const ctx = _getCalcCtx();
+  const attrMap = {FOR:ctx.mFor,DES:ctx.mDes,VIG:ctx.mVig,INT:ctx.mInt,ALM:ctx.mAlm,CAR:ctx.mCar};
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pericias-dropdown-overlay';
+  overlay.id = 'pericias-dropdown-overlay';
+
+  const titulo = tipo === 'maestria' ? `Maestria #${slotIdx+1}` : `Especialização #${slotIdx+1}`;
+  const formula = tipo === 'maestria' ? f['per-mt'] : f['per-es'];
+
+  const itens = PERICIAS_DEF.map((p, i) => {
+    const attrMod = attrMap[p.attr] ?? 0;
+    const pCtx = {...ctx, attrMod};
+    const val = Math.round(avaliarFormula(formula, pCtx));
+    return `<div class="pericias-dropdown-item" onclick="selecionarPericia('${tipo}',${slotIdx},'${p.nome}','${p.attr}')">
+      <span class="pericias-dropdown-item-attr">${p.attr}</span>
+      <span class="pericias-dropdown-item-nome">${p.nome}</span>
+      <span class="pericias-dropdown-item-bonus">${fmtMod(val)}</span>
+    </div>`;
+  }).join('');
+
+  overlay.innerHTML = `
+    <div class="pericias-dropdown-modal">
+      <div class="pericias-dropdown-header">
+        <span class="pericias-dropdown-titulo">${titulo}</span>
+        <button class="pericias-dropdown-close" onclick="document.getElementById('pericias-dropdown-overlay').remove()">✕</button>
+      </div>
+      <input type="text" class="pericias-dropdown-search" id="pericias-search-input" placeholder="Filtrar perícias..." oninput="filtrarPericiaDropdown(this.value)">
+      <div class="pericias-dropdown-list" id="pericias-dropdown-list">${itens}</div>
+    </div>`;
+
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+  document.getElementById('pericias-search-input')?.focus();
+}
+
+function filtrarPericiaDropdown(q) {
+  const list = document.getElementById('pericias-dropdown-list');
+  if (!list) return;
+  q = q.toLowerCase();
+  list.querySelectorAll('.pericias-dropdown-item').forEach(el => {
+    const nome = el.querySelector('.pericias-dropdown-item-nome')?.textContent.toLowerCase() || '';
+    el.style.display = nome.includes(q) ? '' : 'none';
   });
+}
+
+function selecionarPericia(tipo, slotIdx, nome, attr) {
+  document.getElementById('pericias-dropdown-overlay')?.remove();
+  const key = tipo === 'maestria' ? 'maestrias' : 'especializacoes';
+  if (!_slotsPericia[key]) _slotsPericia[key] = [];
+  _slotsPericia[key][slotIdx] = { nome, attr };
+  buildPericias();
+  salvarLocal();
+}
+
+function limparSlotPericia(tipo, slotIdx) {
+  const key = tipo === 'maestria' ? 'maestrias' : 'especializacoes';
+  if (_slotsPericia[key]) _slotsPericia[key][slotIdx] = null;
+  buildPericias();
+  salvarLocal();
 }
 
 // ─── TÉCNICAS ───
@@ -2237,7 +3122,7 @@ function getChave(user) {
 function coletarDados() {
   const campos = [
     // ficha base
-    'f-nome','f-nivel','f-raca','f-antecedente','f-nucleo-prog',
+    'f-nome','f-nivel','f-raca','f-antecedente','f-nucleo-prog','f-alcunha','f-despertar',
     'f-idade','f-altura','f-peso','f-genero','f-cabelos','f-olhos','f-pele','f-poder-nome','f-aparencia','f-roupas',
     // atributos
     'a-for','a-des','a-vig','a-int','a-alm','a-car',
@@ -2273,6 +3158,7 @@ function coletarDados() {
   todos.forEach(id=>{ const el=document.getElementById(id); if(el) d[id]=el.value; });
   ['ms1','ms2','ms3','mf1','mf2','mf3'].forEach(id=>{ const el=document.getElementById(id); if(el) d[id]=el.checked; });
   d.pericias = PERICIAS_DEF.map((_,i)=>({mt:document.getElementById(`pm-${i}`)?.checked||false,es:document.getElementById(`pe-${i}`)?.checked||false}));
+  d.slotsPericia = JSON.parse(JSON.stringify(_slotsPericia));
   d.numTecnicas = numTecnicas;
   d.numPassivas = numPassivas;
   d.numDespertares = numDespertares;
@@ -2360,7 +3246,6 @@ async function carregarListaNuvem(user) {
   return null;
 }
 
-let numTecnicas = 0;
 let numPassivas = 4;
 let numDespertares = 3;
 let numPets = 1;
@@ -2444,6 +3329,8 @@ function salvarLocal(targetUser) {
   localStorage.setItem('ficha_' + u + '_' + personagemAtual, JSON.stringify(dados));
   const el = document.getElementById('save-status');
   if (el) { el.textContent = '✎ Editando…'; el.className = 'save-status'; }
+  // Atualiza hero em tempo real
+  atualizarFichaHero();
   // Debounce: salva na nuvem 1.5s após última edição
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async () => {
@@ -2500,11 +3387,17 @@ async function carregarNuvem(user) { return await carregarFichaFirestore(user); 
 
 function preencherCampos(d) {
   Object.entries(d).forEach(([id,val])=>{
-    if(['pericias','tecnicas','numTecnicas','numPassivas','numDespertares','numPets'].includes(id)) return;
+    if(['pericias','tecnicas','numTecnicas','slotsPericia'].includes(id)) return;
     if(['ms1','ms2','ms3','mf1','mf2','mf3'].includes(id)){ const el=document.getElementById(id); if(el) el.checked=val; return; }
     const el=document.getElementById(id); if(el) el.value=val;
   });
-  if(d.pericias) d.pericias.forEach((p,i)=>{ const mt=document.getElementById(`pm-${i}`); const es=document.getElementById(`pe-${i}`); if(mt) mt.checked=p.mt; if(es) es.checked=p.es; });
+
+  // Restaura slots de perícias (novo sistema)
+  if(d.slotsPericia) {
+    _slotsPericia = { maestrias: d.slotsPericia.maestrias || [], especializacoes: d.slotsPericia.especializacoes || [] };
+  } else {
+    _slotsPericia = { maestrias: [], especializacoes: [] };
+  }
 
   // Restaura passivas extras
   if(d.numPassivas && d.numPassivas > numPassivas) {
@@ -2777,21 +3670,11 @@ function entrarObservador() {
 }
 
 function logout() {
-  // Salva imediatamente se havia algo aberto
-  if (personagemAtual) {
-    clearTimeout(_saveTimer);
-    const d = coletarDados();
-    localStorage.setItem('ficha_' + usuarioAtual + '_' + personagemAtual, JSON.stringify(d));
-    salvarFichaFirestore(usuarioAtual, d);
-  }
-  usuarioAtual = null; roleAtual = null;
-  personagemAtual = null;
-  numTecnicas = 0; numPassivas = 4; numDespertares = 3; numPets = 1;
-  _fotoPrincipal = null; _galeriaFotos = [];
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('login-user').value = '';
-  document.getElementById('login-pass').value = '';
+  usuarioAtual=null; roleAtual=null; numTecnicas=0;
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
 }
 
 document.getElementById('login-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') tentarLogin(); });
@@ -2867,6 +3750,8 @@ async function iniciar() {
     if (personagemAtual) {
       await carregarDados(usuarioAtual);
       calcTudo();
+      atualizarFichaHero();
+      _aplicarEstadoFichaExpand();
     }
     renderizarPersonagensAccordion();
     if (personagemAtual) abrirAccordionPersonagem(personagemAtual);
@@ -2879,7 +3764,7 @@ async function iniciar() {
   // Carrega ranking, fotos e capítulos extras
   carregarCapitulosExtras();
   carregarRanking();
-  if (personagemAtual) inicializarFotos();
+  if (personagemAtual) await inicializarFotos();
 
   document.getElementById('save-status').textContent = 'Bem-vindo, ' + info.nome + '!';
   document.getElementById('save-status').className = 'save-status saved';
