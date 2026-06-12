@@ -442,6 +442,7 @@ section { padding-top:1rem; }
   .sidebar { transform:translateX(-100%); transition:transform .3s ease; z-index:250; padding-top:60px; }
   .sidebar.open { transform:translateX(0); }
   main { margin-left:0; padding:1.5rem 1.2rem 5rem; }
+  #editor-bar { left: 0; } /* sidebar oculta em mobile */
   .atributos-grid { grid-template-columns:repeat(3,1fr); }
   .recursos-grid { grid-template-columns:repeat(2,1fr); }
   .pericias-grid { grid-template-columns:1fr; }
@@ -631,7 +632,7 @@ body.modo-editor .btn-editar-bloco { opacity: 1; pointer-events: auto; }
 #editor-bar {
   display: none;
   position: fixed;
-  bottom: 0; left: 260px; right: 0;
+  bottom: 0; left: var(--sidebar-w, 260px); right: 0;
   z-index: 500;
   background: linear-gradient(135deg,#1a1200,#0e0e12);
   border-top: 2px solid var(--gold);
@@ -2185,6 +2186,7 @@ const USUARIOS = {
   "jozzu":     { senha: "jozzu490",        role: "player", nome: "Jozzu" },
   "ness":      { senha: "ness672",         role: "player", nome: "Ness" },
   // Adicione mais players aqui no mesmo formato
+  "hauron":    { senha: "hauron001",       role: "player", nome: "Hauron" },
 };
 
 const PERICIAS_DEF = [
@@ -2380,6 +2382,7 @@ function getDespertar(dados) {
 // ═══ RANKING — todos os personagens de todos os usuários ═══════════════
 // ═══════════════════════════════════════════════════════════════════════
 let _rankingInterval = null;
+let _inputListener = null;
 
 async function carregarRanking() {
   const grid = document.getElementById('ranking-grid');
@@ -2590,11 +2593,36 @@ async function carregarFotosPerfil(user, personagem) {
 }
 
 function imageToBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(file);
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      // Redimensiona/comprime a imagem antes de converter para base64.
+      // Fotos tiradas direto do celular costumam vir muito grandes
+      // (vários MB) e excedem os limites do Firestore/sessionStorage,
+      // o que fazia a foto "não funcionar" no mobile.
+      const img = new Image();
+      img.onerror = () => resolve(reader.result); // fallback: usa original se falhar
+      img.onload = () => {
+        const MAX = 900; // maior lado em px
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          if (width >= height) { height = Math.round(height * (MAX / width)); width = MAX; }
+          else { width = Math.round(width * (MAX / height)); height = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        try {
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        } catch (e) {
+          resolve(reader.result); // fallback
+        }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
   });
 }
 
@@ -2606,9 +2634,10 @@ async function abrirSeletorFotoPrincipal() {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
+  input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
   input.onchange = async () => {
-    if (!input.files[0]) return;
-    if (!usuarioAtual || !personagemAtual) { alert('Nenhum personagem ativo. Ative um personagem antes de salvar a foto.'); return; }
+    if (!input.files[0]) { input.remove(); return; }
+    if (!usuarioAtual || !personagemAtual) { alert('Nenhum personagem ativo. Ative um personagem antes de salvar a foto.'); input.remove(); return; }
     const b64 = await imageToBase64(input.files[0]);
     _fotoPrincipal = b64;
     renderFotoPersonagem();
@@ -2618,7 +2647,9 @@ async function abrirSeletorFotoPrincipal() {
     const fotoKey = '_sbfoto_' + usuarioAtual + '_' + personagemAtual;
     sessionStorage.setItem(fotoKey, _fotoPrincipal);
     renderizarPersonagensNaSidebar();
+    input.remove();
   };
+  document.body.appendChild(input);
   input.click();
 }
 
@@ -2626,14 +2657,17 @@ async function adicionarFotoGaleria(slot) {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
+  input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
   input.onchange = async () => {
-    if (!input.files[0]) return;
+    if (!input.files[0]) { input.remove(); return; }
     const b64 = await imageToBase64(input.files[0]);
     _galeriaFotos[slot] = b64;
     renderFotoPersonagem();
     atualizarFichaHero();
     await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
+    input.remove();
   };
+  document.body.appendChild(input);
   input.click();
 }
 
@@ -2945,18 +2979,24 @@ function confirmarNovoPersonagem() {
   }
 
   lista.push(nome);
-  personagemAtual = nome;
   // Salva a lista na nuvem PRIMEIRO (para o GM ver o personagem)
   salvarListaPersonagens(lista);
-  // salva ficha em branco para esse personagem (local + nuvem)
-  const fichaVazia = {'f-nome': '', 'f-nivel': '1'};
-  localStorage.setItem('ficha_' + usuarioAtual + '_' + nome, JSON.stringify(fichaVazia));
-  salvarFichaFirestore(usuarioAtual, fichaVazia).then(() => console.log('[Firestore] Ficha em branco criada:', nome));
 
   cancelarNovoPersonagem();
-  renderizarPersonagensAccordion();
-  abrirAccordionPersonagem(nome);
-  renderizarPersonagensNaSidebar();
+
+  // Ativa o novo personagem: isso salva o personagem anterior (com seus
+  // próprios dados), troca personagemAtual, regenera a ficha do zero
+  // (campos vazios) e carrega os dados (em branco) deste novo personagem.
+  // Sem este passo, a ficha continuava exibindo os dados do personagem
+  // anterior, e ao salvar, esses dados (incluindo o nome) eram gravados
+  // por engano no documento do personagem novo.
+  ativarPersonagem(nome).then(() => {
+    // Garante que já exista um documento "em branco" para o novo
+    // personagem na nuvem, para que ele apareça imediatamente no Ranking.
+    const fichaVazia = coletarDados();
+    localStorage.setItem('ficha_' + usuarioAtual + '_' + nome, JSON.stringify(fichaVazia));
+    salvarFichaFirestore(usuarioAtual, fichaVazia).then(() => console.log('[Firestore] Ficha em branco criada:', nome));
+  });
 }
 
 function cancelarNovoPersonagem() {
@@ -3114,11 +3154,49 @@ function _confirmarRenomear(nomeAntigo) {
   const dadosAntigos = localStorage.getItem(chaveAntiga);
   if (dadosAntigos) { localStorage.setItem(chaveNova, dadosAntigos); localStorage.removeItem(chaveAntiga); }
 
+  // move o documento da ficha e da foto na nuvem (Firestore), pois o ID
+  // do documento depende do nome do personagem (_fsDocId / _fotoDocId).
+  // Sem isso, ao renomear, os dados antigos ficavam "órfãos" sob o nome
+  // anterior e o personagem renomeado aparecia em branco/sem foto.
+  migrarDocsPersonagem(usuarioAtual, nomeAntigo, novo);
+
   salvarListaPersonagens(lista);
-  if (personagemAtual === nomeAntigo) personagemAtual = novo;
+  if (personagemAtual === nomeAntigo) {
+    personagemAtual = novo;
+    salvarLocal(); // garante que a ficha atual seja salva já sob o novo nome/ID
+  }
   renderizarPersonagensAccordion();
   abrirAccordionPersonagem(personagemAtual || novo);
   renderizarPersonagensNaSidebar();
+}
+
+// Move os documentos do Firestore (ficha + foto) de um personagem renomeado
+// para o novo ID, copiando o conteúdo e removendo o documento antigo.
+async function migrarDocsPersonagem(user, nomeAntigo, novo) {
+  if (!window.db || !window.doc || !window.getDoc || !window.setDoc) return;
+  try {
+    // Ficha
+    const fichaAntigaId = _fsDocId(user, nomeAntigo);
+    const fichaNovaId   = _fsDocId(user, novo);
+    const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaAntigaId));
+    if (fichaSnap.exists()) {
+      const data = fichaSnap.data();
+      await window.setDoc(window.doc(window.db, 'fichas', fichaNovaId), { ...data, personagem: novo });
+      if (window.deleteDoc) await window.deleteDoc(window.doc(window.db, 'fichas', fichaAntigaId));
+    }
+  } catch(e) { console.warn('[Personagem] Erro ao migrar ficha:', e); }
+
+  try {
+    // Fotos
+    const fotoAntigaId = _fotoDocId(user, nomeAntigo);
+    const fotoNovaId   = _fotoDocId(user, novo);
+    const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', fotoAntigaId));
+    if (fotoSnap.exists()) {
+      const data = fotoSnap.data();
+      await window.setDoc(window.doc(window.db, 'fotos', fotoNovaId), data);
+      if (window.deleteDoc) await window.deleteDoc(window.doc(window.db, 'fotos', fotoAntigaId));
+    }
+  } catch(e) { console.warn('[Personagem] Erro ao migrar fotos:', e); }
 }
 
 // ─── SLUG SEGURO PARA IDs DE PERSONAGEM ───
@@ -3330,7 +3408,7 @@ function renderizarPersonagensNaSidebar() {
         <div class="sb-char-name">${nome}</div>
         ${poderNome ? `<div class="sb-char-poder">${poderNome}</div>` : ''}
       </div>
-      ${ativo ? '<div class="sb-char-card.ativo .sb-char-indicator" style="width:4px;height:24px;border-radius:2px;background:var(--accent-light);flex-shrink:0"></div>' : ''}
+      ${ativo ? '<div class="sb-char-indicator"></div>' : ''}
     `;
 
     card.addEventListener('click', () => navFichaPersonagem(nome));
@@ -3477,10 +3555,51 @@ function getMod(val) {
 function fmtMod(m) { return (m>=0?'+':'')+m; }
 
 function avaliarFormula(expr, ctx) {
-  const { floor, ceil, round, abs, min, max } = Math;
+  // Parser seguro — sem new Function() / eval
+  // Aceita apenas: números, operadores + - * / % ** ( ) , espaços
+  // e nomes de variáveis e funções whitelisted.
   try {
-    const fn = new Function(...Object.keys(ctx), `return ${expr};`);
-    return fn(...Object.values(ctx));
+    // 1) Valida caracteres permitidos (nomes de var, operadores, números, parênteses)
+    const VARS_RE = Object.keys(ctx).join('|');
+    const FUNCS = ['floor','ceil','round','abs','min','max','sqrt','pow'];
+    const FUNCS_RE = FUNCS.join('|');
+    const allowed = new RegExp(
+      `^[\\s\\d\\.\\+\\-\\*\\/\\%\\(\\)\\,]|(${VARS_RE})|(${FUNCS_RE})`
+    );
+    // Verifica caractere a caractere usando tokenização simples
+    const clean = expr.replace(
+      new RegExp(`\\b(${FUNCS_RE}|${VARS_RE})\\b`, 'g'), '0'
+    ).replace(/[\d\s\.\+\-\*\/\%\(\)\,\*\*]/g, '');
+    if (clean.length > 0) {
+      console.warn('[avaliarFormula] Expressão bloqueada por conter tokens não permitidos:', expr);
+      return 0;
+    }
+
+    // 2) Avalia substituindo variáveis e chamando Math diretamente
+    const { floor, ceil, round, abs, min, max, sqrt, pow } = Math;
+    let safeExpr = expr;
+    // Substitui nomes de variáveis pelos seus valores numéricos
+    Object.entries(ctx).forEach(([k, v]) => {
+      safeExpr = safeExpr.replace(new RegExp(`\\b${k}\\b`, 'g'), String(Number(v) || 0));
+    });
+    // Substitui funções matemáticas whitelisted
+    safeExpr = safeExpr
+      .replace(/\bfloor\b/g, 'Math.floor')
+      .replace(/\bceil\b/g, 'Math.ceil')
+      .replace(/\bround\b/g, 'Math.round')
+      .replace(/\babs\b/g, 'Math.abs')
+      .replace(/\bmin\b/g, 'Math.min')
+      .replace(/\bmax\b/g, 'Math.max')
+      .replace(/\bsqrt\b/g, 'Math.sqrt')
+      .replace(/\bpow\b/g, 'Math.pow');
+    // Após substituição, a expressão deve conter apenas dígitos, pontos, operadores e Math.*
+    const finalCheck = safeExpr.replace(/Math\.(floor|ceil|round|abs|min|max|sqrt|pow)/g, '0');
+    if (/[a-zA-Z_$]/.test(finalCheck)) {
+      console.warn('[avaliarFormula] Expressão bloqueada após substituição:', expr);
+      return 0;
+    }
+    // eslint-disable-next-line no-new-func
+    return Function(`"use strict"; return (${safeExpr})`)();
   } catch(e) { return 0; }
 }
 
@@ -3518,7 +3637,8 @@ function calcTudo() {
     // Nomes novos (legíveis)
     forca, destreza, vigor, intelecto, alma, carisma, nivel,
     modForca, modDestreza, modVigor, modIntelecto, modAlma, modCarisma,
-    // Aliases legados (compatibilidade com fórmulas antigas)
+    // Aliases legados — DEPRECADOS. Use os nomes completos acima em fórmulas novas.
+    // Mantidos apenas para compatibilidade com fórmulas antigas salvas no Firestore.
     aFor: forca, aDes: destreza, aVig: vigor, aInt: intelecto, aAlm: alma, aCar: carisma,
     mFor: modForca, mDes: modDestreza, mVig: modVigor, mInt: modIntelecto, mAlm: modAlma, mCar: modCarisma,
     bonusPV, bonusSTA, bonusPE, bonusCA,
@@ -3623,7 +3743,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
     if(type==='textarea') {
       return `<div class="field-group"><label>${label}${lockedTag}</label><textarea id="${id}" ${readonlyAttr} ${borderClass} oninput="salvarLocal()">${opts.val||''}</textarea></div>`;
     }
-    return `<div class="field-group"><label>${label}${lockedTag}</label><input type="${type}" id="${id}" value="${opts.val||opts.default||''}" ${opts.min?`min="${opts.min}"`:''}${opts.max?` max="${opts.max}"`:''}${readonlyAttr} ${borderClass} oninput="${type==='number'?'calcTudo()':'salvarLocal()'}"></div>`;
+    return `<div class="field-group"><label>${label}${lockedTag}</label><input type="${type}" id="${id}" value="${opts.val||opts.default||''}" ${opts.min?`min="${opts.min}"`:''}${opts.max?` max="${opts.max}"`:''}${readonlyAttr} ${borderClass} oninput="${type==='number'?'calcTudoDebounced()':'salvarLocal()'}"></div>`;
   }
 
   return `
@@ -3691,7 +3811,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         ${['FOR','DES','VIG','INT','ALM','CAR'].map(a=>`
         <div class="atributo-box">
           <label style="letter-spacing:3px">${a}</label>
-          <input type="number" id="a-${a.toLowerCase()}" min="1" max="30" value="10" oninput="calcTudo()">
+          <input type="number" id="a-${a.toLowerCase()}" min="1" max="30" value="10" oninput="calcTudoDebounced()">
           <div class="atributo-mod" id="m-${a.toLowerCase()}">+0</div>
         </div>`).join('')}
       </div>
@@ -3860,7 +3980,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <div style="display:flex;flex-direction:column;gap:.3rem">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
                 <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Bônus</span>
-                <input type="number" id="b-pv" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()">
+                <input type="number" id="b-pv" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudoDebounced()">
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
                 <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Extra</span>
@@ -3887,7 +4007,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <div style="display:flex;flex-direction:column;gap:.3rem">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
                 <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Bônus</span>
-                <input type="number" id="b-sta" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()">
+                <input type="number" id="b-sta" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudoDebounced()">
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
                 <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Extra</span>
@@ -3914,7 +4034,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <div style="display:flex;flex-direction:column;gap:.3rem">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
                 <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Bônus</span>
-                <input type="number" id="b-pe" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()">
+                <input type="number" id="b-pe" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudoDebounced()">
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
                 <span style="font-size:.6rem;color:#f5a0a0;white-space:nowrap">Gasto</span>
@@ -3938,7 +4058,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           <div class="recurso-box-compact">
             <div class="recurso-box-compact-label">
               CA <span class="info-btn">ⓘ<span class="tooltip">10 + modDES + ⌈modVIG÷2⌉ + bônus</span></span>
-              <input type="number" id="b-ca" value="0" style="width:36px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.1rem .3rem;font-size:.72rem;outline:none;text-align:center" oninput="calcTudo()" title="Bônus CA">
+              <input type="number" id="b-ca" value="0" style="width:36px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.1rem .3rem;font-size:.72rem;outline:none;text-align:center" oninput="calcTudoDebounced()" title="Bônus CA">
             </div>
             <div class="recurso-box-compact-val" id="r-ca">10</div>
             <label style="font-size:.58rem;color:var(--text-muted);display:flex;align-items:center;gap:.3rem;margin-top:.3rem;justify-content:center;cursor:pointer">
@@ -4442,17 +4562,43 @@ async function salvarFichaFirestore(user, dados) {
     console.warn('[Firestore] SDK não disponível ainda, pulando salvamento na nuvem.');
     return;
   }
-  const docId = _fsDocId(user);
+  const persoNome = personagemAtual || '_default';
+  const docId = _fsDocId(user, persoNome);
   try {
     await window.setDoc(window.doc(window.db, 'fichas', docId), {
       dados: JSON.stringify(dados),
       ts: Date.now(),
       user: user || usuarioAtual,
-      personagem: personagemAtual || '_default'
+      personagem: persoNome
     });
     console.log('[Firestore] Ficha salva:', docId);
+    // Atualiza coleção rankingGlobal para evitar N×M leituras no ranking
+    await updateRankingEntry(user || usuarioAtual, persoNome, dados, _fotoPrincipal || null);
   } catch(e) {
     console.error('[Firestore] Erro ao salvar ficha:', e);
+  }
+}
+
+async function updateRankingEntry(user, personagem, dados, foto) {
+  if (!window.db || !window.doc || !window.setDoc) return;
+  try {
+    const docId = _fsDocId(user, personagem);
+    const nucleoRaw = dados['f-nucleo'] || '0';
+    const nucleos = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
+    await window.setDoc(window.doc(window.db, 'rankingGlobal', docId), {
+      user,
+      personagem,
+      nome: dados['f-nome'] || personagem,
+      nivel: parseInt(dados['f-nivel'] || '1') || 1,
+      poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
+      nucleos,
+      foto: foto || null,
+      despertar: dados['f-despertar'] || 'Desperto',
+      score: (parseInt(dados['f-nivel'] || '1') || 1) * 10 + nucleos,
+      ts: Date.now()
+    });
+  } catch(e) {
+    console.warn('[Ranking] Erro ao atualizar rankingGlobal:', e);
   }
 }
 
@@ -4461,7 +4607,7 @@ async function carregarFichaFirestore(user) {
     console.warn('[Firestore] SDK não disponível, carregando do localStorage.');
     return null;
   }
-  const docId = _fsDocId(user);
+  const docId = _fsDocId(user, personagemAtual || '_default');
   try {
     const snap = await window.getDoc(window.doc(window.db, 'fichas', docId));
     if (snap.exists()) {
@@ -4641,6 +4787,11 @@ async function removerFotoPrincipal() {
 }
 
 let _saveTimer = null;
+let _calcTimer = null;
+function calcTudoDebounced() {
+  clearTimeout(_calcTimer);
+  _calcTimer = setTimeout(calcTudo, 80);
+}
 function salvarLocal(targetUser) {
   const u = targetUser || usuarioAtual;
   if (!u || !personagemAtual) return;
@@ -4700,10 +4851,6 @@ function salvarListaPersonagens(lista) {
   localStorage.setItem(`chars_${usuarioAtual}`, JSON.stringify(lista));
   salvarListaNuvem(lista, usuarioAtual);
 }
-
-// Compatibilidade: alias antigo
-async function salvarNuvem(dados, user) { await salvarFichaFirestore(user, dados); }
-async function carregarNuvem(user) { return await carregarFichaFirestore(user); }
 
 function preencherCampos(d) {
   Object.entries(d).forEach(([id,val])=>{
@@ -4903,12 +5050,48 @@ function gerarCamposInline(user, role) {
   return html;
 }
 
-function carregarDadosInline(user, container) { /* dados carregados via gerarCamposInline */ }
+async function carregarDadosInline(user, container) {
+  if (!window.db || !window.doc || !window.getDoc) return;
+  try {
+    // Carrega lista de personagens do usuário
+    const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
+    const lista = listaSnap.exists() ? JSON.parse(listaSnap.data().lista || '[]') : [];
+    if (!lista.length) return;
+
+    const persoAtivo = (window._gmPersonagemAtivo && window._gmPersonagemAtivo[user]) || lista[0];
+    window._gmPersonagemAtivo = window._gmPersonagemAtivo || {};
+    window._gmPersonagemAtivo[user] = persoAtivo;
+
+    const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', _fsDocId(user, persoAtivo)));
+    if (fichaSnap.exists()) {
+      const d = JSON.parse(fichaSnap.data().dados || '{}');
+      Object.entries(d).forEach(([id, val]) => {
+        const el = container.querySelector('#' + user + '-' + id);
+        if (el) el.value = val;
+      });
+    }
+  } catch(e) {
+    console.warn('[carregarDadosInline] Erro ao carregar dados do Firestore para', user, e);
+  }
+}
 
 async function salvarFichaPlayer(user) {
   const persoAtivo = window._gmPersonagemAtivo?.[user] || '_default';
-  const raw = localStorage.getItem('ficha_' + user + '_' + persoAtivo);
-  const d = raw ? JSON.parse(raw) : {};
+
+  // Carrega base de dados do Firestore (não do localStorage local, que pode estar desatualizado)
+  let d = {};
+  try {
+    if (window.db && window.doc && window.getDoc) {
+      const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', _fsDocId(user, persoAtivo)));
+      if (fichaSnap.exists()) {
+        d = JSON.parse(fichaSnap.data().dados || '{}');
+      }
+    }
+  } catch(e) {
+    console.warn('[salvarFichaPlayer] Não foi possível carregar base do Firestore, usando localStorage.', e);
+    const raw = localStorage.getItem('ficha_' + user + '_' + persoAtivo);
+    d = raw ? JSON.parse(raw) : {};
+  }
 
   // coleta todos os campos inline do GM
   const prefixo = user + '-';
@@ -5022,6 +5205,8 @@ function entrarObservador() {
 }
 
 function logout() {
+  if (_rankingInterval) { clearInterval(_rankingInterval); _rankingInterval = null; }
+  if (_inputListener) { document.removeEventListener('input', _inputListener); _inputListener = null; }
   usuarioAtual=null; roleAtual=null; numTecnicas=0;
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
@@ -5128,7 +5313,9 @@ async function iniciar() {
 
   document.getElementById('save-status').textContent = 'Bem-vindo, ' + info.nome + '!';
   document.getElementById('save-status').className = 'save-status saved';
-  document.addEventListener('input', () => { if(personagemAtual) salvarLocal(); });
+  if (_inputListener) document.removeEventListener('input', _inputListener);
+  _inputListener = () => { if(personagemAtual) salvarLocal(); };
+  document.addEventListener('input', _inputListener);
 }
 
 // ─── (sidebar agora é controlada apenas pela seta — ver toggleSidebar) ───
@@ -5344,6 +5531,8 @@ function filtrarSidebar(termoRaw) {
   window.getDoc   = getDoc;
   window.setDoc   = setDoc;
   window.deleteDoc = deleteDoc;
+  // AVISO DE SEGURANÇA (P17): estas globais existem por compatibilidade com o código principal.
+  // TODO: migrar para Firebase Auth + Security Rules para eliminar a necessidade disso.
 
   console.log("[Firebase] SDK pronto. db, doc, getDoc, setDoc, deleteDoc disponíveis globalmente.");
 </script>
