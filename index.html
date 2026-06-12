@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0045)file:///C:/Users/Gamer/Downloads/index_7.html -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Torre do Pesadelo • Portal do Jogador</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="./index_files/css2" rel="stylesheet">
 <style>
 :root {
   --bg: #0c0c0f; --bg-surface: #141418; --bg-elevated: #1c1c22; --bg-input: #18181e;
@@ -12,8 +12,8 @@
   --silver: #c5c5d1; --border: #2a2a32; --gold: #b8972a; --gold-light: #d4ad3a;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { background:var(--bg); color:var(--text); font-family:'Source Sans 3',sans-serif; font-size:16px; line-height:1.7; min-height:100vh; }
+html { scroll-behavior:smooth; overflow-x:hidden; }
+body { background:var(--bg); color:var(--text); font-family:'Source Sans 3',sans-serif; font-size:16px; line-height:1.7; min-height:100vh; overflow-x:hidden; }
 ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--bg); } ::-webkit-scrollbar-thumb { background:var(--accent); border-radius:3px; }
 
 /* LOGIN */
@@ -63,7 +63,7 @@ body { background:var(--bg); color:var(--text); font-family:'Source Sans 3',sans
 .logout-btn:hover { border-color:var(--accent-light); color:var(--accent-light); }
 
 /* MAIN */
-main { margin-left:260px; padding:2.5rem 3rem 6rem; max-width:1100px; }
+main { margin-left:260px; padding:2rem 2rem 6rem; max-width:100%; box-sizing:border-box; overflow-x:hidden; }
 
 /* HERO */
 .hero { min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3rem 1rem; border-bottom:1px solid var(--border); background:radial-gradient(ellipse at 50% 0%,rgba(156,42,42,.08) 0%,transparent 60%); }
@@ -123,34 +123,45 @@ tr:hover td { background:rgba(156,42,42,.05); }
 /* campos bloqueados */
 .field-group input[readonly],.field-group textarea[readonly] { opacity:.55; cursor:not-allowed; border-style:dashed; }
 
-/* ATRIBUTOS — redesign impactante */
-.atributos-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:.75rem; }
+/* ATRIBUTOS — redesign impactante GRANDE */
+.atributos-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:.75rem; }
 .atributo-box {
-  background:linear-gradient(160deg,#1c1c22,#141418);
-  border:1px solid var(--border);
-  border-top:2px solid var(--accent);
+  background:linear-gradient(160deg,#1e1e26,#141418);
+  border:1px solid rgba(60,40,60,.55);
+  border-top:3px solid var(--accent);
   text-align:center;
-  padding:1.1rem .5rem .9rem;
+  padding:1.4rem .5rem 1.2rem;
   position:relative;
-  transition:border-color .2s, box-shadow .2s;
+  transition:border-color .2s, box-shadow .2s, transform .15s;
+  min-width:0;
+  border-radius:2px;
 }
-.atributo-box:hover { border-top-color:var(--accent-light); box-shadow:0 0 18px rgba(156,42,42,.18); }
+.atributo-box:hover {
+  border-top-color:var(--accent-light);
+  box-shadow:0 0 24px rgba(156,42,42,.22), inset 0 1px 0 rgba(255,255,255,.03);
+  transform:translateY(-2px);
+}
 .atributo-box label {
-  font-size:.6rem; letter-spacing:2.5px; text-transform:uppercase;
-  color:var(--accent-light); display:block; margin-bottom:.55rem; font-weight:600;
+  font-size:.65rem; letter-spacing:3px; text-transform:uppercase;
+  color:var(--accent-light); display:block; margin-bottom:.7rem; font-weight:700;
+  white-space:nowrap; text-shadow: 0 0 8px rgba(193,63,63,.35);
 }
 .atributo-box input {
   width:100%; background:transparent; border:none;
-  border-bottom:1px solid rgba(156,42,42,.35);
-  color:#f5f5f7; text-align:center; font-size:2rem;
-  font-family:'Playfair Display',serif; padding:.2rem 0; outline:none;
-  line-height:1;
+  border-bottom:1px solid rgba(156,42,42,.4);
+  color:#f5f5f7; text-align:center; font-size:2.2rem;
+  font-family:'Playfair Display',serif; padding:.25rem 0; outline:none;
+  line-height:1; min-width:0;
 }
 .atributo-box input:focus { border-bottom-color:var(--accent-light); }
 .atributo-mod {
-  font-size:1rem; color:var(--silver); margin-top:.5rem;
-  font-weight:700; min-height:1.4em;
+  font-size:1.05rem; color:var(--silver); margin-top:.55rem;
+  font-weight:700; min-height:1.3em;
   font-family:'Playfair Display',serif;
+  background: rgba(156,42,42,.1);
+  border-radius:2px;
+  padding:.15rem 0;
+  letter-spacing:1px;
 }
 
 /* RECURSOS — redesign aberto e impactante */
@@ -169,6 +180,15 @@ tr:hover td { background:rgba(156,42,42,.05); }
   border-top: 2px solid var(--accent);
   padding: 1.1rem 1rem 1rem;
   position: relative;
+  min-width: 0;
+}
+
+/* Grids de recursos — sempre dentro da largura disponível */
+.recursos-pv-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .75rem;
+  margin-bottom: 1rem;
 }
 .recurso-tracker-title {
   font-size:.62rem; letter-spacing:2px; text-transform:uppercase;
@@ -206,13 +226,25 @@ tr:hover td { background:rgba(156,42,42,.05); }
   color:var(--silver); line-height:1;
 }
 
-/* PERÍCIAS — novo sistema de slots */
+/* PERÍCIAS — novo sistema de slots — suporte a grid full-width */
 .pericias-slots-section { margin-bottom:1.5rem; }
 .pericias-slots-title {
   font-size:.65rem; letter-spacing:2px; text-transform:uppercase;
   color:var(--accent-light); margin-bottom:.75rem; display:flex; align-items:center; gap:.5rem;
 }
 .pericias-slots-title::after { content:''; flex:1; height:1px; background:linear-gradient(to right,var(--accent),transparent); opacity:.3; }
+
+/* Slots de perícias em 2 colunas (quando em largura total) */
+@media (min-width: 700px) {
+  #slots-maestria, #slots-especializacao {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .4rem;
+  }
+  #slots-maestria .pericias-slot, #slots-especializacao .pericias-slot {
+    margin-bottom: 0;
+  }
+}
 .pericias-slot {
   background:linear-gradient(160deg,#1c1c22,#141418);
   border:1px solid var(--border); margin-bottom:.5rem;
@@ -931,15 +963,821 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   .ficha-full-row  { grid-column: 1 / -1; }
 }
 
+/* Telas médias — sidebar + conteúdo ainda cabe */
+@media (max-width: 1200px) {
+  main { padding: 1.5rem 1.25rem 6rem; }
+  .atributos-grid { gap: .5rem; }
+  .atributo-box input { font-size: 1.8rem; }
+  .recursos-pv-grid { grid-template-columns: 1fr; }
+}
+
+/* Telas pequenas (tablet) — sidebar oculta, sem margin-left */
 @media (max-width: 1024px) {
   #editor-bar { left: 0; }
+  main { margin-left: 0; padding: 1rem 1rem 6rem; }
+  .atributos-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+  .recursos-pv-grid { grid-template-columns: 1fr; }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .atributos-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ficha-hero-nome { font-size: 1.5rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TORRE DO PESADELO — RESKIN DARK FANTASY
+   Atmosfera gótica/apocalíptica sem quebrar a UX existente
+═══════════════════════════════════════════════════════════ */
+
+/* --- Variáveis adicionais --- */
+:root {
+  --stone: #1a1820;
+  --stone-dark: #0f0e12;
+  --rune-glow: rgba(156,42,42,.55);
+  --mist: rgba(80,20,20,.18);
+  --shadow-blood: rgba(156,42,42,.12);
+}
+
+/* --- Canvas de partículas (fundo global) --- */
+#tp-atmosphere {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+}
+
+/* --- Camada de névoa e torres (pseudo-background) --- */
+#tp-scene {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Torres góticas SVG como background das bordas */
+#tp-scene::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 320px; height: 100vh;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 900'%3E%3Cdefs%3E%3ClinearGradient id='fog' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23060408' stop-opacity='0.98'/%3E%3Cstop offset='1' stop-color='%23060408' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3C!-- Torre esquerda principal --%3E%3Crect x='20' y='120' width='50' height='780' fill='%230a0810'/%3E%3Crect x='15' y='80' width='60' height='50' fill='%230c0a12'/%3E%3Crect x='30' y='60' width='30' height='30' fill='%230a0810'/%3E%3Crect x='38' y='40' width='14' height='28' fill='%230c0a12'/%3E%3C!-- Ameias --%3E%3Crect x='15' y='72' width='8' height='14' fill='%230f0c18'/%3E%3Crect x='30' y='72' width='8' height='14' fill='%230f0c18'/%3E%3Crect x='45' y='72' width='8' height='14' fill='%230f0c18'/%3E%3Crect x='60' y='72' width='8' height='14' fill='%230f0c18'/%3E%3C!-- Janela torre --%3E%3Crect x='38' y='200' width='14' height='22' rx='7' fill='%23220a0a' opacity='.8'/%3E%3Crect x='38' y='200' width='14' height='22' rx='7' fill='%23c13f3f' opacity='.07'/%3E%3C!-- Torre menor --%3E%3Crect x='90' y='280' width='32' height='620' fill='%230c0a12'/%3E%3Crect x='86' y='258' width='40' height='28' fill='%230a0810'/%3E%3Crect x='94' y='240' width='24' height='24' fill='%230c0a12'/%3E%3Crect x='100' y='222' width='12' height='24' fill='%230a0810'/%3E%3Crect x='86' y='250' width='6' height='12' fill='%230f0c18'/%3E%3Crect x='98' y='250' width='6' height='12' fill='%230f0c18'/%3E%3Crect x='110' y='250' width='6' height='12' fill='%230f0c18'/%3E%3C!-- Arco ruína --%3E%3Crect x='140' y='400' width='18' height='500' fill='%230a0810' opacity='.7'/%3E%3Crect x='170' y='420' width='18' height='480' fill='%230a0810' opacity='.6'/%3E%3Cellipse cx='158' cy='402' rx='18' ry='20' fill='none' stroke='%230a0810' stroke-width='18' opacity='.7'/%3E%3C!-- Névoa gradient --%3E%3Crect x='0' y='0' width='320' height='900' fill='url(%23fog)'/%3E%3C/svg%3E") no-repeat left bottom;
+  background-size: 320px 100%;
+  opacity: .85;
+  filter: blur(0.5px);
+}
+
+/* Torres lado direito */
+#tp-scene::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 280px; height: 100vh;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 900'%3E%3Cdefs%3E%3ClinearGradient id='fogr' x1='1' y1='0' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%23060408' stop-opacity='0.95'/%3E%3Cstop offset='1' stop-color='%23060408' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3C!-- Torre direita --%3E%3Crect x='210' y='160' width='44' height='740' fill='%230a0810'/%3E%3Crect x='204' y='128' width='56' height='40' fill='%230c0a12'/%3E%3Crect x='216' y='108' width='32' height='28' fill='%230a0810'/%3E%3Crect x='226' y='86' width='12' height='28' fill='%230c0a12'/%3E%3Crect x='204' y='120' width='8' height='14' fill='%230f0c18'/%3E%3Crect x='220' y='120' width='8' height='14' fill='%230f0c18'/%3E%3Crect x='236' y='120' width='8' height='14' fill='%230f0c18'/%3E%3Crect x='252' y='120' width='8' height='14' fill='%230f0c18'/%3E%3Crect x='226' y='260' width='12' height='20' rx='6' fill='%23220a0a' opacity='.9'/%3E%3Crect x='226' y='260' width='12' height='20' rx='6' fill='%23c13f3f' opacity='.1'/%3E%3C!-- Torre menor direita --%3E%3Crect x='158' y='320' width='30' height='580' fill='%230b0912' opacity='.85'/%3E%3Crect x='154' y='296' width='38' height='30' fill='%230a0810'/%3E%3Crect x='162' y='278' width='22' height='22' fill='%230c0a12'/%3E%3Crect x='170' y='260' width='10' height='22' fill='%230a0810'/%3E%3C!-- Névoa gradient --%3E%3Crect x='0' y='0' width='280' height='900' fill='url(%23fogr)'/%3E%3C/svg%3E") no-repeat right bottom;
+  background-size: 280px 100%;
+  opacity: .8;
+  filter: blur(0.5px);
+}
+
+/* --- Background geral: céu sombrio com névoa avermelhada --- */
+body {
+  background: radial-gradient(ellipse at 50% 0%, #1a0505 0%, #0d0810 35%, #080610 65%, #050408 100%) !important;
+  background-attachment: fixed !important;
+}
+
+/* Sobreposição de névoa no topo (céu de sangue) */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 45vh;
+  background: radial-gradient(ellipse at 50% -20%, rgba(140,30,30,.28) 0%, rgba(80,10,30,.12) 50%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Névoa nas bordas horizontais */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(10,6,14,.82) 0%, transparent 18%, transparent 82%, rgba(10,6,14,.82) 100%),
+    linear-gradient(to bottom, transparent 60%, rgba(5,3,8,.7) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Garante que o conteúdo fique acima do cenário */
+#login-screen, #app { z-index: 1; position: relative; }
+.topbar, .sidebar { z-index: 200; }
+
+/* --- Sidebar: pedra escura com bordas góticas --- */
+.sidebar {
+  background: linear-gradient(180deg, #0f0d14 0%, #0c0a10 100%) !important;
+  border-right: 1px solid rgba(156,42,42,.25) !important;
+  box-shadow: 4px 0 20px rgba(0,0,0,.6), inset -1px 0 0 rgba(156,42,42,.08);
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(156,42,42,.4), rgba(156,42,42,.1), transparent);
+}
+
+/* Logo sidebar mais imponente */
+.sidebar-logo {
+  border-bottom: 1px solid rgba(156,42,42,.3) !important;
+  text-shadow: 0 0 12px rgba(193,63,63,.5);
+}
+
+/* Links sidebar com brilho sutil */
+.sidebar a:hover {
+  background: rgba(156,42,42,.14) !important;
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.sidebar a.active {
+  background: linear-gradient(to right, rgba(156,42,42,.5), rgba(156,42,42,.2)) !important;
+  box-shadow: inset 3px 0 0 var(--accent-light);
+}
+
+/* --- Topbar gótica --- */
+.topbar {
+  background: rgba(8,6,12,.97) !important;
+  border-bottom: 1px solid rgba(156,42,42,.3) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,.8);
+}
+
+/* --- Painéis: aparência de pedra antiga --- */
+.ficha-panel {
+  background: linear-gradient(160deg, #131118 0%, #0e0c13 100%) !important;
+  border: 1px solid rgba(60,45,70,.6) !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03);
+}
+.ficha-panel::before {
+  background: linear-gradient(to right, var(--accent), rgba(156,42,42,.3), transparent) !important;
+}
+
+/* --- Cards de sistema: metal antigo --- */
+.system-card {
+  background: linear-gradient(145deg, #141218, #0f0d14) !important;
+  border: 1px solid rgba(50,40,65,.7) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.02), 0 1px 8px rgba(0,0,0,.4);
+}
+
+/* --- Lore-box com borda gótica --- */
+.lore-box {
+  background: linear-gradient(145deg, #120f18, #0d0b12) !important;
+  border: 1px solid rgba(60,45,70,.5) !important;
+  border-left: 3px solid var(--accent) !important;
+  box-shadow: 0 0 20px rgba(156,42,42,.06), inset 0 0 30px rgba(0,0,0,.3);
+}
+
+/* --- Atributo-box: pedra com runa --- */
+.atributo-box {
+  background: linear-gradient(160deg, #161320, #0e0c14) !important;
+  border: 1px solid rgba(50,40,65,.6) !important;
+  border-top: 2px solid var(--accent) !important;
+  box-shadow: 0 0 8px rgba(0,0,0,.5), inset 0 -1px 0 rgba(156,42,42,.1);
+}
+.atributo-box:hover {
+  box-shadow: 0 0 22px rgba(156,42,42,.22), inset 0 0 0 1px rgba(156,42,42,.15) !important;
+}
+
+/* --- Tabelas: estilo pergaminho escuro --- */
+table { background: #0e0c14 !important; }
+th {
+  background: linear-gradient(to right, #1a1224, #151022) !important;
+  border-bottom: 2px solid rgba(156,42,42,.6) !important;
+  letter-spacing: 1.5px;
+}
+tr:hover td { background: rgba(156,42,42,.07) !important; }
+.table-wrapper { border: 1px solid rgba(50,40,65,.5) !important; box-shadow: 0 2px 12px rgba(0,0,0,.4); }
+
+/* --- Hero: névoa e glow sangue --- */
+.hero {
+  background: radial-gradient(ellipse at 50% -10%, rgba(156,42,42,.14) 0%, rgba(80,20,40,.06) 50%, transparent 75%) !important;
+  border-bottom: 1px solid rgba(156,42,42,.2) !important;
+  position: relative;
+}
+
+/* --- Login screen: mais atmosférico --- */
+#login-screen {
+  background: radial-gradient(ellipse at 30% 35%, #1a0505 0%, #0c0810 50%, #060408 100%) !important;
+}
+.login-box {
+  background: linear-gradient(160deg, #111018, #0d0b12) !important;
+  border: 1px solid rgba(60,45,70,.6) !important;
+  box-shadow: 0 8px 40px rgba(0,0,0,.7), 0 0 60px rgba(156,42,42,.06);
+}
+.login-box::before {
+  background: linear-gradient(to right, transparent, var(--accent-light), transparent) !important;
+  opacity: .7;
+}
+
+/* --- Botões: bordas góticas --- */
+.hero-cta, .login-btn {
+  position: relative;
+  overflow: hidden;
+}
+.hero-cta::after, .login-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* --- Inputs: metal escuro --- */
+.field-group input, .field-group textarea, .field-group select,
+.login-box input {
+  background: #0a0812 !important;
+  border: 1px solid rgba(50,40,65,.7) !important;
+}
+.field-group input:focus, .field-group textarea:focus,
+.login-box input:focus { border-color: var(--accent-light) !important; box-shadow: 0 0 8px rgba(193,63,63,.15); }
+
+/* --- Player cards GM --- */
+.player-card {
+  background: linear-gradient(145deg, #111018, #0d0b12) !important;
+  border: 1px solid rgba(50,40,65,.5) !important;
+}
+.player-card:hover { border-color: rgba(193,63,63,.5) !important; box-shadow: 0 0 16px rgba(156,42,42,.12); }
+
+/* --- Ranking cards --- */
+.ranking-card {
+  background: linear-gradient(160deg, #141220, #0e0c15) !important;
+  border: 1px solid rgba(50,40,65,.5) !important;
+  border-top: 2px solid var(--accent) !important;
+}
+.ranking-card:hover { box-shadow: 0 0 20px rgba(156,42,42,.2) !important; }
+
+/* --- GM header dourado --- */
+.gm-header {
+  background: linear-gradient(135deg, #1a1200, #0e0c14) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,.5), 0 0 40px rgba(180,140,30,.04);
+}
+
+/* --- Main: leve textura de névoa --- */
+main { position: relative; z-index: 1; }
+
+/* --- Scrollbar temática --- */
+::-webkit-scrollbar-track { background: #080610 !important; }
+::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, var(--accent), #5a1515) !important; }
+
+/* --- Ficha hero: pedra sombria --- */
+.ficha-hero {
+  background: linear-gradient(160deg, #160a0a 0%, #0c0a12 100%) !important;
+  border: 1px solid rgba(60,40,60,.5) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.02);
+}
+
+/* --- Runas decorativas (pseudo) em certos painéis --- */
+.ficha-panel-title {
+  background: rgba(156,42,42,.08) !important;
+  border-bottom: 1px solid rgba(60,40,60,.4) !important;
+  text-shadow: 0 0 10px rgba(193,63,63,.3);
+}
+.ficha-panel-title::after {
+  content: ' ᚱ';
+  opacity: .18;
+  font-size: .7em;
+  letter-spacing: 3px;
+}
+
+/* Runa na section label */
+.sidebar-section-label::before {
+  content: '᛭ ';
+  opacity: .35;
+  font-size: .8em;
+}
+
+/* --- Olhos na névoa: criaturas ocultas --- */
+.tp-eye {
+  position: fixed;
+  width: 8px; height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, #ff2020 0%, #8b0000 60%, transparent 100%);
+  box-shadow: 0 0 6px 2px rgba(255,20,20,.4), 0 0 12px 4px rgba(180,0,0,.15);
+  pointer-events: none;
+  z-index: 1;
+  animation: tp-eye-blink 8s ease-in-out infinite;
+  opacity: 0;
+}
+@keyframes tp-eye-blink {
+  0%   { opacity: 0; transform: scale(0.6); }
+  10%  { opacity: .7; transform: scale(1); }
+  14%  { opacity: 0; transform: scale(0.6); }
+  16%  { opacity: .65; transform: scale(1); }
+  22%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Silhueta de criatura --- */
+.tp-silhuette {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  animation: tp-creature-appear 20s ease-in-out infinite;
+}
+@keyframes tp-creature-appear {
+  0%   { opacity: 0; }
+  15%  { opacity: .08; }
+  40%  { opacity: .06; }
+  60%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* --- Partículas de névoa/cinzas (canvas) --- */
+/* Estilos auxiliares para o canvas JS */
+#tp-atmosphere { opacity: .85; }
+
+/* --- Divisor temático --- */
+.divider {
+  background: linear-gradient(to right, transparent, var(--accent), rgba(156,42,42,.3), transparent) !important;
+  opacity: .5 !important;
+  height: 1px !important;
+}
+
+/* --- Títulos mais imponentes --- */
+h1, h2 {
+  text-shadow: 0 2px 12px rgba(0,0,0,.8), 0 0 30px rgba(156,42,42,.08);
+}
+.hero-title {
+  text-shadow: 0 4px 20px rgba(0,0,0,.9), 0 0 40px rgba(156,42,42,.12) !important;
+}
+.login-title {
+  text-shadow: 0 0 30px rgba(193,63,63,.3), 0 4px 16px rgba(0,0,0,.8) !important;
+}
+
+/* --- Borda gótica nos modais --- */
+.modal-bloco, .pericias-dropdown-modal {
+  background: linear-gradient(160deg, #131118, #0e0c13) !important;
+  border: 1px solid rgba(60,40,60,.6) !important;
+  box-shadow: 0 8px 40px rgba(0,0,0,.8), 0 0 60px rgba(156,42,42,.07);
+}
+
+/* --- Hover cards de personagem --- */
+.personagem-item {
+  background: linear-gradient(145deg, #111018, #0d0b12) !important;
+  border: 1px solid rgba(50,40,65,.5) !important;
+}
+.personagem-item.ativo { border-color: rgba(193,63,63,.5) !important; }
+
+/* --- Recurso-tracker: ferro enferrujado --- */
+.recurso-tracker {
+  background: linear-gradient(160deg, #141220, #0e0c14) !important;
+  border: 1px solid rgba(50,40,65,.5) !important;
+  border-top: 2px solid rgba(156,42,42,.6) !important;
+}
+
+/* === Compatibilidade: mantém tudo legível === */
+input, textarea, select, button { position: relative; z-index: 2; }
+.ficha-panel-body, .ficha-panel-title { position: relative; z-index: 2; }
+
+/* ═══════════════════════════════════════════════════════════
+   ÍNDICE / SIDEBAR — REFATORAÇÃO COMPLETA (aba lateral recolhível)
+   ═══════════════════════════════════════════════════════════ */
+
+/* Conteúdo principal ocupa a tela toda — sidebar agora é overlay */
+main { margin-left: 0 !important; }
+.topbar { padding-left: 3.2rem; }
+
+/* Painel "grimório" — fundo com gradiente, glass discreto, bordas vermelhas */
+.sidebar {
+  width: 290px;
+  max-width: 86vw;
+  background:
+    linear-gradient(165deg, rgba(20,18,24,.99) 0%, rgba(12,10,14,.99) 55%, rgba(9,8,11,1) 100%);
+  border-right: 1px solid rgba(193,63,63,.28);
+  box-shadow: 6px 0 36px rgba(0,0,0,.65), inset -1px 0 0 rgba(255,255,255,.03);
+  transform: translateX(-100%);
+  transition: transform .38s cubic-bezier(.22,.85,.32,1.1);
+  padding: 1.35rem 1.1rem;
+}
+.sidebar.open { transform: translateX(0); }
+.sidebar::after {
+  content:''; position:absolute; top:0; right:-1px; bottom:0; width:1px;
+  background: linear-gradient(to bottom, transparent, rgba(193,63,63,.5) 20%, rgba(193,63,63,.5) 80%, transparent);
+}
+
+/* Scrollbar elegante */
+.sidebar { scrollbar-width: thin; scrollbar-color: rgba(193,63,63,.4) transparent; }
+.sidebar::-webkit-scrollbar { width: 5px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(193,63,63,.4); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(193,63,63,.65); }
+
+/* Backdrop ao abrir (clique fora fecha) */
+#sidebar-backdrop {
+  position: fixed; inset:0; z-index: 150; background: rgba(0,0,0,.45);
+  opacity:0; pointer-events:none; transition: opacity .35s ease;
+}
+#sidebar-backdrop.show { opacity:1; pointer-events:auto; }
+
+/* Seta única — único controle do menu */
+#sidebar-arrow-btn {
+  position: fixed; top: 50%; left: 0; transform: translateY(-50%);
+  z-index: 210; width: 30px; height: 68px;
+  background: linear-gradient(135deg, rgba(28,26,34,.95), rgba(60,18,18,.85));
+  border: 1px solid rgba(193,63,63,.45); border-left: none;
+  border-radius: 0 12px 12px 0;
+  display:flex; align-items:center; justify-content:center;
+  color: var(--accent-light); font-size: 1.05rem; cursor: pointer;
+  box-shadow: 3px 0 16px rgba(0,0,0,.55), 0 0 14px rgba(193,63,63,.08);
+  transition: left .38s cubic-bezier(.22,.85,.32,1.1), background .25s, color .25s, box-shadow .25s;
+}
+#sidebar-arrow-btn:hover { background: var(--accent); color:#fff; box-shadow: 3px 0 18px rgba(0,0,0,.6), 0 0 20px rgba(193,63,63,.35); }
+#sidebar-arrow-btn .arrow-ic { display:inline-block; transition: transform .38s cubic-bezier(.22,.85,.32,1.1); }
+#sidebar-arrow-btn.open .arrow-ic { transform: rotate(180deg); }
+
+/* Logo */
+.sidebar-logo { margin-bottom: 1.1rem; }
+
+/* Busca */
+.sb-search { position:relative; margin-bottom: 1.1rem; }
+.sb-search input {
+  width:100%; background: rgba(255,255,255,.035); border:1px solid var(--border);
+  color: var(--text); padding:.6rem .9rem .6rem 2.2rem; border-radius: 8px;
+  font-size:.82rem; font-family: inherit; outline:none;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+}
+.sb-search input::placeholder { color:#6a6a76; }
+.sb-search input:focus { border-color: var(--accent-light); background: rgba(255,255,255,.06); box-shadow: 0 0 0 3px rgba(193,63,63,.12); }
+.sb-search-icon {
+  position:absolute; left:.75rem; top:50%; transform:translateY(-50%);
+  font-size:.85rem; opacity:.45; pointer-events:none;
+}
+
+/* Section labels com leve glow */
+.sidebar-section-label {
+  display:flex; align-items:center; gap:.4rem;
+  text-shadow: 0 0 12px rgba(193,63,63,.15);
+}
+
+/* Links de navegação — estilo "índice de grimório" */
+.sidebar-links a { position: relative; padding-left: 1.5rem; }
+.sidebar-links a::before {
+  content:'▸'; position:absolute; left:.35rem; top:50%; transform:translateY(-50%) translateX(-2px);
+  color: var(--accent-light); opacity:.35; font-size:.78rem;
+  transition: opacity .2s, transform .2s;
+}
+.sidebar-links a:hover::before { opacity:.85; transform: translateY(-50%) translateX(1px); }
+.sidebar-links a.active { background: linear-gradient(to right, rgba(156,42,42,.28), rgba(156,42,42,.08)); color:#fff; box-shadow: inset 0 0 0 1px rgba(193,63,63,.3); }
+.sidebar-links a.active::before { opacity:1; color:#fff; }
+
+/* sb-char-card: destaque do personagem ativo */
+.sb-char-card.ativo {
+  box-shadow: 0 0 0 1px var(--accent-light), 0 0 16px rgba(193,63,63,.35);
+}
+.sb-char-card { transition: background .2s, border-color .2s, box-shadow .25s, transform .15s; }
+.sb-char-card:hover { transform: translateX(2px); }
+
+/* Item oculto pela busca */
+.sb-hidden { display: none !important; }
+
+/* Mobile */
+@media (max-width: 600px) {
+  .sidebar { width: 86vw; padding: 1.15rem .9rem; padding-top: 3.5rem; }
+  .topbar { padding-left: 3rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TORRE DO PESADELO — EXPERIÊNCIA MOBILE NATIVA
+   Reorganização vertical completa da Ficha, sem scroll horizontal,
+   mantendo a identidade visual (dark fantasy, vermelho/dourado).
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 860px) {
+
+  html, body { overflow-x: hidden; }
+  main { padding: .9rem .65rem 6rem; }
+
+  /* ── HERO DA FICHA: estrutura tipo app, foto em destaque ── */
+  .ficha-hero-inner {
+    padding: 1.25rem .85rem .9rem;
+    gap: .6rem;
+  }
+  .ficha-hero-foto-img,
+  .ficha-hero-foto-placeholder {
+    width: 104px; height: 104px; border-radius: 50%;
+  }
+  .ficha-hero-nome { font-size: 1.55rem; line-height: 1.15; }
+  .ficha-hero-alcunha { font-size: .8rem; }
+  .ficha-hero-poder { font-size: .78rem; letter-spacing: 2px; }
+  .ficha-hero-recursos { gap: .4rem; }
+  .ficha-hero-recurso-pill { font-size: .7rem; padding: .25rem .65rem; }
+  .ficha-hero-minis-row { padding: .55rem .75rem; gap: .35rem; }
+  .ficha-hero-mini-img, .ficha-hero-mini-placeholder { width: 32px; height: 32px; }
+
+  /* ── PAINEIS GERAIS: respiro confortável ── */
+  .ficha-panel-title {
+    padding: .75rem .9rem;
+    font-size: .72rem;
+    letter-spacing: 2.5px;
+  }
+  .ficha-panel-body { padding: .9rem .8rem; }
+
+  /* ── #FICHA-CONTENT COMO COLUNA ÚNICA ORDENÁVEL ──
+     Ordem mobile: Hero > Atributos > Recursos > Poder > Registro >
+     Inventário > Pets > Progressão > Perícias */
+  #ficha-content {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+  }
+  #ficha-content > * { order: 99; }
+
+  #painel-personagens          { order: 1; }
+  #ficha-hero-dinamico          { order: 2; }
+  #ficha-content > .ficha-panel.ficha-full-row:has(#f-nivel) { order: 3; } /* Ficha Base */
+  #ficha-content > .ficha-full-row:has(.atributos-grid) { order: 4; }      /* Atributos */
+
+  /* Layout de duas colunas (Recursos / Armas) -> coluna única, cada bloco direto no fluxo */
+  .ficha-layout-cols {
+    display: contents;
+  }
+  .ficha-col-left, .ficha-col-right {
+    display: contents;
+  }
+  .ficha-col-left .ficha-panel  { order: 5; } /* Recursos de Combate */
+
+  /* Poder (expansível) */
+  #ficha-content > .ficha-panel.ficha-full-row:has(#toggle-poder) { order: 6; }
+
+  /* Registro / Lore (expansível) */
+  #ficha-content > .ficha-panel.ficha-full-row:has(#toggle-lore) { order: 7; }
+
+  /* Aparência: identificada pelo campo único f-cabelos */
+  #ficha-content > .ficha-panel.ficha-full-row:has(#f-cabelos) { order: 7; }
+
+  /* Inventário */
+  #ficha-content .ficha-panel.ficha-full-row:has(#inv-itens-tbody) { order: 8; }
+
+  /* Pets / Progressão (inclui Armas, tratadas como equipamento) */
+  #ficha-content .ficha-panel.ficha-full-row:has(#pets-lista) { order: 9; }
+  .ficha-col-right .ficha-panel { order: 9; }
+
+  /* Perícias por último antes da save bar */
+  #ficha-content .ficha-panel.ficha-full-row:has(#pericias-panel-body) { order: 10; }
+
+  .save-bar { order: 100; }
+
+  /* ── ATRIBUTOS: grid 3x2 sempre visível, sem corte ── */
+  .atributos-grid {
+    grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+    gap: .45rem !important;
+  }
+  .atributo-box { padding: .8rem .15rem .7rem; min-width: 0; }
+  .atributo-box label { font-size: .56rem; letter-spacing: 1.5px; margin-bottom: .4rem; }
+  .atributo-box input { font-size: 1.5rem; }
+  .atributo-mod { font-size: .85rem; padding: .1rem 0; }
+
+  /* ── RECURSOS DE COMBATE: PV/STA/PE em grid 3 colunas compacto ── */
+  .ficha-col-left .ficha-panel-body [style*="grid-template-columns:repeat(3,1fr)"] {
+    grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+    gap: .4rem !important;
+  }
+  .recurso-box-compact { padding: .65rem .35rem; }
+  .recurso-box-compact-label { font-size: .54rem; flex-wrap: wrap; }
+  .recurso-box-compact-val { font-size: 1.35rem; }
+
+  /* Linha CA / Deslocamento (3 colunas) -> empilha em mobile */
+  .ficha-col-left .ficha-panel-body [style*="grid-template-columns:repeat(3,1fr)"][style*="margin-bottom:.75rem"] {
+    grid-template-columns: 1fr !important;
+  }
+  /* Mt./Es./Núcleo (3 colunas) — mantém 3, compacto */
+  .ficha-col-left .ficha-panel-body [style*="repeat(3,minmax(0,1fr))"] {
+    gap: .4rem !important;
+  }
+  .recurso-tracker-input { font-size: 1.15rem; padding: .35rem .4rem; }
+
+  /* ── CAMPOS DE TEXTO / TEXTAREAS: largura total, toque confortável ── */
+  .field-row.cols-2,
+  .field-row.cols-3,
+  .field-row.cols-4 {
+    grid-template-columns: 1fr !important;
+    gap: .65rem !important;
+  }
+  .field-group input,
+  .field-group select,
+  .field-group textarea {
+    padding: .7rem .8rem;
+    font-size: .95rem;
+    min-height: 44px;
+  }
+  .field-group textarea { min-height: 110px; }
+  .field-group label { font-size: .68rem; margin-bottom: .35rem; }
+
+  /* Grids especiais (atributos de pet em 6 colunas etc.) -> 3 colunas */
+  .ficha-panel-body [style*="repeat(6,1fr)"] {
+    grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+    gap: .5rem !important;
+  }
+  .ficha-panel-body [style*="grid-template-columns:1fr 1fr"][style*="margin-top:.75rem"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── PODER: técnicas como cards de app ── */
+  .tecnica-row, .poder-tecnica { margin-bottom: .55rem; }
+  .poder-tecnica-header { padding: .75rem .9rem; gap: .6rem; }
+  .poder-tecnica-header input[type="text"] { font-size: 1rem; }
+  .poder-tecnica-body {
+    grid-template-columns: 1fr !important;
+    gap: .55rem;
+  }
+  .poder-box, .poder-title { padding: .9rem 1rem; }
+
+  /* ── TABELAS -> CARDS (Passivas, Despertares, Armas, Inventário, Núcleos) ──
+     Cada linha (tr) torna-se um cartão vertical; cada célula ocupa
+     a largura total — elimina qualquer scroll horizontal. */
+  .table-wrapper {
+    overflow-x: visible;
+    border: none;
+    background: transparent;
+  }
+  .table-wrapper table,
+  .table-wrapper tbody,
+  .table-wrapper tr,
+  .table-wrapper td {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+  }
+  .table-wrapper thead { display: none; }
+  .table-wrapper tr {
+    background: linear-gradient(160deg,#161220,#0e0c14);
+    border: 1px solid rgba(50,40,65,.55);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    margin-bottom: .6rem;
+    padding: .6rem .7rem .3rem;
+    position: relative;
+  }
+  .table-wrapper td {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    padding: .5rem .1rem;
+  }
+  .table-wrapper td:last-child { border-bottom: none; }
+  .table-wrapper td input,
+  .table-wrapper td textarea {
+    width: 100% !important;
+    font-size: .95rem;
+    padding: .5rem .1rem;
+  }
+  /* Botão de remover (✕) flutua no canto do card */
+  .table-wrapper td:last-child:has(button) {
+    position: absolute; top: .4rem; right: .5rem;
+    width: auto !important; border: none; padding: 0;
+  }
+  /* Rótulo automático acima de cada campo, vindo do cabeçalho original da coluna */
+  .table-wrapper td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: .58rem; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent-light); margin-bottom: .25rem;
+  }
+
+  /* ── PERÍCIAS: acordeões por grupo (Maestrias / Especializações) ── */
+  .pericias-mobile-group {
+    background: linear-gradient(160deg,#161220,#0e0c14);
+    border: 1px solid rgba(50,40,65,.55);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    margin-bottom: .5rem;
+    overflow: hidden;
+  }
+  .pericias-mobile-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .8rem .95rem;
+    cursor: pointer;
+    font-size: .72rem; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--accent-light);
+    min-height: 44px;
+    margin-bottom: 0;
+  }
+  .pericias-mobile-header::after { content: none !important; } /* remove linha decorativa do título */
+  .pericias-mobile-header .seta {
+    font-size: .7rem; color: #777; transition: transform .25s;
+  }
+  .pericias-mobile-group.aberto .pericias-mobile-header .seta { transform: rotate(90deg); }
+  .pericias-mobile-body {
+    display: none;
+    padding: 0 .6rem .6rem;
+  }
+  .pericias-mobile-group.aberto .pericias-mobile-body { display: block; }
+  .pericias-mobile-group .pericias-slot { margin-bottom: .4rem; min-height: 48px; }
+
+  /* ── BOTÕES: área de toque confortável (44–48px) ── */
+  button, .save-btn, .hero-cta, .editor-bar-btn, .pericias-slot-clear {
+    min-height: 44px;
+  }
+  .save-bar { padding: .75rem .9rem; }
+  .save-btn { padding: .7rem 1.6rem; font-size: 1rem; flex-shrink: 0; }
+  .save-status { font-size: .78rem; }
+
+  .ficha-panel-body button[onclick*="add"],
+  .ficha-panel-body button[onclick*="remove"] {
+    min-height: 40px; padding: .5rem 1rem; font-size: .85rem;
+  }
+
+  .personagem-header { min-height: 48px; }
+  .pericias-slot { min-height: 46px; }
 }
 </style>
 </head>
 <body>
 
-<!-- BOTÃO FLUTUANTE SIDEBAR (desktop) -->
-<button id="sidebar-float-btn" title="Abrir sumário" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+<!-- ═══ TORRE DO PESADELO: CENÁRIO ATMOSFÉRICO ═══ -->
+<div id="tp-scene" aria-hidden="true"></div>
+<canvas id="tp-atmosphere" aria-hidden="true"></canvas>
+
+<!-- Olhos na névoa (pares de olhos sincronizados) -->
+<div class="tp-eye" style="left:5%;top:38%;animation-delay:0s;animation-duration:9s;"></div>
+<div class="tp-eye" style="left:5.8%;top:38.4%;animation-delay:.08s;animation-duration:9s;"></div>
+<div class="tp-eye" style="right:4%;top:55%;animation-delay:4s;animation-duration:11s;"></div>
+<div class="tp-eye" style="right:4.9%;top:55.5%;animation-delay:4.08s;animation-duration:11s;"></div>
+<div class="tp-eye" style="left:8%;top:72%;animation-delay:7s;animation-duration:13s;"></div>
+<div class="tp-eye" style="left:8.9%;top:72.5%;animation-delay:7.08s;animation-duration:13s;"></div>
+<div class="tp-eye" style="right:5.5%;top:28%;animation-delay:12s;animation-duration:10s;"></div>
+<div class="tp-eye" style="right:6.4%;top:28.5%;animation-delay:12.08s;animation-duration:10s;"></div>
+
+<!-- Silhuetas de criaturas na névoa lateral -->
+<svg class="tp-silhuette" style="right:1.5%;bottom:6%;width:80px;height:140px;animation-delay:5s;" viewBox="0 0 80 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <ellipse cx="40" cy="26" rx="13" ry="15" fill="#090710"/>
+  <path d="M27 42 Q17 74 16 108 Q20 126 33 133 Q40 138 47 133 Q60 126 64 108 Q63 74 53 42 Z" fill="#090710"/>
+  <path d="M27 56 Q4 46 2 72 Q7 90 24 84 Q27 72 27 56Z" fill="#070511"/>
+  <path d="M53 56 Q76 46 78 72 Q73 90 56 84 Q53 72 53 56Z" fill="#070511"/>
+  <path d="M32 13 Q26 1 24 0" stroke="#0d0b16" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M48 13 Q54 1 56 0" stroke="#0d0b16" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>
+
+<svg class="tp-silhuette" style="left:2%;top:25%;width:50px;height:88px;animation-delay:14s;animation-duration:22s;" viewBox="0 0 50 88" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <ellipse cx="25" cy="16" rx="9" ry="11" fill="#090710"/>
+  <path d="M16 28 Q10 50 12 70 Q17 82 25 82 Q33 82 38 70 Q40 50 34 28 Z" fill="#090710"/>
+  <path d="M16 36 Q2 30 1 50 Q6 60 16 55Z" fill="#070511"/>
+  <path d="M34 36 Q48 30 49 50 Q44 60 34 55Z" fill="#070511"/>
+</svg>
+
+<script>
+// ═══ PARTÍCULAS ATMOSFÉRICAS: NÉVOA, CINZAS, POEIRA ═══
+(function() {
+  var canvas = document.getElementById('tp-atmosphere');
+  var ctx = canvas.getContext('2d');
+  var W, H;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  var particles = [];
+  var COUNT = 60;
+  for (var i = 0; i < COUNT; i++) {
+    var t = Math.random();
+    var isMist = t < 0.4;
+    var col = t < 0.18 ? [110,25,25] : t < 0.4 ? [45,25,55] : [150,130,130];
+    var a = isMist ? rand(0.012, 0.042) : rand(0.045, 0.2);
+    particles.push({
+      x: rand(0, 1), y: rand(0, 1),
+      r: isMist ? rand(28, 85) : rand(1.2, 3.5),
+      vx: rand(-0.00018, 0.00018),
+      vy: isMist ? rand(-0.00008, 0.00004) : rand(-0.00035, -0.00008),
+      alpha: a, alphaBase: a,
+      pulse: rand(0, 6.28), pulseSpeed: rand(0.003, 0.013),
+      isMist: isMist, color: col
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (var j = 0; j < particles.length; j++) {
+      var p = particles[j];
+      p.x += p.vx; p.y += p.vy; p.pulse += p.pulseSpeed;
+      if (p.x < -0.05) p.x = 1.05; if (p.x > 1.05) p.x = -0.05;
+      if (p.y < -0.05) p.y = 1.05; if (p.y > 1.05) p.y = -0.05;
+      var al = p.alphaBase * (0.55 + 0.45 * Math.sin(p.pulse));
+      var px = p.x * W, py = p.y * H;
+      var r = p.color[0], g = p.color[1], b = p.color[2];
+      if (p.isMist) {
+        var grad = ctx.createRadialGradient(px, py, 0, px, py, p.r);
+        grad.addColorStop(0, 'rgba('+r+','+g+','+b+','+al+')');
+        grad.addColorStop(1, 'rgba('+r+','+g+','+b+',0)');
+        ctx.beginPath(); ctx.arc(px, py, p.r, 0, 6.283);
+        ctx.fillStyle = grad; ctx.fill();
+      } else {
+        ctx.beginPath(); ctx.arc(px, py, p.r, 0, 6.283);
+        ctx.fillStyle = 'rgba('+r+','+g+','+b+','+al+')'; ctx.fill();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -960,21 +1798,32 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 
 <!-- APP -->
 <div id="app">
+  <!-- ÍNDICE: seta única + backdrop (dentro de #app para ficar no mesmo contexto de empilhamento da sidebar) -->
+  <button id="sidebar-arrow-btn" title="Abrir/fechar índice" onclick="toggleSidebar()" aria-label="Menu">
+    <span class="arrow-ic">▶</span>
+  </button>
+  <div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+
   <div class="topbar">
     <span class="topbar-logo">Torre do Pesadelo</span>
-    <button class="hamburger" onclick="toggleSidebar()">☰</button>
   </div>
 
   <nav class="sidebar" id="sidebar">
+    <div class="sb-search">
+      <span class="sb-search-icon">🔍</span>
+      <input type="text" id="sb-search-input" placeholder="Buscar capítulos, regras, personagens..." oninput="filtrarSidebar(this.value)">
+    </div>
+
     <div class="sidebar-logo">Torre do Pesadelo<span>Livro do Jogador</span></div>
 
     <!-- GM only -->
     <div id="sb-gm-section" style="display:none">
       <div class="sidebar-section-label">⚔ Game Master</div>
-      <ul>
-        <li><a onclick="navTo('painel-gm');mostrarTab('tab-fichas')">Fichas dos Players</a></li>
-        <li><a onclick="navTo('painel-gm');mostrarTab('tab-formulas')">Editor de Fórmulas</a></li>
-        <li><a onclick="navTo('secao-ranking')">🏆 Ranking</a></li>
+      <ul class="sidebar-links">
+        <li><a data-nav="painel-gm" onclick="navTo(&#39;painel-gm&#39;);mostrarTab(&#39;tab-fichas&#39;)">Fichas dos Players</a></li>
+        <li><a data-nav="painel-gm" onclick="navTo(&#39;painel-gm&#39;);mostrarTab(&#39;tab-formulas&#39;)">Editor de Fórmulas</a></li>
+        <li><a data-nav="secao-ranking" onclick="navTo(&#39;secao-ranking&#39;)">🏆 Ranking</a></li>
       </ul>
       <button class="btn-modo-editor" id="btn-modo-editor" onclick="toggleModoEditor()">✏ Modo Editor do Site</button>
     </div>
@@ -982,40 +1831,42 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
     <!-- ADM only -->
     <div id="sb-adm-section" style="display:none">
       <div class="sidebar-section-label">🗡 Administrador</div>
-      <ul>
-        <li><a onclick="navTo('painel-adm')">Fichas dos Players</a></li>
+      <ul class="sidebar-links">
+        <li><a data-nav="painel-adm" onclick="navTo(&#39;painel-adm&#39;)">Fichas dos Players</a></li>
       </ul>
     </div>
 
     <!-- Player/GM ficha -->
     <div id="sb-ficha-section">
-      <div class="sidebar-section-label">Personagens</div>
+      <div class="sidebar-section-label">🎭 Personagens</div>
       <div id="sb-personagens-lista">
         <!-- Preenchido por renderizarPersonagensNaSidebar() -->
       </div>
       <div style="margin-top:.3rem">
-        <a onclick="criarNovoPersonagem()" style="display:flex;align-items:center;gap:.4rem;color:var(--accent-light);font-size:.83rem;padding:.35rem .5rem;border-radius:3px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='rgba(156,42,42,.12)'" onmouseout="this.style.background='transparent'">
+        <a onclick="criarNovoPersonagem()" style="display:flex;align-items:center;gap:.4rem;color:var(--accent-light);font-size:.83rem;padding:.35rem .5rem;border-radius:3px;cursor:pointer;transition:background .2s" onmouseover="this.style.background=&#39;rgba(156,42,42,.12)&#39;" onmouseout="this.style.background=&#39;transparent&#39;">
           <span style="font-size:1rem;line-height:1">+</span> Novo Personagem
         </a>
       </div>
     </div>
 
-    <div class="sidebar-section-label">Regras</div>
-    <ul>
-      <li><a onclick="navTo('home')">Apresentação</a></li>
-      <li><a onclick="navTo('sumario')">Sumário</a></li>
-      <li><a onclick="navTo('secao-ranking')">🏆 Ranking</a></li>
-      <li><a onclick="navTo('cap1')">Cap. 1 — A Ficha</a></li>
-      <li><a onclick="navTo('cap2')">Cap. 2 — Ficha Base</a></li>
-      <li><a onclick="navTo('cap3')">Cap. 3 — Atributos</a></li>
-      <li><a onclick="navTo('cap4')">Cap. 4 — Recursos</a></li>
-      <li><a onclick="navTo('cap5')">Cap. 5 — Poder</a></li>
-      <li><a onclick="navTo('cap6')">Cap. 6 — Registro</a></li>
-      <li><a onclick="navTo('cap7')">Cap. 7 — Inventário</a></li>
-      <li><a onclick="navTo('cap8')">Cap. 8 — Pets</a></li>
-      <li><a onclick="navTo('cap9')">Cap. 9 — Progressão</a></li>
-      <li><a onclick="navTo('cap10')">Cap. 10 — Perícias</a></li>
+
+    <div class="sidebar-section-label">📖 Regras</div>
+    <ul class="sidebar-links">
+      <li><a data-nav="home" onclick="navTo(&#39;home&#39;)">Apresentação</a></li>
+      <li><a data-nav="sumario" onclick="navTo(&#39;sumario&#39;)">Sumário</a></li>
+      <li><a data-nav="secao-ranking" onclick="navTo(&#39;secao-ranking&#39;)">🏆 Ranking</a></li>
+      <li><a data-nav="cap1" onclick="navTo(&#39;cap1&#39;)">Cap. 1 — A Ficha</a></li>
+      <li><a data-nav="cap2" onclick="navTo(&#39;cap2&#39;)">Cap. 2 — Ficha Base</a></li>
+      <li><a data-nav="cap3" onclick="navTo(&#39;cap3&#39;)">Cap. 3 — Atributos</a></li>
+      <li><a data-nav="cap4" onclick="navTo(&#39;cap4&#39;)">Cap. 4 — Recursos</a></li>
+      <li><a data-nav="cap5" onclick="navTo(&#39;cap5&#39;)">Cap. 5 — Poder</a></li>
+      <li><a data-nav="cap6" onclick="navTo(&#39;cap6&#39;)">Cap. 6 — Registro</a></li>
+      <li><a data-nav="cap7" onclick="navTo(&#39;cap7&#39;)">Cap. 7 — Inventário</a></li>
+      <li><a data-nav="cap8" onclick="navTo(&#39;cap8&#39;)">Cap. 8 — Pets</a></li>
+      <li><a data-nav="cap9" onclick="navTo(&#39;cap9&#39;)">Cap. 9 — Progressão</a></li>
+      <li><a data-nav="cap10" onclick="navTo(&#39;cap10&#39;)">Cap. 10 — Perícias</a></li>
     </ul>
+
 
     <div class="sidebar-player">
       <div class="sidebar-player-name" id="sb-player-name">—</div>
@@ -1040,7 +1891,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
         <p style="color:var(--text-muted);max-width:520px;margin-bottom:2rem;font-size:.95rem;">
           Bem-vindo, Desperto. Este portal contém tudo que você precisa para criar seu personagem, entender as mecânicas e registrar sua progressão dentro das Torres.
         </p>
-        <button class="hero-cta" id="hero-cta-btn" onclick="navTo('ficha')">Acessar Minha Ficha</button>
+        <button class="hero-cta" id="hero-cta-btn" onclick="navTo(&#39;ficha&#39;)">Acessar Minha Ficha</button>
       </div>
     </section>
 
@@ -1053,8 +1904,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
       </div>
 
       <div class="gm-tabs">
-        <button class="gm-tab active" id="tab-fichas" onclick="mostrarTab('tab-fichas')">Fichas dos Players</button>
-        <button class="gm-tab" id="tab-formulas" onclick="mostrarTab('tab-formulas')">Editor de Fórmulas</button>
+        <button class="gm-tab active" id="tab-fichas" onclick="mostrarTab(&#39;tab-fichas&#39;)">Fichas dos Players</button>
+        <button class="gm-tab" id="tab-formulas" onclick="mostrarTab(&#39;tab-formulas&#39;)">Editor de Fórmulas</button>
       </div>
 
       <!-- TAB: FICHAS -->
@@ -1067,7 +1918,15 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
       <div class="gm-tab-content" id="content-tab-formulas">
         <div class="lore-box" style="margin-bottom:1.5rem">
           <strong style="color:var(--gold-light)">Como usar o editor:</strong><br>
-          Edite as fórmulas abaixo usando as variáveis disponíveis. Após salvar, todas as fichas recalculam automaticamente ao serem abertas. Use operadores matemáticos normais: <code style="color:#a8e6b8;background:rgba(0,0,0,.4);padding:.1rem .3rem">+ - * / ( )</code> e funções como <code style="color:#a8e6b8;background:rgba(0,0,0,.4);padding:.1rem .3rem">floor() ceil() round()</code>.
+          Use os <strong>nomes legíveis</strong> dos atributos nas fórmulas. Após salvar, todas as fichas recalculam automaticamente.
+          Operadores: <code style="color:#a8e6b8;background:rgba(0,0,0,.4);padding:.1rem .3rem">+ - * / ( )</code>
+          Funções: <code style="color:#a8e6b8;background:rgba(0,0,0,.4);padding:.1rem .3rem">floor() ceil() round()</code><br><br>
+          <strong style="color:var(--silver)">Atributos brutos:</strong>
+          <code>forca</code> <code>destreza</code> <code>vigor</code> <code>intelecto</code> <code>alma</code> <code>carisma</code> <code>nivel</code><br>
+          <strong style="color:var(--silver)">Modificadores:</strong>
+          <code>modForca</code> <code>modDestreza</code> <code>modVigor</code> <code>modIntelecto</code> <code>modAlma</code> <code>modCarisma</code><br>
+          <strong style="color:var(--silver)">Extras:</strong>
+          <code>maestria</code> <code>pvBase</code> <code>staBase</code> <code>bonusPV</code> <code>bonusPE</code> <code>bonusCA</code> <code>attrMod</code>
         </div>
 
         <!-- PV -->
@@ -1076,14 +1935,14 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
             <span class="formula-editor-title">Pontos de Vida (PV)</span>
           </div>
           <div class="formula-editor-body">
-            <div class="formula-desc">Resistência total do personagem. Calculado com Vigor e Alma.</div>
-            <div class="formula-vars">Variáveis: <code>mVig</code> <code>mAlm</code> <code>mFor</code> <code>mDes</code> <code>mInt</code> <code>mCar</code> <code>nivel</code> <code>prof</code> <code>bonusPV</code></div>
+            <div class="formula-desc">Resistência total. Padrão: <code>(vigor + alma) × (2 + ⌊nível÷2⌋)</code></div>
+            <div class="formula-vars">Variáveis recomendadas: <code>vigor</code> <code>alma</code> <code>nivel</code> <code>modVigor</code> <code>modAlma</code> <code>bonusPV</code></div>
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula PV Base</span>
-              <input type="text" class="formula-input" id="form-pv" value="(aVig + aAlm) * (2 + floor(nivel / 2))">
+              <input type="text" class="formula-input" id="form-pv" value="(vigor + alma) * (2 + floor(nivel / 2))">
               <button class="apply-formula-btn" onclick="aplicarFormula('pv')">Aplicar</button>
             </div>
-            <div class="formula-result" id="res-pv">✓ Fórmula salva e aplicada a todas as fichas.</div>
+            <div class="formula-result" id="res-pv">✓ Fórmula salva e aplicada.</div>
           </div>
         </div>
 
@@ -1094,13 +1953,13 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
           </div>
           <div class="formula-editor-body">
             <div class="formula-desc">Fôlego e esforço físico. Por padrão igual ao PV base.</div>
-            <div class="formula-vars">Variáveis: <code>pvBase</code> <code>mVig</code> <code>mAlm</code> <code>nivel</code> <code>bonusSTA</code></div>
+            <div class="formula-vars">Variáveis recomendadas: <code>vigor</code> <code>alma</code> <code>nivel</code> <code>pvBase</code> <code>bonusSTA</code></div>
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula STA</span>
-              <input type="text" class="formula-input" id="form-sta" value="((floor(nivel/2)+2)*(mAlm+mInt))+2">
+              <input type="text" class="formula-input" id="form-sta" value="(vigor + alma) * (2 + floor(nivel / 2))">
               <button class="apply-formula-btn" onclick="aplicarFormula('sta')">Aplicar</button>
             </div>
-            <div class="formula-result" id="res-sta">✓ Fórmula salva e aplicada a todas as fichas.</div>
+            <div class="formula-result" id="res-sta">✓ Fórmula salva e aplicada.</div>
           </div>
         </div>
 
@@ -1110,14 +1969,14 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
             <span class="formula-editor-title">Pontos de Energia (PE)</span>
           </div>
           <div class="formula-editor-body">
-            <div class="formula-desc">Energia para poderes e técnicas.</div>
-            <div class="formula-vars">Variáveis: <code>pvBase</code> <code>mAlm</code> <code>mInt</code> <code>nivel</code> <code>bonusPE</code></div>
+            <div class="formula-desc">Energia para poderes. Padrão: <code>(⌊nível÷2⌋ + 2) × (modAlma + modIntelecto)</code></div>
+            <div class="formula-vars">Variáveis recomendadas: <code>nivel</code> <code>modAlma</code> <code>modIntelecto</code> <code>bonusPE</code></div>
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula PE</span>
-              <input type="text" class="formula-input" id="form-pe" value="floor((pvBase/2)/10)+bonusPE">
+              <input type="text" class="formula-input" id="form-pe" value="(floor(nivel / 2) + 2) * (modAlma + modIntelecto)">
               <button class="apply-formula-btn" onclick="aplicarFormula('pe')">Aplicar</button>
             </div>
-            <div class="formula-result" id="res-pe">✓ Fórmula salva e aplicada a todas as fichas.</div>
+            <div class="formula-result" id="res-pe">✓ Fórmula salva e aplicada.</div>
           </div>
         </div>
 
@@ -1127,14 +1986,14 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
             <span class="formula-editor-title">Classe de Armadura (CA)</span>
           </div>
           <div class="formula-editor-body">
-            <div class="formula-desc">Dificuldade de ser atingido. Base 10 + Destreza + metade Vigor.</div>
-            <div class="formula-vars">Variáveis: <code>mDes</code> <code>mVig</code> <code>mFor</code> <code>nivel</code> <code>bonusCA</code></div>
+            <div class="formula-desc">Padrão: <code>10 + modDestreza + ⌈modVigor÷2⌉ + bonusCA</code></div>
+            <div class="formula-vars">Variáveis recomendadas: <code>modDestreza</code> <code>modVigor</code> <code>bonusCA</code></div>
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula CA</span>
-              <input type="text" class="formula-input" id="form-ca" value="10 + mDes + ceil(mVig / 2) + bonusCA">
+              <input type="text" class="formula-input" id="form-ca" value="10 + modDestreza + ceil(modVigor / 2) + bonusCA">
               <button class="apply-formula-btn" onclick="aplicarFormula('ca')">Aplicar</button>
             </div>
-            <div class="formula-result" id="res-ca">✓ Fórmula salva e aplicada a todas as fichas.</div>
+            <div class="formula-result" id="res-ca">✓ Fórmula salva e aplicada.</div>
           </div>
         </div>
 
@@ -1144,42 +2003,42 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
             <span class="formula-editor-title">Iniciativa</span>
           </div>
           <div class="formula-editor-body">
-            <div class="formula-desc">Velocidade de reação em combate. Atualmente baseada em Destreza.</div>
-            <div class="formula-vars">Variáveis: <code>mDes</code> <code>mVig</code> <code>mInt</code> <code>nivel</code></div>
+            <div class="formula-desc">Velocidade de reação em combate. Padrão: <code>modDestreza</code></div>
+            <div class="formula-vars">Variáveis recomendadas: <code>modDestreza</code> <code>modVigor</code> <code>modIntelecto</code> <code>nivel</code></div>
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula Iniciativa</span>
-              <input type="text" class="formula-input" id="form-init" value="mDes">
+              <input type="text" class="formula-input" id="form-init" value="modDestreza">
               <button class="apply-formula-btn" onclick="aplicarFormula('init')">Aplicar</button>
             </div>
-            <div class="formula-result" id="res-init">✓ Fórmula salva e aplicada a todas as fichas.</div>
+            <div class="formula-result" id="res-init">✓ Fórmula salva e aplicada.</div>
           </div>
         </div>
 
-        <!-- PROFICIÊNCIA -->
+        <!-- MAESTRIA -->
         <div class="formula-editor">
           <div class="formula-editor-header">
             <span class="formula-editor-title">Maestria</span>
           </div>
           <div class="formula-editor-body">
-            <div class="formula-desc">Bônus de treinamento geral. Aumenta com o nível.</div>
+            <div class="formula-desc">Bônus de treinamento por nível. Padrão: <code>1 + ⌈nível÷4⌉</code> → Nv1-4=+2, Nv5-8=+3...</div>
             <div class="formula-vars">Variáveis: <code>nivel</code></div>
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula Maestria</span>
               <input type="text" class="formula-input" id="form-maestria" value="1 + ceil(nivel / 4)">
               <button class="apply-formula-btn" onclick="aplicarFormula('maestria')">Aplicar</button>
             </div>
-            <div class="formula-result" id="res-maestria">✓ Fórmula salva e aplicada a todas as fichas.</div>
+            <div class="formula-result" id="res-maestria">✓ Fórmula salva e aplicada.</div>
           </div>
         </div>
 
-        <!-- MAESTRIA / ESPECIALIZAÇÃO -->
+        <!-- PERÍCIAS -->
         <div class="formula-editor">
           <div class="formula-editor-header">
-            <span class="formula-editor-title">Perícias — Maestria & Especialização</span>
+            <span class="formula-editor-title">Perícias — Maestria &amp; Especialização</span>
           </div>
           <div class="formula-editor-body">
-            <div class="formula-desc">Como Maestria e Especialização afetam o valor final de cada perícia.</div>
-            <div class="formula-vars">Variáveis para todas: <code>attrMod</code> <code>nivel</code> <code>prof</code></div>
+            <div class="formula-desc">Fórmulas que calculam o bônus de cada perícia conforme o treinamento.</div>
+            <div class="formula-vars">Variáveis: <code>attrMod</code> <code>nivel</code> <code>maestria</code></div>
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Sem treinamento</span>
               <input type="text" class="formula-input" id="form-per-base" value="attrMod + floor(nivel / 2)">
@@ -1187,12 +2046,12 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
             </div>
             <div class="formula-row">
               <span class="formula-label">Com Maestria</span>
-              <input type="text" class="formula-input" id="form-per-mt" value="attrMod + floor(nivel / 2) + prof">
+              <input type="text" class="formula-input" id="form-per-mt" value="attrMod + floor(nivel / 2) + maestria">
               <button class="apply-formula-btn" onclick="aplicarFormula('per-mt')">Aplicar</button>
             </div>
             <div class="formula-row">
               <span class="formula-label">Com Especialização</span>
-              <input type="text" class="formula-input" id="form-per-es" value="attrMod + floor(nivel / 2) + floor(prof * 1.5)">
+              <input type="text" class="formula-input" id="form-per-es" value="attrMod + floor(nivel / 2) + floor(maestria * 1.5)">
               <button class="apply-formula-btn" onclick="aplicarFormula('per-es')">Aplicar</button>
             </div>
             <div class="formula-result" id="res-per-base">✓ Salvo.</div>
@@ -1237,24 +2096,24 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
         <table>
           <thead><tr><th>Capítulo</th><th>Conteúdo</th></tr></thead>
           <tbody>
-            <tr><td><a onclick="navTo('ficha')" style="color:var(--accent-light);cursor:pointer">Ficha</a></td><td>Minha Ficha de Personagem</td></tr>
-            <tr><td><a onclick="navTo('cap1')" style="color:var(--accent-light);cursor:pointer">Cap. 1</a></td><td>A Ficha de Personagem</td></tr>
-            <tr><td><a onclick="navTo('cap2')" style="color:var(--accent-light);cursor:pointer">Cap. 2</a></td><td>Ficha Base</td></tr>
-            <tr><td><a onclick="navTo('cap3')" style="color:var(--accent-light);cursor:pointer">Cap. 3</a></td><td>Atributos</td></tr>
-            <tr><td><a onclick="navTo('cap4')" style="color:var(--accent-light);cursor:pointer">Cap. 4</a></td><td>Recursos</td></tr>
-            <tr><td><a onclick="navTo('cap5')" style="color:var(--accent-light);cursor:pointer">Cap. 5</a></td><td>Poder</td></tr>
-            <tr><td><a onclick="navTo('cap6')" style="color:var(--accent-light);cursor:pointer">Cap. 6</a></td><td>Registro</td></tr>
-            <tr><td><a onclick="navTo('cap7')" style="color:var(--accent-light);cursor:pointer">Cap. 7</a></td><td>Inventário</td></tr>
-            <tr><td><a onclick="navTo('cap8')" style="color:var(--accent-light);cursor:pointer">Cap. 8</a></td><td>Pets & Montarias</td></tr>
-            <tr><td><a onclick="navTo('cap9')" style="color:var(--accent-light);cursor:pointer">Cap. 9</a></td><td>Progressão</td></tr>
-            <tr><td><a onclick="navTo('cap10')" style="color:var(--accent-light);cursor:pointer">Cap. 10</a></td><td>Perícias</td></tr>
+            <tr><td><a onclick="navTo(&#39;ficha&#39;)" style="color:var(--accent-light);cursor:pointer">Ficha</a></td><td>Minha Ficha de Personagem</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap1&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 1</a></td><td>A Ficha de Personagem</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap2&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 2</a></td><td>Ficha Base</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap3&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 3</a></td><td>Atributos</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap4&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 4</a></td><td>Recursos</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap5&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 5</a></td><td>Poder</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap6&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 6</a></td><td>Registro</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap7&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 7</a></td><td>Inventário</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap8&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 8</a></td><td>Pets &amp; Montarias</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap9&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 9</a></td><td>Progressão</td></tr>
+            <tr><td><a onclick="navTo(&#39;cap10&#39;)" style="color:var(--accent-light);cursor:pointer">Cap. 10</a></td><td>Perícias</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
     <!-- CAPÍTULOS -->
-    <section id="cap1" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 1</span><h1>A Ficha de Personagem</h1><p>A ficha é o documento central do seu personagem — um registro vivo de tudo que ele é, pode fazer e carrega consigo.</p><div class="attr-grid"><div class="attr-card"><h4>Ficha Base</h4><p style="font-size:.88rem;color:var(--text-muted)">Identidade, atributos, recursos e perícias.</p></div><div class="attr-card"><h4>Poder</h4><p style="font-size:.88rem;color:var(--text-muted)">Habilidades, técnicas e Técnica Final.</p></div><div class="attr-card"><h4>Registro & Inventário</h4><p style="font-size:.88rem;color:var(--text-muted)">História, personalidade e equipamentos.</p></div><div class="attr-card"><h4>Pets & Montarias</h4><p style="font-size:.88rem;color:var(--text-muted)">Companheiros com ficha e atributos próprios.</p></div></div></section>
+    <section id="cap1" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 1</span><h1>A Ficha de Personagem</h1><p>A ficha é o documento central do seu personagem — um registro vivo de tudo que ele é, pode fazer e carrega consigo.</p><div class="attr-grid"><div class="attr-card"><h4>Ficha Base</h4><p style="font-size:.88rem;color:var(--text-muted)">Identidade, atributos, recursos e perícias.</p></div><div class="attr-card"><h4>Poder</h4><p style="font-size:.88rem;color:var(--text-muted)">Habilidades, técnicas e Técnica Final.</p></div><div class="attr-card"><h4>Registro &amp; Inventário</h4><p style="font-size:.88rem;color:var(--text-muted)">História, personalidade e equipamentos.</p></div><div class="attr-card"><h4>Pets &amp; Montarias</h4><p style="font-size:.88rem;color:var(--text-muted)">Companheiros com ficha e atributos próprios.</p></div></div></section>
 
     <section id="cap2" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 2</span><h1>Ficha Base</h1><p>Reúne todas as informações fundamentais do personagem — quem ele é e o que o define dentro do sistema.</p><div class="system-card"><strong>Campos:</strong> Nome, Nível, Raça, Idade, Altura, Peso, Gênero, Cabelos, Olhos, Pele, Roupas, Aparência e Poder.</div><div class="lore-box"><strong>Dica:</strong> Preencha a Aparência com detalhes vívidos — quanto mais detalhado, melhor o roleplay nas sessões.</div></section>
 
@@ -1268,7 +2127,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 
     <section id="cap7" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 7</span><h1>Inventário</h1><p>Equipamentos, consumíveis, materiais, núcleos e moeda do personagem.</p><div class="lore-box"><strong>Núcleos:</strong> Itens especiais extraídos das Torres. Essenciais para progressão e forja avançada.</div></section>
 
-    <section id="cap8" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 8</span><h1>Pets & Montarias</h1><p>Companheiros com ficha própria, atributos e habilidades — quase personagens completos.</p><div class="attr-grid"><div class="attr-card"><h4>Pets</h4><p style="font-size:.87rem;color:var(--text-muted)">Criaturas companheiras com atributos e ações.</p></div><div class="attr-card"><h4>Montarias</h4><p style="font-size:.87rem;color:var(--text-muted)">Para locomoção e combate. Evoluem separadamente.</p></div></div></section>
+    <section id="cap8" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 8</span><h1>Pets &amp; Montarias</h1><p>Companheiros com ficha própria, atributos e habilidades — quase personagens completos.</p><div class="attr-grid"><div class="attr-card"><h4>Pets</h4><p style="font-size:.87rem;color:var(--text-muted)">Criaturas companheiras com atributos e ações.</p></div><div class="attr-card"><h4>Montarias</h4><p style="font-size:.87rem;color:var(--text-muted)">Para locomoção e combate. Evoluem separadamente.</p></div></div></section>
 
     <section id="cap9" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 9</span><h1>Progressão</h1><div class="table-wrapper"><table><thead><tr><th>Nível</th><th>Proficiência</th></tr></thead><tbody><tr><td>1–4</td><td>+2</td></tr><tr><td>5–8</td><td>+3</td></tr><tr><td>9–12</td><td>+4</td></tr><tr><td>13–16</td><td>+5</td></tr><tr><td>17–20</td><td>+6</td></tr></tbody></table></div><div class="system-card"><strong>Maestria (Mt.):</strong> Adiciona Proficiência à perícia.<br><br><strong>Especialização (Es.):</strong> Adiciona 1,5× Proficiência. Representa excelência avançada.</div></section>
 
@@ -1279,7 +2138,10 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
       <div class="divider"></div>
       <span class="chapter-number">Classificação Geral</span>
       <h1>🏆 Ranking dos Despertos</h1>
-      <p style="color:var(--text-muted);margin-bottom:1rem">Classificação baseada em núcleos absorvidos. Clique em um Desperto para ver o perfil público.</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem">
+        <p style="color:var(--text-muted);margin:0">Classificação por nível e núcleos absorvidos. Clique num Desperto para ver o perfil público.</p>
+        <button onclick="carregarRanking()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.4rem 1rem;font-family:inherit;font-size:.82rem;cursor:pointer;letter-spacing:.5px;transition:all .2s" onmouseover="this.style.background='rgba(156,42,42,.12)'" onmouseout="this.style.background='none'">↺ Atualizar</button>
+      </div>
       <div id="ranking-grid" class="ranking-grid">
         <p style="color:var(--text-muted);font-size:.85rem;grid-column:1/-1">☁ Carregando ranking...</p>
       </div>
@@ -1313,14 +2175,15 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 const USUARIOS = {
   "rauron":    { senha: "happy14768",      role: "gm",     nome: "Rauron"   },
   "pratesz":   { senha: "Breno123",        role: "gm",     nome: "Pratesz"  },
-  "tortuga":   { senha: "Tartarugalerda",  role: "adm",    nome: "Tortuga"  },
-  "herick":    { senha: "Herick123",       role: "adm",    nome: "Herick"   },
-  "seki":      { senha: "Seki123",         role: "adm",    nome: "Seki"     },
-  "melp":      { senha: "Melp123",         role: "adm",    nome: "Melp"     },
-  "jogador1":  { senha: "desperto1",       role: "player", nome: "Jogador 1" },
-  "jogador2":  { senha: "desperto2",       role: "player", nome: "Jogador 2" },
-  "jogador3":  { senha: "desperto3",       role: "player", nome: "Jogador 3" },
-  "jogador4":  { senha: "desperto4",       role: "player", nome: "Jogador 4" },
+  "tortuga":   { senha: "tortuga547",      role: "adm",    nome: "Tortuga"  },
+  "herick":    { senha: "herick118",       role: "adm",    nome: "Herick"   },
+  "seki":      { senha: "seki092",         role: "adm",    nome: "Seki"     },
+  "melp":      { senha: "melp705",         role: "adm",    nome: "Melp"     },
+  "gabriel":   { senha: "biel381",         role: "player", nome: "Gabriel" },
+  "joaofelipe":{ senha: "joao814",         role: "player", nome: "João Felipe" },
+  "thiago":    { senha: "thiago263",       role: "player", nome: "Thiago" },
+  "jozzu":     { senha: "jozzu490",        role: "player", nome: "Jozzu" },
+  "ness":      { senha: "ness672",         role: "player", nome: "Ness" },
   // Adicione mais players aqui no mesmo formato
 };
 
@@ -1516,6 +2379,8 @@ function getDespertar(dados) {
 // ═══════════════════════════════════════════════════════════════════════
 // ═══ RANKING — todos os personagens de todos os usuários ═══════════════
 // ═══════════════════════════════════════════════════════════════════════
+let _rankingInterval = null;
+
 async function carregarRanking() {
   const grid = document.getElementById('ranking-grid');
   if (!grid) return;
@@ -1526,25 +2391,22 @@ async function carregarRanking() {
 
   grid.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;grid-column:1/-1">☁ Carregando ranking...</p>';
 
-  // Todos os usuários que têm personagens (players + adm)
-  const todos = Object.entries(USUARIOS).filter(([u, d]) => d.role === 'player' || d.role === 'adm');
-  const fichas = []; // cada entrada = 1 personagem individual
+  // TODOS os usuários (player + adm + gm) têm personagens no ranking
+  const todos = Object.entries(USUARIOS);
+  const fichas = [];
 
   for (const [user, info] of todos) {
     try {
-      // Carrega lista de personagens do usuário
       const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
       let listaPersonagens = [];
       if (listaSnap.exists()) {
         listaPersonagens = JSON.parse(listaSnap.data().lista || '[]');
       }
-      // Se não tem nenhum personagem na nuvem, pula
       if (listaPersonagens.length === 0) continue;
 
-      // Itera CADA personagem individualmente
       for (const nomePersonagem of listaPersonagens) {
         try {
-          const fichaDocId = user + '_' + nomePersonagem;
+          const fichaDocId = _fsDocId(user, nomePersonagem);
           const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
           let dados = {};
           if (fichaSnap.exists()) {
@@ -1558,30 +2420,30 @@ async function carregarRanking() {
           // Foto principal do personagem
           let fotoPrincipal = null;
           try {
-            const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', fichaDocId));
+            const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(user, nomePersonagem)));
             if (fotoSnap.exists()) fotoPrincipal = fotoSnap.data().principal || null;
           } catch(e) {}
 
-          // Conta núcleos absorvidos (campo f-nucleo, formato "atual/máx" ou só número)
+          // Conta núcleos absorvidos
           const nucleoRaw = dados['f-nucleo'] || '0';
           const nucleos = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
 
-          // Nome do personagem: prioriza o campo da ficha, depois o nome da lista
+          // Nível
+          const nivel = parseInt(dados['f-nivel'] || '1') || 1;
+
+          // Nome exibido
           const nomeExibido = dados['f-nome'] || nomePersonagem;
 
-          // Não inclui personagens sem nome preenchido na ficha (fichas em branco)
-          if (!nomeExibido || nomeExibido === nomePersonagem && !dados['f-nome']) {
-            // Inclui mesmo assim se o nome da lista está preenchido
-          }
+          // Score: nível * 10 + núcleos (para ordenação significativa)
+          const score = nivel * 10 + nucleos;
 
           fichas.push({
-            user,
-            info,
+            user, info,
             nome: nomeExibido,
             nomePersonagem,
             nivel: dados['f-nivel'] || '1',
             poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
-            nucleos,
+            nucleos, score,
             foto: fotoPrincipal,
             despertar: getDespertar(dados),
           });
@@ -1594,8 +2456,8 @@ async function carregarRanking() {
     }
   }
 
-  // Ordena por núcleos absorvidos (decrescente)
-  fichas.sort((a, b) => b.nucleos - a.nucleos);
+  // Ordena por score (nível × 10 + núcleos) decrescente
+  fichas.sort((a, b) => b.score - a.score || b.nucleos - a.nucleos || b.nivel - a.nivel);
 
   grid.innerHTML = '';
 
@@ -1608,8 +2470,8 @@ async function carregarRanking() {
     const pos = i + 1;
     const posClass = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : '';
     const posLabel = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`;
-    const maxNucleos = fichas[0].nucleos || 1;
-    const pct = Math.max(4, Math.round((f.nucleos / maxNucleos) * 100));
+    const maxScore = fichas[0].score || 1;
+    const pct = Math.max(4, Math.round((f.score / maxScore) * 100));
 
     const card = document.createElement('div');
     card.className = 'ranking-card';
@@ -1621,12 +2483,20 @@ async function carregarRanking() {
         : `<div class="ranking-avatar-placeholder">⚔</div>`}
       <div class="ranking-nome">${f.nome}</div>
       <div class="ranking-poder">${f.poder !== '—' ? f.poder : '<span style="color:#555">—</span>'}</div>
+      <div style="font-size:.72rem;color:var(--text-muted);margin-top:.2rem">Nv. ${f.nivel}</div>
       <div class="ranking-nucleos">◆ ${f.nucleos} núcleo${f.nucleos !== 1 ? 's' : ''}</div>
       <div class="ranking-card-despertar">${f.despertar}</div>
       <div class="ranking-bar" style="width:${pct}%"></div>
     `;
     grid.appendChild(card);
   });
+
+  // Atualização automática a cada 30s
+  if (!_rankingInterval) {
+    _rankingInterval = setInterval(() => {
+      if (document.getElementById('ranking-grid')) carregarRanking();
+    }, 30000);
+  }
 }
 
 function abrirPerfilPublico(f) {
@@ -1662,7 +2532,7 @@ async function carregarGaleriaPublica(user, personagem) {
   if (!container || !window.db || !window.doc || !window.getDoc) return;
   try {
     // Tenta chave nova (user_personagem), com fallback para chave legada (user)
-    const docId = personagem ? (user + '_' + personagem) : user;
+    const docId = personagem ? _fotoDocId(user, personagem) : _sanitizeDocPart(user);
     let snap = await window.getDoc(window.doc(window.db, 'fotos', docId));
     if (!snap.exists() && personagem) {
       snap = await window.getDoc(window.doc(window.db, 'fotos', user));
@@ -1690,7 +2560,7 @@ async function carregarGaleriaPublica(user, personagem) {
 // Cada personagem tem seu próprio doc, nunca compartilham referência.
 
 function _fotoDocId(user, personagem) {
-  return (user || usuarioAtual) + '_' + (personagem || personagemAtual || '_default');
+  return _sanitizeDocPart(user || usuarioAtual) + '_' + _sanitizeDocPart(personagem || personagemAtual || '_default');
 }
 
 async function salvarFotosPerfil(user, personagem, principal, galeria) {
@@ -1738,11 +2608,16 @@ async function abrirSeletorFotoPrincipal() {
   input.accept = 'image/*';
   input.onchange = async () => {
     if (!input.files[0]) return;
+    if (!usuarioAtual || !personagemAtual) { alert('Nenhum personagem ativo. Ative um personagem antes de salvar a foto.'); return; }
     const b64 = await imageToBase64(input.files[0]);
     _fotoPrincipal = b64;
     renderFotoPersonagem();
     atualizarFichaHero();
     await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
+    // Atualiza cache da sidebar
+    const fotoKey = '_sbfoto_' + usuarioAtual + '_' + personagemAtual;
+    sessionStorage.setItem(fotoKey, _fotoPrincipal);
+    renderizarPersonagensNaSidebar();
   };
   input.click();
 }
@@ -1777,20 +2652,109 @@ function abrirLightbox(src) {
   document.body.appendChild(ov);
 }
 
+// Abre painel de ações ao clicar em uma miniatura com foto
+function abrirAcoesMiniatura(slot, src) {
+  // Apenas o dono ou GM pode gerenciar
+  if (roleAtual !== 'player' && roleAtual !== 'gm') {
+    abrirLightbox(src);
+    return;
+  }
+  document.getElementById('modal-mini-acao')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'modal-mini-acao';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:980;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;';
+  ov.innerHTML = `
+    <div style="background:linear-gradient(160deg,#131118,#0e0c13);border:1px solid rgba(60,40,60,.7);padding:1.5rem 1.75rem;width:min(94vw,340px);position:relative;box-shadow:0 8px 40px rgba(0,0,0,.8)">
+      <div style="font-family:'Playfair Display',serif;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent-light);margin-bottom:1rem">Foto ${slot+1}</div>
+      <img src="${src}" style="width:100%;max-height:180px;object-fit:contain;border:1px solid rgba(60,40,60,.5);margin-bottom:1rem;display:block;">
+      <div style="display:flex;flex-direction:column;gap:.6rem">
+        <button onclick="document.getElementById('modal-mini-acao').remove();adicionarFotoGaleria(${slot})"
+          style="width:100%;padding:.6rem;background:var(--accent);border:none;color:#fff;font-family:'Playfair Display',serif;font-size:.9rem;letter-spacing:1px;cursor:pointer;transition:background .2s"
+          onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='var(--accent)'">
+          🔄 Trocar Foto
+        </button>
+        <button onclick="document.getElementById('modal-mini-acao').remove();removerFotoGaleria(${slot})"
+          style="width:100%;padding:.6rem;background:rgba(156,42,42,.15);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;font-family:inherit;font-size:.88rem;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.background='rgba(193,63,63,.25)'" onmouseout="this.style.background='rgba(156,42,42,.15)'">
+          ✕ Remover Foto
+        </button>
+        <button onclick="abrirLightbox('${src.replace(/'/g,"\\'")}')"
+          style="width:100%;padding:.5rem;background:none;border:1px solid rgba(50,40,65,.6);color:var(--text-muted);font-family:inherit;font-size:.82rem;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='rgba(50,40,65,.6)'">
+          ⤢ Ampliar
+        </button>
+        <button onclick="document.getElementById('modal-mini-acao').remove()"
+          style="width:100%;padding:.4rem;background:none;border:none;color:#555;font-family:inherit;font-size:.8rem;cursor:pointer;margin-top:.2rem">
+          Cancelar
+        </button>
+      </div>
+    </div>`;
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
+async function removerFotoPrincipal() {
+  _fotoPrincipal = null;
+  renderFotoPersonagem();
+  atualizarFichaHero();
+  await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
+}
+
+// ─── ARMAS DINÂMICAS ───────────────────────────────────────────
+let _armaCounter = 3;
+
+function addArmaRow() {
+  const tbody = document.getElementById('armas-tbody');
+  if (!tbody) return;
+  _armaCounter++;
+  const n = _armaCounter;
+  const tr = document.createElement('tr');
+  tr.id = `arma-row-${n}`;
+  tr.innerHTML = `
+    <td data-label="Nome"><input type="text" id="arm${n}-nome" style="min-width:110px" oninput="salvarLocal()"></td>
+    <td data-label="Bônus Atq."><input type="text" id="arm${n}-bat" style="min-width:55px" oninput="salvarLocal()"></td>
+    <td data-label="Dano"><input type="text" id="arm${n}-dano" style="min-width:55px" oninput="salvarLocal()"></td>
+    <td data-label="Crítico"><input type="text" id="arm${n}-crit" style="min-width:50px" oninput="salvarLocal()"></td>
+    <td data-label="Tipo"><input type="text" id="arm${n}-tipo" style="min-width:55px" oninput="salvarLocal()"></td>
+    <td data-label="Alcance"><input type="text" id="arm${n}-alc" style="min-width:55px" oninput="salvarLocal()"></td>
+    <td data-label="Notas"><input type="text" id="arm${n}-obs" oninput="salvarLocal()"></td>
+    <td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+  salvarLocal();
+}
+
+function removeArmaRow() {
+  const tbody = document.getElementById('armas-tbody');
+  if (!tbody) return;
+  const rows = tbody.querySelectorAll('tr');
+  if (rows.length <= 1) return;
+  rows[rows.length - 1].remove();
+  salvarLocal();
+}
+
+function removeArmaRowEl(btn) {
+  const tr = btn.closest('tr');
+  if (tr) { tr.remove(); salvarLocal(); }
+}
+
 function renderFotoPersonagem() {
   const area = document.getElementById('personagem-foto-area');
   if (!area) return;
 
-  // Foto principal
+  // Foto principal com botão de remover
   const principal = _fotoPrincipal
-    ? `<img src="${_fotoPrincipal}" class="personagem-foto-display" onclick="abrirSeletorFotoPrincipal()" title="Clique para trocar">`
+    ? `<div style="position:relative;display:inline-block">
+        <img src="${_fotoPrincipal}" class="personagem-foto-display" onclick="abrirSeletorFotoPrincipal()" title="Clique para trocar">
+        <button onclick="event.stopPropagation();removerFotoPrincipal()" title="Remover foto principal" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.75);border:none;color:#f5a0a0;font-size:.65rem;cursor:pointer;padding:.15rem .35rem;border-radius:2px;line-height:1.4">✕</button>
+       </div>`
     : `<div class="personagem-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><span style="font-size:1.8rem">📷</span><span>Foto Principal</span></div>`;
 
-  // 5 miniaturas
+  // 5 miniaturas — clique abre painel de ação (remover / trocar / ampliar)
   const minis = _galeriaFotos.map((src, i) => {
     if (src) {
       return `<div class="foto-miniatura-item">
-        <img src="${src}" onclick="abrirLightbox('${src.replace(/'/g,"\\'")}');_fotoPrincipal='${src.replace(/'/g,"\\'")}';renderFotoPersonagem();atualizarFichaHero()" title="Clique para ampliar / definir como principal">
+        <img src="${src.replace(/'/g,"&apos;")}" onclick="abrirAcoesMiniatura(${i},'${src.replace(/'/g,"\\'")}');" title="Clique para gerenciar foto">
         <button class="btn-remove-mini" onclick="event.stopPropagation();removerFotoGaleria(${i})">✕</button>
       </div>`;
     }
@@ -1880,9 +2844,9 @@ function atualizarFichaHero() {
 
   // Recursos para exibição no hero
   const pvMax = document.getElementById('r-pv')?.textContent || '0';
-  const pvAtual = document.getElementById('pv-atual')?.value || '0';
+  const pvAtual = document.getElementById('pv-atual-display')?.textContent || pvMax;
   const peMax = document.getElementById('r-pe')?.textContent || '0';
-  const peAtual = document.getElementById('pe-atual')?.value || '0';
+  const peAtual = document.getElementById('pe-atual-display')?.textContent || peMax;
   const ca = document.getElementById('r-ca')?.textContent || '10';
   const nivel = document.getElementById('f-nivel')?.value || '1';
 
@@ -1890,8 +2854,9 @@ function atualizarFichaHero() {
     ? `<img src="${_fotoPrincipal}" class="ficha-hero-foto-img" onclick="abrirSeletorFotoPrincipal()" title="Trocar foto">`
     : `<div class="ficha-hero-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><span style="font-size:2rem">📷</span><span>Foto</span></div>`;
 
+  // Miniaturas no hero — clique abre painel de ação
   const miniHtml = _galeriaFotos.map((src, i) => {
-    if (src) return `<img class="ficha-hero-mini-img" src="${src}" onclick="abrirLightbox('${src.replace(/'/g,"\\'")}');_fotoPrincipal='${src.replace(/'/g,"\\'")}';renderFotoPersonagem();atualizarFichaHero()" title="Ver / definir como principal">`;
+    if (src) return `<img class="ficha-hero-mini-img" src="${src.replace(/'/g,"&apos;")}" onclick="abrirAcoesMiniatura(${i},'${src.replace(/'/g,"\\'")}');" title="Gerenciar foto">`;
     return `<div class="ficha-hero-mini-placeholder" onclick="adicionarFotoGaleria(${i})" title="Adicionar miniatura">+</div>`;
   }).join('');
 
@@ -1905,8 +2870,8 @@ function atualizarFichaHero() {
           ${poder ? `<div class="ficha-hero-poder">⚡ ${poder}</div>` : ''}
           <div class="ficha-hero-recursos">
             <div class="ficha-hero-recurso-pill">Nv. <strong>${nivel}</strong></div>
-            <div class="ficha-hero-recurso-pill">PV <strong>${pvAtual}</strong></div>
-            <div class="ficha-hero-recurso-pill">PE <strong>${peAtual}</strong></div>
+            <div class="ficha-hero-recurso-pill">PV <strong>${pvMax}</strong></div>
+            <div class="ficha-hero-recurso-pill">PE <strong>${peMax}</strong></div>
             <div class="ficha-hero-recurso-pill">CA <strong>${ca}</strong></div>
           </div>
         </div>
@@ -1980,11 +2945,13 @@ function confirmarNovoPersonagem() {
   }
 
   lista.push(nome);
-  salvarListaPersonagens(lista);
   personagemAtual = nome;
+  // Salva a lista na nuvem PRIMEIRO (para o GM ver o personagem)
+  salvarListaPersonagens(lista);
   // salva ficha em branco para esse personagem (local + nuvem)
-  localStorage.setItem('ficha_' + usuarioAtual + '_' + nome, JSON.stringify({}));
-  salvarFichaFirestore(usuarioAtual, {}).then(() => console.log('[Firestore] Ficha em branco criada:', nome));
+  const fichaVazia = {'f-nome': '', 'f-nivel': '1'};
+  localStorage.setItem('ficha_' + usuarioAtual + '_' + nome, JSON.stringify(fichaVazia));
+  salvarFichaFirestore(usuarioAtual, fichaVazia).then(() => console.log('[Firestore] Ficha em branco criada:', nome));
 
   cancelarNovoPersonagem();
   renderizarPersonagensAccordion();
@@ -2031,6 +2998,9 @@ function renderizarPersonagensAccordion() {
           <button data-acao="ativar" style="background:var(--accent);border:none;color:#fff;padding:.45rem 1.2rem;font-family:'Playfair Display',serif;font-size:.88rem;cursor:pointer;letter-spacing:1px;transition:background .2s" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='var(--accent)'">
             ▶ Ativar Ficha
           </button>
+          <button data-acao="ver-atributos" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.45rem 1rem;font-family:'Playfair Display',serif;font-size:.88rem;cursor:pointer;letter-spacing:.5px;transition:all .2s" onmouseover="this.style.background='rgba(156,42,42,.15)'" onmouseout="this.style.background='none'" title="Ir para os atributos desta ficha">
+            ◆ Ver Atributos
+          </button>
           <button data-acao="renomear" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.45rem 1rem;font-family:inherit;font-size:.85rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">
             ✏ Editar
           </button>
@@ -2051,6 +3021,16 @@ function renderizarPersonagensAccordion() {
     // Dropdown (menu ···)
     item.querySelectorAll('[data-acao="renomear"]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); editarNomePersonagem(nome); fecharDropdowns(); }));
     item.querySelectorAll('[data-acao="ativar"]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); ativarPersonagem(nome); fecharDropdowns(); }));
+    item.querySelectorAll('[data-acao="ver-atributos"]').forEach(b => b.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      fecharDropdowns();
+      if (nome !== personagemAtual) await ativarPersonagem(nome);
+      setTimeout(() => {
+        const attrEl = document.querySelector('.atributos-grid') || document.querySelector('[id^="a-for"]');
+        const panel = attrEl?.closest('.ficha-panel') || attrEl;
+        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, nome !== personagemAtual ? 500 : 100);
+    }));
     item.querySelectorAll('[data-acao="excluir"]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); confirmarExcluirPersonagem(nome); fecharDropdowns(); }));
 
     accordion.appendChild(item);
@@ -2248,7 +3228,7 @@ async function deletarPersonagem(nome) {
   // 3. Cria backup completo no Firebase ANTES de qualquer exclusão
   if (window.db && window.doc && window.setDoc) {
     try {
-      const backupDocId = usuarioAtual + '_' + nome;
+      const backupDocId = _fsDocId(usuarioAtual, nome);
       await window.setDoc(window.doc(window.db, 'backupsPersonagens', backupDocId), {
         nome,
         usuario: usuarioAtual,
@@ -2263,7 +3243,7 @@ async function deletarPersonagem(nome) {
 
     // 4. Marca a ficha com status=arquivado (não apaga fisicamente)
     try {
-      const fichaDocId = usuarioAtual + '_' + nome;
+      const fichaDocId = _fsDocId(usuarioAtual, nome);
       const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
       if (fichaSnap.exists()) {
         await window.setDoc(window.doc(window.db, 'fichas', fichaDocId), {
@@ -2361,8 +3341,8 @@ function renderizarPersonagensNaSidebar() {
 // Atalho direto: clique no nome → ativa + scroll para ficha imediatamente
 async function navFichaPersonagem(nome) {
   document.getElementById('sidebar').classList.remove('open');
-  const btn = document.getElementById('sidebar-float-btn');
-  if (btn && window.innerWidth <= 1024) btn.style.display = 'flex';
+  document.getElementById('sidebar-arrow-btn')?.classList.remove('open');
+  document.getElementById('sidebar-backdrop')?.classList.remove('show');
 
   if (nome !== personagemAtual) {
     await ativarPersonagem(nome);
@@ -2423,13 +3403,21 @@ function carregarFicha(){
 
 
 // ─── FÓRMULAS (salvas no Firestore, cache local) ───
+// Variáveis disponíveis nas fórmulas:
+//   Atributos brutos: forca, destreza, vigor, intelecto, alma, carisma, nivel
+//   Modificadores:    modForca, modDestreza, modVigor, modIntelecto, modAlma, modCarisma
+//   Aliases antigos:  aFor, aDes, aVig, aInt, aAlm, aCar (iguais aos nomes novos)
+//   Bônus de recursos: bonusPV, bonusSTA, bonusPE, bonusCA
+//   Derivados:        pvBase, staBase, maestria, attrMod (perícias)
+//   Funções:          floor(), ceil(), round()
 function getFormulas() {
   const def = {
-    pv:         '(mVig + mAlm) * (2 + floor(nivel / 2))',
-    sta:        '((floor(nivel/2)+2)*(mAlm+mInt))+2',
-    pe:         'floor((pvBase/2)/staBase)+bonusPE',
-    ca:         '10 + mDes + ceil(mVig / 2) + bonusCA',
-    init:       'mDes',
+    // Fórmulas oficiais Torre do Pesadelo
+    pv:         '(vigor + alma) * (2 + floor(nivel / 2))',
+    sta:        '(vigor + alma) * (2 + floor(nivel / 2))',
+    pe:         '(floor(nivel / 2) + 2) * (modAlma + modIntelecto)',
+    ca:         '10 + modDestreza + ceil(modVigor / 2) + bonusCA',
+    init:       'modDestreza',
     maestria:   '1 + ceil(nivel / 4)',
     'per-base': 'attrMod + floor(nivel / 2)',
     'per-mt':   'attrMod + floor(nivel / 2) + maestria',
@@ -2498,60 +3486,126 @@ function avaliarFormula(expr, ctx) {
 
 function calcTudo() {
   const f = getFormulas();
-  const nivel = parseInt(document.getElementById('f-nivel')?.value) || 1;
-  const aFor = parseInt(document.getElementById('a-for')?.value) || 10;
-  const aDes = parseInt(document.getElementById('a-des')?.value) || 10;
-  const aVig = parseInt(document.getElementById('a-vig')?.value) || 10;
-  const aInt = parseInt(document.getElementById('a-int')?.value) || 10;
-  const aAlm = parseInt(document.getElementById('a-alm')?.value) || 10;
-  const aCar = parseInt(document.getElementById('a-car')?.value) || 10;
-  const mFor=getMod(aFor), mDes=getMod(aDes), mVig=getMod(aVig), mInt=getMod(aInt), mAlm=getMod(aAlm), mCar=getMod(aCar);
-  const bonusPV=parseInt(document.getElementById('b-pv')?.value)||0;
-  const bonusSTA=parseInt(document.getElementById('b-sta')?.value)||0;
-  const bonusPE=parseInt(document.getElementById('b-pe')?.value)||0;
-  const bonusCA=parseInt(document.getElementById('b-ca')?.value)||0;
 
+  // ── Atributos brutos ──
+  const nivel    = parseInt(document.getElementById('f-nivel')?.value) || 1;
+  const forca    = parseInt(document.getElementById('a-for')?.value)   || 10;
+  const destreza = parseInt(document.getElementById('a-des')?.value)   || 10;
+  const vigor    = parseInt(document.getElementById('a-vig')?.value)   || 10;
+  const intelecto= parseInt(document.getElementById('a-int')?.value)   || 10;
+  const alma     = parseInt(document.getElementById('a-alm')?.value)   || 10;
+  const carisma  = parseInt(document.getElementById('a-car')?.value)   || 10;
+
+  // ── Modificadores ──
+  const modForca    = getMod(forca);
+  const modDestreza = getMod(destreza);
+  const modVigor    = getMod(vigor);
+  const modIntelecto= getMod(intelecto);
+  const modAlma     = getMod(alma);
+  const modCarisma  = getMod(carisma);
+
+  // ── Bônus manuais ──
+  const bonusPV  = parseInt(document.getElementById('b-pv')?.value)  || 0;
+  const bonusSTA = parseInt(document.getElementById('b-sta')?.value) || 0;
+  const bonusPE  = parseInt(document.getElementById('b-pe')?.value)  || 0;
+  const bonusCA  = parseInt(document.getElementById('b-ca')?.value)  || 0;
+
+  // ── Modo Tank: usa modVigor no lugar de modDestreza na CA ──
+  const modoTank = !!document.getElementById('modo-tank')?.checked;
+
+  // ── Contexto base com TODOS os nomes (novos + aliases antigos) ──
   const baseCtx = {
-  aFor,aDes,aVig,aInt,aAlm,aCar,
+    // Nomes novos (legíveis)
+    forca, destreza, vigor, intelecto, alma, carisma, nivel,
+    modForca, modDestreza, modVigor, modIntelecto, modAlma, modCarisma,
+    // Aliases legados (compatibilidade com fórmulas antigas)
+    aFor: forca, aDes: destreza, aVig: vigor, aInt: intelecto, aAlm: alma, aCar: carisma,
+    mFor: modForca, mDes: modDestreza, mVig: modVigor, mInt: modIntelecto, mAlm: modAlma, mCar: modCarisma,
+    bonusPV, bonusSTA, bonusPE, bonusCA,
+    floor: Math.floor, ceil: Math.ceil, round: Math.round
+  };
 
-  mFor,mDes,mVig,mInt,mAlm,mCar,
+  // ── Maestria ──
+  const maestria = Math.max(2, avaliarFormula(f['maestria'], {nivel, floor: Math.floor, ceil: Math.ceil, round: Math.round}));
 
-  nivel,
+  // ── PV base (sem bônus extra) ──
+  const pvBase = Math.max(1, Math.round(avaliarFormula(f['pv'], { ...baseCtx, maestria })));
 
-  bonusPV,
-  bonusSTA,
-  bonusPE,
-  bonusCA,
+  // ── STA base ──
+  const staBase = Math.max(1, Math.round(avaliarFormula(f['sta'], { ...baseCtx, maestria, pvBase })));
 
-  floor:Math.floor,
-  ceil:Math.ceil,
-  round:Math.round
-};
-  const maestria = Math.max(2, avaliarFormula(f['maestria'], {nivel,floor:Math.floor,ceil:Math.ceil,round:Math.round}));
-  const pvBase = avaliarFormula(f['pv'], {...baseCtx,maestria});
-  const staBase = Math.max(1, Math.round(avaliarFormula(f['sta'], {...baseCtx,maestria,pvBase})));
-  const ctx = {...baseCtx, maestria, pvBase, staBase};
+  // ── Contexto completo ──
+  const ctx = { ...baseCtx, maestria, pvBase, staBase };
 
-  // mods
-  ['for','des','vig','int','alm','car'].forEach(a => {
-    const el = document.getElementById('m-'+a); if(el) el.textContent = fmtMod(getMod(parseInt(document.getElementById('a-'+a)?.value)||10));
+  // ── Modo Tank: sobrescreve modDestreza por modVigor na CA ──
+  const ctxCA = modoTank ? { ...ctx, modDestreza: modVigor, mDes: modVigor } : ctx;
+
+  // ── Exibir modificadores nos atributos ──
+  const attrMap = { for: modForca, des: modDestreza, vig: modVigor, int: modIntelecto, alm: modAlma, car: modCarisma };
+  Object.entries(attrMap).forEach(([a, mod]) => {
+    const el = document.getElementById('m-' + a);
+    if (el) el.textContent = fmtMod(mod);
   });
-  const total = aFor+aDes+aVig+aInt+aAlm+aCar;
-  const ta = document.getElementById('total-attr');
-  if(ta) { ta.textContent=total; ta.style.color=total>80?'#f5a0a0':'var(--accent-light)'; }
 
-  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  set('r-pv',  Math.round(avaliarFormula(f['pv'],ctx)+bonusPV));
-  set('r-sta', Math.round(avaliarFormula(f['sta'],ctx)+bonusSTA));
-  set('r-pe',  Math.round(avaliarFormula(f['pe'],ctx)));
-  set('r-ca',  Math.round(avaliarFormula(f['ca'],ctx)));
-  set('r-init',fmtMod(Math.round(avaliarFormula(f['init'],ctx))));
+  // ── Total de pontos de atributo ──
+  const total = forca + destreza + vigor + intelecto + alma + carisma;
+  const ta = document.getElementById('total-attr');
+  if (ta) { ta.textContent = total; ta.style.color = total > 80 ? '#f5a0a0' : 'var(--accent-light)'; }
+
+  // ── Atualizar recursos na tela ──
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('r-pv',      Math.round(pvBase + bonusPV));
+  set('r-sta',     Math.round(staBase + bonusSTA));
+  set('r-pe',      Math.max(0, Math.round(avaliarFormula(f['pe'], ctx) + bonusPE)));
+  set('r-ca',      Math.round(avaliarFormula(f['ca'], ctxCA)));
+  set('r-init',    fmtMod(Math.round(avaliarFormula(f['init'], ctx))));
   set('r-maestria', '+' + Math.round(maestria));
 
-  // perícias — novo sistema de slots (recalcula bônus)
+  // ── Recalcula valores atuais (gasto) ──
+  calcRecursoAtual('pv');
+  calcRecursoAtual('sta');
+  calcRecursoAtual('pe');
+
+  // ── Perícias — novo sistema de slots ──
   buildPericias();
 
   salvarLocal();
+}
+
+// ─── CÁLCULO AUTOMÁTICO DOS RECURSOS ATUAIS ───
+function calcRecursoAtual(tipo) {
+  if (tipo === 'pv') {
+    const pvMax = parseInt(document.getElementById('r-pv')?.textContent) || 0;
+    const pvExtra = parseInt(document.getElementById('pv-extra')?.value) || 0;
+    const pvGasto = parseInt(document.getElementById('pv-gasto')?.value) || 0;
+    const atual = (pvMax + pvExtra) - pvGasto;
+    const el = document.getElementById('pv-atual-display');
+    if (el) {
+      el.textContent = atual;
+      el.style.color = atual <= 0 ? '#f5a0a0' : atual <= Math.floor((pvMax + pvExtra) * 0.3) ? '#e0a040' : 'var(--accent-light)';
+    }
+    atualizarFichaHero();
+  } else if (tipo === 'sta') {
+    const staMax = parseInt(document.getElementById('r-sta')?.textContent) || 0;
+    const staExtra = parseInt(document.getElementById('sta-extra')?.value) || 0;
+    const staGasto = parseInt(document.getElementById('sta-gasto')?.value) || 0;
+    const atual = (staMax + staExtra) - staGasto;
+    const el = document.getElementById('sta-atual-display');
+    if (el) {
+      el.textContent = atual;
+      el.style.color = atual <= 0 ? '#f5a0a0' : atual <= Math.floor((staMax + staExtra) * 0.3) ? '#e0a040' : 'var(--accent-light)';
+    }
+  } else if (tipo === 'pe') {
+    const peMax = parseInt(document.getElementById('r-pe')?.textContent) || 0;
+    const peGasto = parseInt(document.getElementById('pe-gasto')?.value) || 0;
+    const atual = peMax - peGasto;
+    const el = document.getElementById('pe-atual-display');
+    if (el) {
+      el.textContent = atual;
+      el.style.color = atual <= 0 ? '#f5a0a0' : atual <= Math.floor(peMax * 0.3) ? '#e0a040' : 'var(--accent-light)';
+    }
+    atualizarFichaHero();
+  }
 }
 
 // ─── GERAR FICHA HTML ───
@@ -2628,19 +3682,35 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
   </div>
 </div>
 
-<!-- APARÊNCIA -->
-<div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem">
-  <div class="ficha-panel-title">◆ Aparência</div>
-  <div class="ficha-panel-body">
-    <div class="field-row cols-4" style="margin-bottom:.75rem">
-      ${fieldGroup('Cabelos','f-cabelos')}
-      ${fieldGroup('Olhos','f-olhos')}
-      ${fieldGroup('Pele','f-pele')}
-      ${fieldGroup('Roupas & Acessórios','f-roupas')}
+<!-- ATRIBUTOS — logo abaixo da ficha base, largura total -->
+<div class="ficha-full-row">
+  <div class="ficha-panel" style="border-top:3px solid var(--accent)!important;margin-bottom:1rem">
+    <div class="ficha-panel-title" style="font-size:.9rem;letter-spacing:4px;padding:1rem 1.5rem">◆ Atributos</div>
+    <div class="ficha-panel-body" style="padding:1.75rem 1.5rem 1.5rem">
+      <div class="atributos-grid" style="gap:.85rem">
+        ${['FOR','DES','VIG','INT','ALM','CAR'].map(a=>`
+        <div class="atributo-box">
+          <label style="letter-spacing:3px">${a}</label>
+          <input type="number" id="a-${a.toLowerCase()}" min="1" max="30" value="10" oninput="calcTudo()">
+          <div class="atributo-mod" id="m-${a.toLowerCase()}">+0</div>
+        </div>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem;flex-wrap:wrap;gap:.75rem">
+        <p style="font-size:.78rem;color:var(--text-muted);margin:0">Total: <strong id="total-attr" style="color:var(--accent-light);font-family:'Playfair Display',serif;font-size:1.05rem">60</strong> <span style="color:#555">/ 80 pontos</span></p>
+        <div style="display:flex;gap:2rem">
+          <div style="text-align:center">
+            <div style="font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:.2rem">Maestria</div>
+            <div id="r-maestria" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--silver)">+2</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:.2rem">Iniciativa</div>
+            <div id="r-init" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--silver)">+0</div>
+          </div>
+        </div>
+      </div>
     </div>
-    ${fieldGroup('Aparência','f-aparencia','textarea')}
   </div>
-</div>
+</div><!-- /ficha-full-row atributos -->
 
 <!-- PODER — barra grande expansível igual à Lore -->
 <div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem">
@@ -2663,14 +3733,17 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
     <!-- PASSIVAS -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;margin-bottom:.5rem">
       <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Habilidades Passivas</div>
-      <button onclick="addPassiva()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Passiva</button>
+      <div style="display:flex;gap:.4rem">
+        <button onclick="addPassiva()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Passiva</button>
+        <button onclick="removePassiva()" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.3rem .7rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'" title="Remover última passiva">−</button>
+      </div>
     </div>
     <div class="table-wrapper"><table>
       <thead><tr><th style="min-width:160px">Nome da Passiva</th><th>Descrição / Efeito</th></tr></thead>
       <tbody id="passivas-tbody">
         ${[1,2,3,4].map(n=>`<tr>
-          <td><input type="text" id="pass${n}-nome" style="min-width:140px" placeholder="Nome..." oninput="salvarLocal()"></td>
-          <td><textarea id="pass${n}-desc" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
+          <td data-label="Nome da Passiva"><input type="text" id="pass${n}-nome" style="min-width:140px" placeholder="Nome..." oninput="salvarLocal()"></td>
+          <td data-label="Descrição / Efeito"><textarea id="pass${n}-desc" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
         </tr>`).join('')}
       </tbody>
     </table></div>
@@ -2678,15 +3751,18 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
     <!-- DESPERTARES -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;margin-bottom:.5rem">
       <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Despertares</div>
-      <button onclick="addDespertar()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Despertar</button>
+      <div style="display:flex;gap:.4rem">
+        <button onclick="addDespertar()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Despertar</button>
+        <button onclick="removeDespertar()" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.3rem .7rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'" title="Remover último despertar">−</button>
+      </div>
     </div>
     <div class="table-wrapper"><table>
       <thead><tr><th style="min-width:160px">Nome do Despertar</th><th>Condição / Gatilho</th><th>Efeito</th></tr></thead>
       <tbody id="despertares-tbody">
         ${[1,2,3].map(n=>`<tr>
-          <td><input type="text" id="desp${n}-nome" placeholder="Nome..." oninput="salvarLocal()"></td>
-          <td><input type="text" id="desp${n}-cond" placeholder="Gatilho..." oninput="salvarLocal()"></td>
-          <td><textarea id="desp${n}-efei" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
+          <td data-label="Nome do Despertar"><input type="text" id="desp${n}-nome" placeholder="Nome..." oninput="salvarLocal()"></td>
+          <td data-label="Condição / Gatilho"><input type="text" id="desp${n}-cond" placeholder="Gatilho..." oninput="salvarLocal()"></td>
+          <td data-label="Efeito"><textarea id="desp${n}-efei" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
         </tr>`).join('')}
       </tbody>
     </table></div>
@@ -2694,7 +3770,10 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
     <!-- TÉCNICAS -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;margin-bottom:.5rem">
       <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Técnicas</div>
-      <button onclick="addTecnica()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Técnica</button>
+      <div style="display:flex;gap:.4rem">
+        <button onclick="addTecnica()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Técnica</button>
+        <button onclick="removeTecnica()" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.3rem .7rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'" title="Remover última técnica">−</button>
+      </div>
     </div>
     <div id="tecnicas-lista"></div>
   </div>
@@ -2709,6 +3788,19 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
   </div>
   <div class="ficha-expand-area" id="area-lore">
   <div class="ficha-panel-body">
+    <!-- PERSONALIDADE -->
+    <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+      <div style="font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
+        Personalidade & Mentalidade
+        <span style="flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;display:inline-block"></span>
+      </div>
+      <div class="field-row cols-2" style="margin-bottom:.75rem">
+        ${fieldGroup('Personalidade','r-personalidade','textarea')}
+        ${fieldGroup('Mentalidade & Crenças','r-mentalidade','textarea')}
+      </div>
+      ${fieldGroup('Comportamento em Combate / Situações de Pressão','r-comportamento','textarea')}
+    </div>
+    <!-- TRAÇOS -->
     <div class="field-row cols-2">
       ${fieldGroup('Traços da Alma — Positivos','r-tracos','textarea')}
       ${fieldGroup('Traços da Alma — Negativos','r-defeitos','textarea')}
@@ -2728,83 +3820,143 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
   </div>
 </div>
 
-<!-- LAYOUT DE DUAS COLUNAS (desktop): Atributos + Recursos | Perícias + Armas -->
+
+
+<!-- APARÊNCIA — após Lore, acima dos recursos -->
+<div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem">
+  <div class="ficha-panel-title">◆ Aparência</div>
+  <div class="ficha-panel-body">
+    <div class="field-row cols-4" style="margin-bottom:.75rem">
+      ${fieldGroup('Cabelos','f-cabelos')}
+      ${fieldGroup('Olhos','f-olhos')}
+      ${fieldGroup('Pele','f-pele')}
+      ${fieldGroup('Roupas & Acessórios','f-roupas')}
+    </div>
+    ${fieldGroup('Aparência','f-aparencia','textarea')}
+  </div>
+</div>
+
+<!-- LAYOUT DE DUAS COLUNAS (desktop): Recursos | Armas -->
 <div class="ficha-layout-cols">
 
-  <!-- COLUNA ESQUERDA: Atributos + Recursos -->
+  <!-- COLUNA ESQUERDA: Recursos -->
   <div class="ficha-col-left">
 
-    <!-- ATRIBUTOS -->
-    <div class="ficha-panel">
-      <div class="ficha-panel-title">◆ Atributos</div>
-      <div class="ficha-panel-body" style="padding:1.5rem 1.2rem">
-        <div class="atributos-grid">
-          ${['FOR','DES','VIG','INT','ALM','CAR'].map(a=>`
-          <div class="atributo-box">
-            <label>${a}</label>
-            <input type="number" id="a-${a.toLowerCase()}" min="1" max="30" value="10" oninput="calcTudo()">
-            <div class="atributo-mod" id="m-${a.toLowerCase()}">+0</div>
-          </div>`).join('')}
-        </div>
-        <p style="font-size:.78rem;color:var(--text-muted);margin-top:1rem;margin-bottom:0">Total: <strong id="total-attr" style="color:var(--accent-light)">60</strong> / 80 pontos</p>
-      </div>
-    </div>
-
-    <!-- RECURSOS DE COMBATE -->
+    <!-- RECURSOS DE COMBATE — compactos -->
     <div class="ficha-panel">
       <div class="ficha-panel-title">◆ Recursos de Combate</div>
-      <div class="ficha-panel-body" style="padding:1.25rem 1.2rem">
+      <div class="ficha-panel-body" style="padding:1rem 1.2rem">
 
-        <!-- PV / STA / PE -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
-          <div class="recurso-tracker">
-            <div class="recurso-tracker-title">PV <span class="info-btn">ⓘ<span class="tooltip">(mVIG + mALM) × (2 + nível÷2)</span></span></div>
-            <div class="recurso-tracker-max">Máx: <strong id="r-pv">0</strong> <span style="font-size:.65rem;color:#555;margin-left:.25rem">+</span> <input type="number" id="b-pv" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()"></div>
-            <div class="recurso-tracker-row"><div class="recurso-tracker-label">Atual</div><input type="number" id="pv-atual" value="0" class="recurso-tracker-input" oninput="salvarLocal();atualizarFichaHero()"></div>
-            <div class="recurso-tracker-row" style="margin-top:.4rem"><div class="recurso-tracker-label">Temp.</div><input type="number" id="pv-temp" value="0" class="recurso-tracker-input" oninput="salvarLocal()"></div>
+        <!-- PV / STA / PE — três colunas compactas -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.75rem">
+
+          <!-- PV -->
+          <div style="background:linear-gradient(160deg,#161220,#0e0c14);border:1px solid rgba(50,40,65,.5);border-top:2px solid var(--accent);padding:.75rem .6rem">
+            <div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem">
+              PV <span class="info-btn" style="font-size:.65rem">ⓘ<span class="tooltip">(vigor + alma) × (2 + ⌊nível÷2⌋)</span></span>
+            </div>
+            <div style="text-align:center;font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--accent-light);line-height:1;margin-bottom:.3rem" id="r-pv">0</div>
+            <div style="font-size:.58rem;color:#555;text-align:center;margin-bottom:.5rem">máximo</div>
+            <div style="display:flex;flex-direction:column;gap:.3rem">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
+                <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Bônus</span>
+                <input type="number" id="b-pv" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()">
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
+                <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Extra</span>
+                <input type="number" id="pv-extra" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pv');salvarLocal()">
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
+                <span style="font-size:.6rem;color:#f5a0a0;white-space:nowrap">Gasto</span>
+                <input type="number" id="pv-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pv');salvarLocal()">
+              </div>
+              <div style="border-top:1px solid var(--border);padding-top:.3rem;text-align:center">
+                <div style="font-size:.55rem;color:var(--accent-light);letter-spacing:1px;margin-bottom:.1rem">ATUAL</div>
+                <div id="pv-atual-display" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--accent-light)">0</div>
+              </div>
+            </div>
           </div>
-          <div class="recurso-tracker">
-            <div class="recurso-tracker-title">STA <span class="info-btn">ⓘ<span class="tooltip">(nível÷2 + 2) × (mALM + mINT) + 2</span></span></div>
-            <div class="recurso-tracker-max">Máx: <strong id="r-sta">0</strong> <span style="font-size:.65rem;color:#555;margin-left:.25rem">+</span> <input type="number" id="b-sta" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()"></div>
-            <div class="recurso-tracker-row"><div class="recurso-tracker-label">Atual</div><input type="number" id="sta-atual" value="0" class="recurso-tracker-input" oninput="salvarLocal()"></div>
-            <div class="recurso-tracker-row" style="margin-top:.4rem"><div class="recurso-tracker-label">Temp.</div><input type="number" id="sta-temp" value="0" class="recurso-tracker-input" oninput="salvarLocal()"></div>
+
+          <!-- STA -->
+          <div style="background:linear-gradient(160deg,#161220,#0e0c14);border:1px solid rgba(50,40,65,.5);border-top:2px solid rgba(100,80,140,.7);padding:.75rem .6rem">
+            <div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:#a080d0;margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem">
+              STA <span class="info-btn" style="font-size:.65rem">ⓘ<span class="tooltip">Igual ao PV base</span></span>
+            </div>
+            <div style="text-align:center;font-family:'Playfair Display',serif;font-size:1.6rem;color:#a080d0;line-height:1;margin-bottom:.3rem" id="r-sta">0</div>
+            <div style="font-size:.58rem;color:#555;text-align:center;margin-bottom:.5rem">máximo</div>
+            <div style="display:flex;flex-direction:column;gap:.3rem">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
+                <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Bônus</span>
+                <input type="number" id="b-sta" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()">
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
+                <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Extra</span>
+                <input type="number" id="sta-extra" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('sta');salvarLocal()">
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
+                <span style="font-size:.6rem;color:#f5a0a0;white-space:nowrap">Gasto</span>
+                <input type="number" id="sta-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('sta');salvarLocal()">
+              </div>
+              <div style="border-top:1px solid var(--border);padding-top:.3rem;text-align:center">
+                <div style="font-size:.55rem;color:#a080d0;letter-spacing:1px;margin-bottom:.1rem">ATUAL</div>
+                <div id="sta-atual-display" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#a080d0">0</div>
+              </div>
+            </div>
           </div>
-          <div class="recurso-tracker">
-            <div class="recurso-tracker-title">PE <span class="info-btn">ⓘ<span class="tooltip">PVmáx ÷ (2 × STA)</span></span></div>
-            <div class="recurso-tracker-max">Máx: <strong id="r-pe">0</strong> <span style="font-size:.65rem;color:#555;margin-left:.25rem">+</span> <input type="number" id="b-pe" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()"></div>
-            <div class="recurso-tracker-row"><div class="recurso-tracker-label">Atual</div><input type="number" id="pe-atual" value="0" class="recurso-tracker-input" oninput="salvarLocal();atualizarFichaHero()"></div>
-            <div class="recurso-tracker-row" style="margin-top:.4rem"><div class="recurso-tracker-label">Gasto STA</div><input type="number" id="pe-gastosta" value="0" class="recurso-tracker-input" oninput="salvarLocal()"></div>
+
+          <!-- PE -->
+          <div style="background:linear-gradient(160deg,#161220,#0e0c14);border:1px solid rgba(50,40,65,.5);border-top:2px solid rgba(180,140,30,.7);padding:.75rem .6rem">
+            <div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem">
+              PE <span class="info-btn" style="font-size:.65rem">ⓘ<span class="tooltip">(⌊nível÷2⌋ + 2) × (modAlma + modIntelecto)</span></span>
+            </div>
+            <div style="text-align:center;font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold-light);line-height:1;margin-bottom:.3rem" id="r-pe">0</div>
+            <div style="font-size:.58rem;color:#555;text-align:center;margin-bottom:.5rem">máximo</div>
+            <div style="display:flex;flex-direction:column;gap:.3rem">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
+                <span style="font-size:.6rem;color:var(--text-muted);white-space:nowrap">Bônus</span>
+                <input type="number" id="b-pe" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudo()">
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
+                <span style="font-size:.6rem;color:#f5a0a0;white-space:nowrap">Gasto</span>
+                <input type="number" id="pe-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pe');salvarLocal()">
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
+                <span style="font-size:.6rem;color:var(--gold);white-space:nowrap">Custo</span>
+                <input type="number" id="pe-custo" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(180,140,30,.3);color:var(--gold);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="salvarLocal()">
+              </div>
+              <div style="border-top:1px solid var(--border);padding-top:.3rem;text-align:center">
+                <div style="font-size:.55rem;color:var(--gold-light);letter-spacing:1px;margin-bottom:.1rem">ATUAL</div>
+                <div id="pe-atual-display" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold-light)">0</div>
+              </div>
+            </div>
           </div>
+
         </div>
 
-        <!-- CA / Iniciativa / Maestria -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem">
+        <!-- CA / Deslocamento / Núcleo — segunda linha compacta -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.75rem">
           <div class="recurso-box-compact">
-            <div class="recurso-box-compact-label">CA <span class="info-btn">ⓘ<span class="tooltip">10 + mDES + bônus + ⌈mVIG÷2⌉</span></span> <input type="number" id="b-ca" value="0" style="width:38px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.1rem .3rem;font-size:.75rem;outline:none;text-align:center" oninput="calcTudo()" title="Bônus CA"></div>
+            <div class="recurso-box-compact-label">
+              CA <span class="info-btn">ⓘ<span class="tooltip">10 + modDES + ⌈modVIG÷2⌉ + bônus</span></span>
+              <input type="number" id="b-ca" value="0" style="width:36px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.1rem .3rem;font-size:.72rem;outline:none;text-align:center" oninput="calcTudo()" title="Bônus CA">
+            </div>
             <div class="recurso-box-compact-val" id="r-ca">10</div>
+            <label style="font-size:.58rem;color:var(--text-muted);display:flex;align-items:center;gap:.3rem;margin-top:.3rem;justify-content:center;cursor:pointer">
+              <input type="checkbox" id="modo-tank" onchange="calcTudo()" style="accent-color:var(--gold);cursor:pointer"> Tank
+            </label>
           </div>
-          <div class="recurso-box-compact">
-            <div class="recurso-box-compact-label">Iniciativa <span class="info-btn">ⓘ<span class="tooltip">Modificador de Destreza</span></span></div>
-            <div class="recurso-box-compact-val" id="r-init">+0</div>
-          </div>
-          <div class="recurso-box-compact">
-            <div class="recurso-box-compact-label">Maestria <span class="info-btn">ⓘ<span class="tooltip">1 + ⌈nível÷4⌉</span></span></div>
-            <div class="recurso-box-compact-val" id="r-maestria">+2</div>
-          </div>
-        </div>
-
-        <!-- Deslocamento -->
-        <div style="margin-bottom:1rem">
-          <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.5rem">Deslocamento</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem">
-            ${fieldGroup('Movimento (m)','f-mov','number',{default:8})}
-            ${fieldGroup('Vôo (m)','f-mov-voo','number',{default:''})}
-            ${fieldGroup('Nado (m)','f-mov-nado','number',{default:''})}
+          <div class="recurso-box-compact" style="grid-column:span 2">
+            <div class="recurso-box-compact-label" style="justify-content:flex-start">Deslocamento</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-top:.4rem">
+              ${fieldGroup('Mov. (m)','f-mov','number',{default:8})}
+              ${fieldGroup('Vôo (m)','f-mov-voo','number',{default:''})}
+              ${fieldGroup('Nado (m)','f-mov-nado','number',{default:''})}
+            </div>
           </div>
         </div>
 
         <!-- Maestrias/Es + Núcleo -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:1rem">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin-bottom:.75rem">
           ${fieldGroup('Mt. disponíveis','f-mt','number',{default:5,min:0})}
           ${fieldGroup('Es. disponíveis','f-es','number',{default:3,min:0})}
           ${fieldGroup('Núcleo (atual/máx)','f-nucleo')}
@@ -2812,11 +3964,11 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
 
         <!-- Testes de Morte -->
         <div>
-          <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.4rem">Testes de Morte</div>
+          <div style="font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.4rem">Testes de Morte</div>
           <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
-            <span style="font-size:.8rem;color:var(--text-muted)">Sucessos:</span>
+            <span style="font-size:.78rem;color:var(--text-muted)">Sucessos:</span>
             <input type="checkbox" id="ms1"> <input type="checkbox" id="ms2"> <input type="checkbox" id="ms3">
-            <span style="font-size:.8rem;color:var(--text-muted)">Fracassos:</span>
+            <span style="font-size:.78rem;color:var(--text-muted)">Fracassos:</span>
             <input type="checkbox" id="mf1" style="accent-color:#c13f3f">
             <input type="checkbox" id="mf2" style="accent-color:#c13f3f">
             <input type="checkbox" id="mf3" style="accent-color:#c13f3f">
@@ -2827,25 +3979,23 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
 
   </div><!-- /ficha-col-left -->
 
-  <!-- COLUNA DIREITA: Perícias + Armas -->
+  <!-- COLUNA DIREITA: Armas -->
   <div class="ficha-col-right">
-
-    <!-- PERÍCIAS — novo sistema de slots -->
-    <div class="ficha-panel">
-      <div class="ficha-panel-title">◆ Perícias</div>
-      <div class="ficha-panel-body" id="pericias-panel-body">
-        <!-- gerado por buildPericias() -->
-      </div>
-    </div>
 
     <!-- ARMAS -->
     <div class="ficha-panel">
-      <div class="ficha-panel-title">◆ Armas</div>
+      <div class="ficha-panel-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>◆ Armas</span>
+        <div style="display:flex;gap:.4rem">
+          <button onclick="addArmaRow()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.2rem .65rem;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:.5px" onmouseover="this.style.borderColor='var(--accent-light)';this.style.color='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">+ Slot</button>
+          <button onclick="removeArmaRow()" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.2rem .65rem;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
+        </div>
+      </div>
       <div class="ficha-panel-body">
         <div class="table-wrapper"><table>
-          <thead><tr><th style="min-width:130px">Nome</th><th>Bônus Atq.</th><th>Dano</th><th>Crítico</th><th>Tipo</th><th>Alcance</th><th>Notas</th></tr></thead>
-          <tbody>
-            ${[1,2,3,4,5,6].map(n=>`<tr>${['nome','bat','dano','crit','tipo','alc','obs'].map(f=>`<td><input type="text" id="arm${n}-${f}" style="min-width:${f==='nome'?'120':'55'}px" oninput="salvarLocal()"></td>`).join('')}</tr>`).join('')}
+          <thead><tr><th style="min-width:120px">Nome</th><th>Bônus Atq.</th><th>Dano</th><th>Crítico</th><th>Tipo</th><th>Alcance</th><th>Notas</th><th style="width:28px"></th></tr></thead>
+          <tbody id="armas-tbody">
+            ${[1,2,3].map(n=>`<tr id="arma-row-${n}"><td data-label="Nome"><input type="text" id="arm${n}-nome" style="min-width:110px" oninput="salvarLocal()"></td><td data-label="Bônus Atq."><input type="text" id="arm${n}-bat" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Dano"><input type="text" id="arm${n}-dano" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Crítico"><input type="text" id="arm${n}-crit" style="min-width:50px" oninput="salvarLocal()"></td><td data-label="Tipo"><input type="text" id="arm${n}-tipo" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Alcance"><input type="text" id="arm${n}-alc" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Notas"><input type="text" id="arm${n}-obs" oninput="salvarLocal()"></td><td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td></tr>`).join('')}
           </tbody>
         </table></div>
       </div>
@@ -2855,6 +4005,13 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
 
 </div><!-- /ficha-layout-cols -->
 
+  <!-- PERÍCIAS — abaixo dos recursos e armas, largura total -->
+  <div class="ficha-panel ficha-full-row" style="margin-bottom:1rem">
+    <div class="ficha-panel-title">◆ Perícias</div>
+    <div class="ficha-panel-body" id="pericias-panel-body">
+      <!-- gerado por buildPericias() -->
+    </div>
+  </div>
 
   <!-- INVENTÁRIO -->
   <div class="ficha-panel ficha-full-row">
@@ -2864,51 +4021,86 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         <span style="font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light)">Espíritos:</span>
         <input type="text" id="inv-espiritos" placeholder="Ex: 500" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.45rem .7rem;font-family:'Playfair Display',serif;font-size:1rem;outline:none;width:140px" oninput="salvarLocal()">
       </div>
-      <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0;margin-bottom:.5rem">Itens & Equipamentos</div>
+
+      <!-- Itens & Equipamentos -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0">Itens & Equipamentos</div>
+        <div style="display:flex;gap:.4rem">
+          <button onclick="addInvRow('inv-itens-tbody','item',['nome','qtd','esp','desc'],['Nome do Item','Qtd','Esp','Descrição'])" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Slot</button>
+          <button onclick="removeInvRow('inv-itens-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
+        </div>
+      </div>
       <div class="table-wrapper"><table>
-        <thead><tr><th style="min-width:200px">Nome do Item</th><th>Qtd.</th><th>Espaços</th><th>Descrição / Efeito</th></tr></thead>
-        <tbody>
-          ${Array.from({length:12},(_,i)=>i+1).map(n=>`<tr>
-            <td><input type="text" id="item${n}-nome" oninput="salvarLocal()"></td>
-            <td><input type="number" id="item${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
-            <td><input type="number" id="item${n}-esp" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
-            <td><input type="text" id="item${n}-desc" oninput="salvarLocal()"></td>
+        <thead><tr><th style="min-width:200px">Nome do Item</th><th>Qtd.</th><th>Espaços</th><th>Descrição / Efeito</th><th style="width:30px"></th></tr></thead>
+        <tbody id="inv-itens-tbody">
+          ${Array.from({length:12},(_,i)=>i+1).map(n=>`<tr id="inv-item-row-${n}">
+            <td data-label="Nome do Item"><input type="text" id="item${n}-nome" oninput="salvarLocal()"></td>
+            <td data-label="Qtd."><input type="number" id="item${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
+            <td data-label="Espaços"><input type="number" id="item${n}-esp" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
+            <td data-label="Descrição / Efeito"><input type="text" id="item${n}-desc" oninput="salvarLocal()"></td>
+            <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
           </tr>`).join('')}
         </tbody>
       </table></div>
-      <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0;margin:.75rem 0 .5rem">Consumíveis</div>
+
+      <!-- Consumíveis -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:.75rem 0 .5rem">
+        <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0">Consumíveis</div>
+        <div style="display:flex;gap:.4rem">
+          <button onclick="addInvRow('inv-cons-tbody','cons',['nome','qtd','efei'],['Nome','Qtd','Efeito'])" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Slot</button>
+          <button onclick="removeInvRow('inv-cons-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
+        </div>
+      </div>
       <div class="table-wrapper"><table>
-        <thead><tr><th style="min-width:180px">Nome</th><th>Qtd.</th><th>Efeito</th></tr></thead>
-        <tbody>
-          ${Array.from({length:6},(_,i)=>i+1).map(n=>`<tr>
-            <td><input type="text" id="cons${n}-nome" oninput="salvarLocal()"></td>
-            <td><input type="number" id="cons${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
-            <td><input type="text" id="cons${n}-efei" oninput="salvarLocal()"></td>
+        <thead><tr><th style="min-width:180px">Nome</th><th>Qtd.</th><th>Efeito</th><th style="width:30px"></th></tr></thead>
+        <tbody id="inv-cons-tbody">
+          ${Array.from({length:6},(_,i)=>i+1).map(n=>`<tr id="inv-cons-row-${n}">
+            <td data-label="Nome"><input type="text" id="cons${n}-nome" oninput="salvarLocal()"></td>
+            <td data-label="Qtd."><input type="number" id="cons${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
+            <td data-label="Efeito"><input type="text" id="cons${n}-efei" oninput="salvarLocal()"></td>
+            <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
           </tr>`).join('')}
         </tbody>
       </table></div>
+
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem">
         <div>
-          <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0;margin-bottom:.5rem">Materiais & Recursos</div>
+          <!-- Materiais & Recursos -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+            <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0">Materiais & Recursos</div>
+            <div style="display:flex;gap:.4rem">
+              <button onclick="addInvRow('inv-mat-tbody','mat',['nome','qtd'],['Material','Qtd'])" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+</button>
+              <button onclick="removeInvRow('inv-mat-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">−</button>
+            </div>
+          </div>
           <div class="table-wrapper"><table>
-            <thead><tr><th>Material</th><th>Qtd.</th></tr></thead>
-            <tbody>
+            <thead><tr><th>Material</th><th>Qtd.</th><th style="width:30px"></th></tr></thead>
+            <tbody id="inv-mat-tbody">
               ${Array.from({length:6},(_,i)=>i+1).map(n=>`<tr>
-                <td><input type="text" id="mat${n}-nome" oninput="salvarLocal()"></td>
-                <td><input type="number" id="mat${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
+                <td data-label="Material"><input type="text" id="mat${n}-nome" oninput="salvarLocal()"></td>
+                <td data-label="Qtd."><input type="number" id="mat${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
+                <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.8rem;padding:.1rem .25rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
               </tr>`).join('')}
             </tbody>
           </table></div>
         </div>
         <div>
-          <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0;margin-bottom:.5rem">Núcleos</div>
+          <!-- Núcleos -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+            <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0">Núcleos</div>
+            <div style="display:flex;gap:.4rem">
+              <button onclick="addInvRow('inv-nuc-tbody','nuc',['nome','tipo','efei'],['Nome','Tipo','Efeito'])" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+</button>
+              <button onclick="removeInvRow('inv-nuc-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">−</button>
+            </div>
+          </div>
           <div class="table-wrapper"><table>
-            <thead><tr><th>Nome</th><th>Tipo</th><th>Efeito</th></tr></thead>
-            <tbody>
+            <thead><tr><th>Nome</th><th>Tipo</th><th>Efeito</th><th style="width:30px"></th></tr></thead>
+            <tbody id="inv-nuc-tbody">
               ${Array.from({length:4},(_,i)=>i+1).map(n=>`<tr>
-                <td><input type="text" id="nuc${n}-nome" oninput="salvarLocal()"></td>
-                <td><input type="text" id="nuc${n}-tipo" style="width:70px" oninput="salvarLocal()"></td>
-                <td><input type="text" id="nuc${n}-efei" oninput="salvarLocal()"></td>
+                <td data-label="Nome"><input type="text" id="nuc${n}-nome" oninput="salvarLocal()"></td>
+                <td data-label="Tipo"><input type="text" id="nuc${n}-tipo" style="width:70px" oninput="salvarLocal()"></td>
+                <td data-label="Efeito"><input type="text" id="nuc${n}-efei" oninput="salvarLocal()"></td>
+                <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.8rem;padding:.1rem .25rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
               </tr>`).join('')}
             </tbody>
           </table></div>
@@ -2966,19 +4158,34 @@ function buildPericias() {
 
   body.innerHTML = `
     <!-- MAESTRIAS -->
-    <div class="pericias-slots-section">
-      <div class="pericias-slots-title">Maestrias</div>
-      <div id="slots-maestria"></div>
+    <div class="pericias-slots-section pericias-mobile-group aberto" data-grupo="maestria">
+      <div class="pericias-slots-title pericias-mobile-header" onclick="togglePericiaGrupoMobile(this)">
+        <span>Maestrias</span><span class="seta">▶</span>
+      </div>
+      <div class="pericias-mobile-body" id="slots-maestria-wrap">
+        <div id="slots-maestria"></div>
+      </div>
     </div>
     <!-- ESPECIALIZAÇÕES -->
-    <div class="pericias-slots-section">
-      <div class="pericias-slots-title">Especializações</div>
-      <div id="slots-especializacao"></div>
+    <div class="pericias-slots-section pericias-mobile-group aberto" data-grupo="especializacao">
+      <div class="pericias-slots-title pericias-mobile-header" onclick="togglePericiaGrupoMobile(this)">
+        <span>Especializações</span><span class="seta">▶</span>
+      </div>
+      <div class="pericias-mobile-body" id="slots-especializacao-wrap">
+        <div id="slots-especializacao"></div>
+      </div>
     </div>
   `;
 
   _renderSlots('maestria', numMt);
   _renderSlots('especializacao', numEs);
+}
+
+// Acordeão de Perícias (mobile) — abre/fecha cada grupo (Maestrias / Especializações)
+function togglePericiaGrupoMobile(headerEl) {
+  const grupo = headerEl.closest('.pericias-mobile-group');
+  if (!grupo) return;
+  grupo.classList.toggle('aberto');
 }
 
 function _renderSlots(tipo, total) {
@@ -2997,7 +4204,7 @@ function _renderSlots(tipo, total) {
     if (slot) {
       const f = getFormulas();
       const ctx = _getCalcCtx();
-      const attrMap = {FOR:ctx.mFor,DES:ctx.mDes,VIG:ctx.mVig,INT:ctx.mInt,ALM:ctx.mAlm,CAR:ctx.mCar};
+      const attrMap = {FOR:ctx.modForca,DES:ctx.modDestreza,VIG:ctx.modVigor,INT:ctx.modIntelecto,ALM:ctx.modAlma,CAR:ctx.modCarisma};
       const attrMod = attrMap[slot.attr] ?? 0;
       const pCtx = {...ctx, attrMod, maestria: ctx.maestria};
       const formula = tipo === 'maestria' ? f['per-mt'] : f['per-es'];
@@ -3023,25 +4230,39 @@ function _renderSlots(tipo, total) {
 
 function _getCalcCtx() {
   const f = getFormulas();
-  const nivel = parseInt(document.getElementById('f-nivel')?.value) || 1;
-  const aFor=parseInt(document.getElementById('a-for')?.value)||10;
-  const aDes=parseInt(document.getElementById('a-des')?.value)||10;
-  const aVig=parseInt(document.getElementById('a-vig')?.value)||10;
-  const aInt=parseInt(document.getElementById('a-int')?.value)||10;
-  const aAlm=parseInt(document.getElementById('a-alm')?.value)||10;
-  const aCar=parseInt(document.getElementById('a-car')?.value)||10;
-  const mFor=getMod(aFor), mDes=getMod(aDes), mVig=getMod(aVig), mInt=getMod(aInt), mAlm=getMod(aAlm), mCar=getMod(aCar);
-  const maestria = Math.max(2, avaliarFormula(f['maestria'], {nivel, floor:Math.floor, ceil:Math.ceil, round:Math.round}));
-  const pvBase = avaliarFormula(f['pv'], {aFor,aDes,aVig,aInt,aAlm,aCar,mFor,mDes,mVig,mInt,mAlm,mCar,nivel,bonusPV:0,bonusSTA:0,bonusPE:0,bonusCA:0,floor:Math.floor,ceil:Math.ceil,round:Math.round});
-  const staBase = Math.max(1, Math.round(avaliarFormula(f['sta'], {aFor,aDes,aVig,aInt,aAlm,aCar,mFor,mDes,mVig,mInt,mAlm,mCar,nivel,bonusPV:0,bonusSTA:0,bonusPE:0,bonusCA:0,pvBase,floor:Math.floor,ceil:Math.ceil,round:Math.round})));
-  return {aFor,aDes,aVig,aInt,aAlm,aCar,mFor,mDes,mVig,mInt,mAlm,mCar,nivel,maestria,pvBase,staBase,bonusPV:0,bonusSTA:0,bonusPE:0,bonusCA:0,floor:Math.floor,ceil:Math.ceil,round:Math.round};
+  const nivel     = parseInt(document.getElementById('f-nivel')?.value) || 1;
+  const forca     = parseInt(document.getElementById('a-for')?.value)   || 10;
+  const destreza  = parseInt(document.getElementById('a-des')?.value)   || 10;
+  const vigor     = parseInt(document.getElementById('a-vig')?.value)   || 10;
+  const intelecto = parseInt(document.getElementById('a-int')?.value)   || 10;
+  const alma      = parseInt(document.getElementById('a-alm')?.value)   || 10;
+  const carisma   = parseInt(document.getElementById('a-car')?.value)   || 10;
+  const modForca    = getMod(forca),    modDestreza = getMod(destreza), modVigor    = getMod(vigor);
+  const modIntelecto= getMod(intelecto),modAlma     = getMod(alma),     modCarisma  = getMod(carisma);
+
+  const maestria = Math.max(2, avaliarFormula(f['maestria'], { nivel, floor: Math.floor, ceil: Math.ceil, round: Math.round }));
+
+  const base = {
+    forca, destreza, vigor, intelecto, alma, carisma, nivel,
+    modForca, modDestreza, modVigor, modIntelecto, modAlma, modCarisma,
+    // aliases legados
+    aFor: forca, aDes: destreza, aVig: vigor, aInt: intelecto, aAlm: alma, aCar: carisma,
+    mFor: modForca, mDes: modDestreza, mVig: modVigor, mInt: modIntelecto, mAlm: modAlma, mCar: modCarisma,
+    bonusPV: 0, bonusSTA: 0, bonusPE: 0, bonusCA: 0,
+    floor: Math.floor, ceil: Math.ceil, round: Math.round
+  };
+
+  const pvBase  = Math.max(1, Math.round(avaliarFormula(f['pv'], { ...base, maestria })));
+  const staBase = Math.max(1, Math.round(avaliarFormula(f['sta'], { ...base, maestria, pvBase })));
+
+  return { ...base, maestria, pvBase, staBase };
 }
 
 function abrirSeletorPericia(tipo, slotIdx) {
   document.getElementById('pericias-dropdown-overlay')?.remove();
   const f = getFormulas();
   const ctx = _getCalcCtx();
-  const attrMap = {FOR:ctx.mFor,DES:ctx.mDes,VIG:ctx.mVig,INT:ctx.mInt,ALM:ctx.mAlm,CAR:ctx.mCar};
+  const attrMap = {FOR:ctx.modForca,DES:ctx.modDestreza,VIG:ctx.modVigor,INT:ctx.modIntelecto,ALM:ctx.modAlma,CAR:ctx.modCarisma};
 
   const overlay = document.createElement('div');
   overlay.className = 'pericias-dropdown-overlay';
@@ -3109,9 +4330,20 @@ function addTecnica() {
   if(!c) return;
   const d = document.createElement('div');
   d.className = 'poder-tecnica'; d.id = `tec-${numTecnicas}`;
-  d.innerHTML = `<div class="poder-tecnica-header"><span class="poder-tecnica-num">${numTecnicas}</span><input type="text" placeholder="Nome da Técnica" style="flex:1;background:transparent;border:none;color:var(--text);font-family:'Playfair Display',serif;font-size:.95rem;outline:none" id="tn-${numTecnicas}" oninput="salvarLocal()"><input type="number" placeholder="PE" style="background:transparent;border:none;color:var(--accent-light);width:50px;text-align:right;font-size:.9rem;outline:none" id="tc-${numTecnicas}" oninput="salvarLocal()"></div><div class="poder-tecnica-body"><textarea placeholder="Descrição..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.5rem;font-family:inherit;font-size:.87rem;resize:vertical;width:100%;outline:none;min-height:70px" id="td-${numTecnicas}" oninput="salvarLocal()"></textarea><textarea placeholder="Efeitos, alcance..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.5rem;font-family:inherit;font-size:.87rem;resize:vertical;width:100%;outline:none;min-height:70px" id="te-${numTecnicas}" oninput="salvarLocal()"></textarea></div>`;
+  d.innerHTML = `<div class="poder-tecnica-header"><span class="poder-tecnica-num">${numTecnicas}</span><input type="text" placeholder="Nome da Técnica" style="flex:1;background:transparent;border:none;color:var(--text);font-family:'Playfair Display',serif;font-size:.95rem;outline:none" id="tn-${numTecnicas}" oninput="salvarLocal()"><input type="number" placeholder="PE" style="background:transparent;border:none;color:var(--accent-light);width:50px;text-align:right;font-size:.9rem;outline:none" id="tc-${numTecnicas}" oninput="salvarLocal()"><button onclick="event.stopPropagation();removerTecnicaEl(this)" title="Remover técnica" style="background:none;border:none;color:#555;font-size:.85rem;cursor:pointer;padding:.15rem .4rem;margin-left:.25rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'">✕</button></div><div class="poder-tecnica-body"><textarea placeholder="Descrição..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.5rem;font-family:inherit;font-size:.87rem;resize:vertical;width:100%;outline:none;min-height:70px" id="td-${numTecnicas}" oninput="salvarLocal()"></textarea><textarea placeholder="Efeitos, alcance..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.5rem;font-family:inherit;font-size:.87rem;resize:vertical;width:100%;outline:none;min-height:70px" id="te-${numTecnicas}" oninput="salvarLocal()"></textarea></div>`;
   c.appendChild(d);
   salvarLocal();
+}
+
+function removeTecnica() {
+  if (numTecnicas <= 0) return;
+  const el = document.getElementById(`tec-${numTecnicas}`);
+  if (el) { el.remove(); numTecnicas--; salvarLocal(); }
+}
+
+function removerTecnicaEl(btn) {
+  const div = btn.closest('.poder-tecnica');
+  if (div) { div.remove(); salvarLocal(); }
 }
 
 // ─── SAVE / LOAD ───
@@ -3128,11 +4360,12 @@ function coletarDados() {
     'a-for','a-des','a-vig','a-int','a-alm','a-car',
     // recursos
     'b-pv','b-sta','b-pe','b-ca',
-    'pv-atual','pv-temp','sta-atual','sta-temp','pe-atual','pe-gastosta',
+    'pv-extra','pv-gasto','sta-extra','sta-gasto','pe-gasto','pe-custo',
     'f-mov','f-mov-voo','f-mov-nado','f-mt','f-es','f-nucleo',
     // poder
     'p-principal','p-attr','p-max','p-descricao','p-suprema',
     // registro
+    'r-personalidade','r-mentalidade','r-comportamento',
     'r-tracos','r-defeitos','r-ideais','r-ligacoes','r-antecedentes','r-historia','r-eventos','r-npcs',
     // inventário
     'inv-espiritos',
@@ -3145,7 +4378,23 @@ function coletarDados() {
   for(let n=2; n<=numPets; n++) {
     ['nome','esp','tipo','for','des','vig','int','esp2','car','pv','ca','mov','hab','evo'].forEach(f => petFields.push(`pet${n}-${f==='esp2'?'esp':f}`));
   }
-  const armaFields  = [1,2,3,4,5,6].flatMap(n=>['nome','bat','dano','crit','tipo','alc','obs'].map(f=>`arm${n}-${f}`));
+  const armaFields  = [];
+  const armasTbody = document.getElementById('armas-tbody');
+  if (armasTbody) {
+    armasTbody.querySelectorAll('tr').forEach(tr => {
+      const firstInput = tr.querySelector('input');
+      if (firstInput) {
+        const id = firstInput.id; // e.g. arm1-nome
+        const match = id.match(/^arm(\d+)-/);
+        if (match) {
+          const n = match[1];
+          ['nome','bat','dano','crit','tipo','alc','obs'].forEach(f => armaFields.push(`arm${n}-${f}`));
+        }
+      }
+    });
+  } else {
+    [1,2,3,4,5,6].flatMap(n=>['nome','bat','dano','crit','tipo','alc','obs'].map(f=>`arm${n}-${f}`)).forEach(f => armaFields.push(f));
+  }
   const passFields  = Array.from({length:numPassivas},(_,i)=>i+1).flatMap(n=>['nome','desc'].map(f=>`pass${n}-${f}`));
   const despFields  = Array.from({length:numDespertares},(_,i)=>i+1).flatMap(n=>['nome','cond','efei'].map(f=>`desp${n}-${f}`));
   const itemFields  = [1,2,3,4,5,6,7,8,9,10,11,12].flatMap(n=>['nome','qtd','esp','desc'].map(f=>`item${n}-${f}`));
@@ -3173,9 +4422,19 @@ function coletarDados() {
 // as novas auxiliares principais. localStorage é mantido apenas
 // como cache local secundário (fallback offline).
 
+// Sanitiza um nome de personagem para uso como (parte de) ID de documento Firestore.
+// IDs do Firestore não podem conter "/", e o SDK trata "/" dentro de um ID
+// passado a doc() como separador de caminho — o que corrompia o caminho e
+// fazia getDoc()/setDoc() falhar (silenciosamente, via catch) para personagens
+// com "/" no nome (ex: "Scarlett / MID9"), causando: ficha não carregava,
+// foto não salvava e o personagem desaparecia do ranking.
+function _sanitizeDocPart(s) {
+  return String(s ?? '').trim().replace(/[\/\\#\?\[\]\.]/g, '-');
+}
+
 function _fsDocId(user, personagem) {
   // Documento Firestore: coleção "fichas", id = "user_personagem"
-  return (user || usuarioAtual) + '_' + (personagem || personagemAtual || '_default');
+  return _sanitizeDocPart(user || usuarioAtual) + '_' + _sanitizeDocPart(personagem || personagemAtual || '_default');
 }
 
 async function salvarFichaFirestore(user, dados) {
@@ -3255,12 +4514,21 @@ function addPassiva() {
   const tbody = document.getElementById('passivas-tbody');
   if (!tbody) return;
   const tr = document.createElement('tr');
+  tr.id = `passiva-row-${numPassivas}`;
   tr.innerHTML = `
-    <td><input type="text" id="pass${numPassivas}-nome" style="min-width:140px" placeholder="Nome..." oninput="salvarLocal()"></td>
-    <td><textarea id="pass${numPassivas}-desc" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
+    <td data-label="Nome da Passiva"><input type="text" id="pass${numPassivas}-nome" style="min-width:140px" placeholder="Nome..." oninput="salvarLocal()"></td>
+    <td data-label="Descrição / Efeito"><textarea id="pass${numPassivas}-desc" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
   `;
   tbody.appendChild(tr);
   salvarLocal();
+}
+
+function removePassiva() {
+  if (numPassivas <= 1) return;
+  const tbody = document.getElementById('passivas-tbody');
+  if (!tbody) return;
+  const rows = tbody.querySelectorAll('tr');
+  if (rows.length > 1) { rows[rows.length-1].remove(); numPassivas--; salvarLocal(); }
 }
 
 function addDespertar() {
@@ -3269,12 +4537,20 @@ function addDespertar() {
   if (!tbody) return;
   const tr = document.createElement('tr');
   tr.innerHTML = `
-    <td><input type="text" id="desp${numDespertares}-nome" placeholder="Nome..." oninput="salvarLocal()"></td>
-    <td><input type="text" id="desp${numDespertares}-cond" placeholder="Gatilho..." oninput="salvarLocal()"></td>
-    <td><textarea id="desp${numDespertares}-efei" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
+    <td data-label="Nome do Despertar"><input type="text" id="desp${numDespertares}-nome" placeholder="Nome..." oninput="salvarLocal()"></td>
+    <td data-label="Condição / Gatilho"><input type="text" id="desp${numDespertares}-cond" placeholder="Gatilho..." oninput="salvarLocal()"></td>
+    <td data-label="Efeito"><textarea id="desp${numDespertares}-efei" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
   `;
   tbody.appendChild(tr);
   salvarLocal();
+}
+
+function removeDespertar() {
+  if (numDespertares <= 1) return;
+  const tbody = document.getElementById('despertares-tbody');
+  if (!tbody) return;
+  const rows = tbody.querySelectorAll('tr');
+  if (rows.length > 1) { rows[rows.length-1].remove(); numDespertares--; salvarLocal(); }
 }
 
 function addPet() {
@@ -3318,6 +4594,50 @@ function removerPet(n) {
   const div = document.getElementById(`pet-entry-${n}`);
   if (div) div.remove();
   salvarLocal();
+}
+
+// ─── INVENTÁRIO DINÂMICO ───────────────────────────────────────
+let _invCounters = { item: 12, cons: 6, mat: 6, nuc: 4 };
+
+function addInvRow(tbodyId, prefix, fields, labels) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  _invCounters[prefix] = (_invCounters[prefix] || 0) + 1;
+  const n = _invCounters[prefix];
+  const tr = document.createElement('tr');
+  tr.innerHTML = fields.map((f, i) => {
+    const isNum = f === 'qtd' || f === 'esp';
+    return `<td data-label="${labels[i]||''}"><input type="${isNum?'number':'text'}" id="${prefix}${n}-${f}" ${isNum?'style="width:50px;text-align:center"':''} placeholder="${labels[i]||''}" oninput="salvarLocal()"></td>`;
+  }).join('') + `<td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover linha">✕</button></td>`;
+  tbody.appendChild(tr);
+  salvarLocal();
+}
+
+function removeInvRow(tbodyId, minRows) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  const rows = tbody.querySelectorAll('tr');
+  if (rows.length <= (minRows || 1)) return;
+  rows[rows.length - 1].remove();
+  salvarLocal();
+}
+
+function removeInvRowEl(btn) {
+  const tr = btn.closest('tr');
+  if (tr) { tr.remove(); salvarLocal(); }
+}
+
+// ─── FOTO — botão de remover a foto principal ───────────────────
+async function removerFotoPrincipal() {
+  _fotoPrincipal = null;
+  renderFotoPersonagem();
+  atualizarFichaHero();
+  await salvarFotosPerfil(usuarioAtual, personagemAtual, null, _galeriaFotos);
+  // limpa cache da sidebar
+  if (usuarioAtual && personagemAtual) {
+    sessionStorage.removeItem('_sbfoto_' + usuarioAtual + '_' + personagemAtual);
+    renderizarPersonagensNaSidebar();
+  }
 }
 
 let _saveTimer = null;
@@ -3420,6 +4740,38 @@ function preencherCampos(d) {
     for(let i=0;i<d.numTecnicas;i++) addTecnica();
     d.tecnicas.forEach((t,i)=>{ const n=i+1; ['tn','tc','td','te'].forEach((p,j)=>{ const el=document.getElementById(`${p}-${n}`); if(el) el.value=[t.nome,t.custo,t.desc,t.efei][j]; }); });
   }
+
+  // Restaura linhas extras de armas se existirem dados salvos
+  const armasTbody2 = document.getElementById('armas-tbody');
+  if (armasTbody2) {
+    const armaKeysFromData = Object.keys(d).filter(k => k.match(/^arm(\d+)-nome$/));
+    armaKeysFromData.forEach(k => {
+      const n = parseInt(k.match(/^arm(\d+)-/)[1]);
+      if (n > _armaCounter && !document.getElementById(`arm${n}-nome`)) {
+        _armaCounter = n;
+        const tr = document.createElement('tr');
+        tr.id = `arma-row-${n}`;
+        tr.innerHTML = `
+          <td><input type="text" id="arm${n}-nome" style="min-width:110px" oninput="salvarLocal()"></td>
+          <td><input type="text" id="arm${n}-bat" style="min-width:55px" oninput="salvarLocal()"></td>
+          <td><input type="text" id="arm${n}-dano" style="min-width:55px" oninput="salvarLocal()"></td>
+          <td><input type="text" id="arm${n}-crit" style="min-width:50px" oninput="salvarLocal()"></td>
+          <td><input type="text" id="arm${n}-tipo" style="min-width:55px" oninput="salvarLocal()"></td>
+          <td><input type="text" id="arm${n}-alc" style="min-width:55px" oninput="salvarLocal()"></td>
+          <td><input type="text" id="arm${n}-obs" oninput="salvarLocal()"></td>
+          <td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
+        `;
+        armasTbody2.appendChild(tr);
+      }
+    });
+  }
+
+  // Recalcula os displays de "Atual" após preencher todos os campos
+  setTimeout(() => {
+    calcRecursoAtual('pv');
+    calcRecursoAtual('sta');
+    calcRecursoAtual('pe');
+  }, 50);
 }
 
 // ─── GM: listar fichas ───
@@ -3427,44 +4779,44 @@ async function renderGMPlayers() {
   const lista = document.getElementById('gm-players-list');
   if(!lista) return;
   lista.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">☁ Carregando fichas...</p>';
-  const players = Object.entries(USUARIOS).filter(([u,d])=>d.role==='player'||d.role==='adm');
+  const players = Object.entries(USUARIOS).filter(([u,d])=> u !== usuarioAtual && (d.role==='player'||d.role==='adm'||d.role==='gm'));
 
   lista.innerHTML = '';
   for (const [user, info] of players) {
-    // tenta carregar do Firestore para preview; cai para localStorage
-    let dados = {};
+    let personagens = [];
+    let primeiroNome = '(sem personagem)';
+    let primeiroNivel = '1';
+    let primeiroRaca = '—';
+    let primeiroPoder = '—';
+
     try {
       if (window.db && window.doc && window.getDoc) {
-        // pega o primeiro personagem da lista
         const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
-        let primeiroPersonagem = null;
         if (listaSnap.exists()) {
-          const listaPerso = JSON.parse(listaSnap.data().lista || '[]');
-          primeiroPersonagem = listaPerso[0] || null;
+          personagens = JSON.parse(listaSnap.data().lista || '[]');
         }
-        if (primeiroPersonagem) {
-          const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', user + '_' + primeiroPersonagem));
-          if (fichaSnap.exists()) dados = JSON.parse(fichaSnap.data().dados);
+        // Carrega dados do primeiro personagem para preview
+        if (personagens.length > 0) {
+          const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', _fsDocId(user, personagens[0])));
+          if (fichaSnap.exists()) {
+            const d = JSON.parse(fichaSnap.data().dados || '{}');
+            primeiroNome   = d['f-nome']      || personagens[0];
+            primeiroNivel  = d['f-nivel']     || '1';
+            primeiroRaca   = d['f-raca']      || '—';
+            primeiroPoder  = d['p-principal'] || '—';
+          }
         }
       }
     } catch(e) { console.warn('[Firestore] Erro ao carregar preview GM:', e); }
-    if (!dados['f-nome']) {
-      const raw = localStorage.getItem('ficha_' + user + '_' + (personagemAtual || '_default'));
-      if (raw) dados = JSON.parse(raw);
-    }
 
-    const nome   = dados['f-nome']       || '(sem nome)';
-    const nivel  = dados['f-nivel']      || '1';
-    const raca   = dados['f-raca']       || '—';
-    const poder  = dados['p-principal']  || '—';
-
+    const nPersonagens = personagens.length;
     const card = document.createElement('div');
     card.className = 'player-card';
     card.innerHTML = `
       <div class="player-card-header" onclick="togglePlayerCard('gm-body-${user}')">
         <div>
           <div class="player-card-name">${info.nome} <span class="role-badge badge-${info.role}">${info.role}</span></div>
-          <div class="player-card-meta">@${user} • ${nome} • Nível ${nivel} • ${raca} • Poder: ${poder}</div>
+          <div class="player-card-meta">@${user} • ${primeiroNome} • Nível ${primeiroNivel} • ${primeiroRaca} • Poder: ${primeiroPoder} • ${nPersonagens} personagem${nPersonagens!==1?'s':''}</div>
         </div>
         <span style="color:var(--text-muted);font-size:.8rem">▼ Ver ficha</span>
       </div>
@@ -3569,7 +4921,7 @@ async function salvarFichaPlayer(user) {
   localStorage.setItem('ficha_' + user + '_' + persoAtivo, JSON.stringify(d));
 
   // Salva no Firestore
-  const docId = user + '_' + persoAtivo;
+  const docId = _fsDocId(user, persoAtivo);
   try {
     if (window.db && window.doc && window.setDoc) {
       await window.setDoc(window.doc(window.db, 'fichas', docId), {
@@ -3601,7 +4953,7 @@ async function renderADMPlayers() {
         let primeiroPerso = null;
         if (listaSnap.exists()) primeiroPerso = JSON.parse(listaSnap.data().lista || '[]')[0] || null;
         if (primeiroPerso) {
-          const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', user + '_' + primeiroPerso));
+          const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', _fsDocId(user, primeiroPerso)));
           if (fichaSnap.exists()) dados = JSON.parse(fichaSnap.data().dados);
         }
       }
@@ -3686,7 +5038,6 @@ function iniciarObservador() {
   document.getElementById('ficha').style.display='none';
   document.getElementById('sb-player-name').textContent = 'Observador';
   document.getElementById('sb-player-info').textContent = 'Acesso somente leitura';
-  setupScrollHighlight();
 }
 
 // Aguarda o Firebase SDK ficar disponível (máx 5s)
@@ -3742,6 +5093,17 @@ async function iniciar() {
     if(statusEl) { statusEl.textContent = '☁ Carregando dados…'; statusEl.className = 'save-status'; }
     const listaNuvem = await carregarListaNuvem(usuarioAtual);
     if(listaNuvem) salvarListaPersonagens(listaNuvem);
+    // Se a lista local tem mais personagens do que a nuvem, sincroniza a local para a nuvem
+    const listaLocal = JSON.parse(localStorage.getItem(`chars_${usuarioAtual}`) || '[]');
+    const listaFinal = listaNuvem || listaLocal;
+    if (!listaNuvem && listaLocal.length > 0) {
+      salvarListaNuvem(listaLocal, usuarioAtual);
+    } else if (listaNuvem && listaLocal.length > listaNuvem.length) {
+      // Merge: mantém todos os personagens únicos
+      const merged = [...new Set([...listaNuvem, ...listaLocal])];
+      salvarListaNuvem(merged, usuarioAtual);
+      localStorage.setItem(`chars_${usuarioAtual}`, JSON.stringify(merged));
+    }
 
     const lista = getListaPersonagens();
     if (lista.length > 0 && !personagemAtual) {
@@ -3758,8 +5120,6 @@ async function iniciar() {
     renderizarPersonagensNaSidebar();
   }
 
-  setupScrollHighlight();
-  setupSidebarFloat();
 
   // Carrega ranking, fotos e capítulos extras
   carregarCapitulosExtras();
@@ -3771,31 +5131,7 @@ async function iniciar() {
   document.addEventListener('input', () => { if(personagemAtual) salvarLocal(); });
 }
 
-// ─── SIDEBAR FLUTUANTE ───
-function setupSidebarFloat() {
-  const btn = document.getElementById('sidebar-float-btn');
-  if (!btn) return;
-  const sidebar = document.getElementById('sidebar');
-
-  // Em desktop a sidebar fica fixa; o botão só aparece quando a sidebar está escondida/fechada
-  function atualizarBtnFloat() {
-    const sidebarVisivel = window.innerWidth > 1024;
-    btn.style.display = sidebarVisivel ? 'none' : 'flex';
-  }
-
-  // Scroll suave — botão desce junto
-  window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    const maxScroll = document.body.scrollHeight - window.innerHeight;
-    const pct = maxScroll > 0 ? scrollY / maxScroll : 0;
-    const minTop = 80, maxTop = window.innerHeight - 60;
-    btn.style.top = Math.round(minTop + (maxTop - minTop) * pct) + 'px';
-    btn.style.transform = 'none';
-  });
-
-  window.addEventListener('resize', atualizarBtnFloat);
-  atualizarBtnFloat();
-}
+// ─── (sidebar agora é controlada apenas pela seta — ver toggleSidebar) ───
 
 // ─── EDITOR DE BLOCOS (GM) ───
 // Permite ao GM clicar e editar qualquer parágrafo/bloco de texto do site
@@ -3915,28 +5251,68 @@ async function carregarBlocosGMDaNuvem() {
 }
 
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  // Em mobile, esconde/mostra o botão flutuante
-  const btn = document.getElementById('sidebar-float-btn');
-  if (btn && window.innerWidth <= 1024) {
-    btn.style.display = document.getElementById('sidebar').classList.contains('open') ? 'none' : 'flex';
-  }
+  const sb = document.getElementById('sidebar');
+  const arrow = document.getElementById('sidebar-arrow-btn');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const open = sb.classList.toggle('open');
+  arrow.classList.toggle('open', open);
+  if (backdrop) backdrop.classList.toggle('show', open);
+  arrow.querySelector('.arrow-ic').textContent = open ? '◀' : '▶';
 }
 
 function navTo(id) {
   document.getElementById('sidebar').classList.remove('open');
+  const arrow = document.getElementById('sidebar-arrow-btn');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (arrow) { arrow.classList.remove('open'); arrow.querySelector('.arrow-ic').textContent = '▶'; }
+  if (backdrop) backdrop.classList.remove('show');
   setTimeout(()=>{ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth'}); },100);
 }
 
-function setupScrollHighlight() {
-  const sections = document.querySelectorAll('section[id]');
-  const links = document.querySelectorAll('.sidebar a');
-  window.addEventListener('scroll',()=>{
-    let cur='';
-    sections.forEach(s=>{ if(window.scrollY>=s.offsetTop-120) cur=s.id; });
-    links.forEach(a=>{ a.classList.remove('active'); if(a.getAttribute('href')==='#'+cur) a.classList.add('active'); });
+// ─── BUSCA NO ÍNDICE ────────────────────────────────────────────────
+function filtrarSidebar(termoRaw) {
+  const termo = (termoRaw || '').trim().toLowerCase();
+
+  // Links de capítulos/regras/painéis
+  document.querySelectorAll('.sidebar-links li').forEach(li => {
+    const texto = li.textContent.toLowerCase();
+    li.classList.toggle('sb-hidden', termo !== '' && !texto.includes(termo));
+  });
+
+  // Cards de personagens
+  document.querySelectorAll('#sb-personagens-lista .sb-char-card').forEach(card => {
+    const texto = card.textContent.toLowerCase();
+    card.classList.toggle('sb-hidden', termo !== '' && !texto.includes(termo));
   });
 }
+
+// ─── INDICADOR DE LOCALIZAÇÃO (scrollspy) ──────────────────────────
+(function(){
+  let _spyTicking = false;
+  function atualizarSpy() {
+    _spyTicking = false;
+    const links = document.querySelectorAll('.sidebar-links a[data-nav]');
+    if (!links.length) return;
+    let atualId = null;
+    let melhorTopo = -Infinity;
+    links.forEach(a => {
+      const el = document.getElementById(a.dataset.nav);
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= 140 && rect.top > melhorTopo) {
+        melhorTopo = rect.top;
+        atualId = a.dataset.nav;
+      }
+    });
+    links.forEach(a => a.classList.toggle('active', a.dataset.nav === atualId));
+  }
+  window.addEventListener('scroll', () => {
+    if (!_spyTicking) { _spyTicking = true; requestAnimationFrame(atualizarSpy); }
+  }, { passive: true });
+  window.addEventListener('load', atualizarSpy);
+})();
+
+// (setupScrollHighlight substituído pelo scrollspy de .sidebar-links acima)
 </script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -3971,5 +5347,5 @@ function setupScrollHighlight() {
 
   console.log("[Firebase] SDK pronto. db, doc, getDoc, setDoc, deleteDoc disponíveis globalmente.");
 </script>
-</body>
-</html>
+
+</body></html>
