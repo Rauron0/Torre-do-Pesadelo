@@ -16,6 +16,254 @@ html { scroll-behavior:smooth; overflow-x:hidden; }
 body { background:var(--bg); color:var(--text); font-family:'Source Sans 3',sans-serif; font-size:16px; line-height:1.7; min-height:100vh; overflow-x:hidden; }
 ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--bg); } ::-webkit-scrollbar-thumb { background:var(--accent); border-radius:3px; }
 
+
+/* ═══════════════════════════════════════════════════════════
+   GRIMÓRIO DOS DESPERTOS — PERFIL PÚBLICO COMPLETO
+═══════════════════════════════════════════════════════════ */
+
+/* Modal base — maior para acomodar todo o perfil */
+.grimorio-overlay {
+  position: fixed; inset: 0; z-index: 960;
+  background: rgba(0,0,0,.88);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+.grimorio-modal {
+  background: linear-gradient(160deg, #131118 0%, #0d0b12 100%);
+  border: 1px solid rgba(193,63,63,.35);
+  width: 100%; max-width: 680px;
+  max-height: 92vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 12px 60px rgba(0,0,0,.9), 0 0 80px rgba(156,42,42,.07);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(193,63,63,.35) transparent;
+}
+.grimorio-modal::-webkit-scrollbar { width: 4px; }
+.grimorio-modal::-webkit-scrollbar-thumb { background: rgba(193,63,63,.4); border-radius: 2px; }
+
+/* Banner do topo */
+.grimorio-banner {
+  height: 100px;
+  background: linear-gradient(135deg, #1a0505 0%, #0d0b18 50%, #0a0008 100%);
+  border-bottom: 2px solid rgba(193,63,63,.5);
+  position: relative;
+  overflow: hidden;
+}
+.grimorio-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(156,42,42,.18), transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(60,20,80,.12), transparent 60%);
+}
+.grimorio-banner-rune {
+  position: absolute; font-size: 5rem; opacity: .04;
+  font-family: 'Playfair Display', serif; color: #fff;
+  letter-spacing: 6px; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap; pointer-events: none;
+}
+.grimorio-close {
+  position: absolute; top: .75rem; right: .75rem;
+  background: rgba(0,0,0,.6); border: 1px solid rgba(193,63,63,.3);
+  color: #aaa; width: 30px; height: 30px; border-radius: 50%;
+  cursor: pointer; font-size: 1rem; z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.grimorio-close:hover { background: var(--accent); color: #fff; border-color: var(--accent-light); }
+
+/* Avatar no banner */
+.grimorio-avatar-wrap {
+  position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);
+  z-index: 5;
+}
+.grimorio-avatar {
+  width: 100px; height: 100px; border-radius: 8px;
+  object-fit: cover; border: 3px solid var(--accent);
+  background: var(--bg-input); display: block;
+  box-shadow: 0 4px 24px rgba(0,0,0,.7), 0 0 20px rgba(193,63,63,.25);
+}
+.grimorio-avatar-placeholder {
+  width: 100px; height: 100px; border-radius: 8px;
+  border: 3px solid var(--accent);
+  background: linear-gradient(160deg, #1a0a0a, #0d0b12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem; color: var(--accent);
+  box-shadow: 0 4px 24px rgba(0,0,0,.7), 0 0 20px rgba(193,63,63,.2);
+}
+
+/* Cabeçalho de identidade */
+.grimorio-identity {
+  padding: 3.5rem 1.75rem 1.25rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(60,40,60,.5);
+}
+.grimorio-nome {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem; color: #f5f5f7; line-height: 1.1;
+  margin-bottom: .2rem;
+  text-shadow: 0 2px 12px rgba(0,0,0,.8);
+}
+.grimorio-alcunha {
+  font-size: .9rem; color: var(--text-muted); font-style: italic;
+  letter-spacing: .5px; margin-bottom: .8rem;
+}
+.grimorio-poder-principal {
+  display: inline-flex; align-items: center; gap: .4rem;
+  background: rgba(156,42,42,.12); border: 1px solid rgba(193,63,63,.3);
+  padding: .4rem 1.1rem; font-size: .88rem;
+  color: var(--accent-light); letter-spacing: 1.5px;
+  text-transform: uppercase; font-weight: 600; margin-bottom: .9rem;
+  box-shadow: 0 0 20px rgba(193,63,63,.08);
+}
+.grimorio-tags {
+  display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center;
+  margin-bottom: .75rem;
+}
+.grimorio-tag {
+  background: rgba(255,255,255,.03); border: 1px solid rgba(60,40,60,.55);
+  padding: .25rem .75rem; font-size: .74rem;
+  color: var(--text-muted); letter-spacing: .75px;
+}
+.grimorio-tag.rank-tag {
+  border-color: rgba(180,140,30,.4); color: var(--gold-light);
+  background: rgba(180,140,30,.07);
+}
+.grimorio-tag.faccao-tag {
+  border-color: rgba(193,63,63,.35); color: var(--accent-light);
+  background: rgba(156,42,42,.07);
+}
+.grimorio-frase {
+  font-family: 'Playfair Display', serif;
+  font-size: .95rem; color: var(--silver); font-style: italic;
+  line-height: 1.55; margin: .5rem 1rem 0;
+  padding: .6rem 1rem; border-left: 2px solid rgba(193,63,63,.35);
+  background: rgba(255,255,255,.02); text-align: left;
+}
+
+/* Corpo do grimório */
+.grimorio-body {
+  padding: 1.25rem 1.75rem 1.75rem;
+}
+
+/* Seções */
+.grimorio-section {
+  margin-bottom: 1.25rem;
+}
+.grimorio-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: .72rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--accent-light); margin-bottom: .6rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.grimorio-section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, rgba(193,63,63,.35), transparent);
+}
+
+/* Descrição pública */
+.grimorio-descricao {
+  font-size: .88rem; color: #c8c8d4; line-height: 1.7;
+  background: rgba(255,255,255,.02); border: 1px solid rgba(60,40,60,.4);
+  border-left: 3px solid rgba(193,63,63,.3);
+  padding: .9rem 1rem;
+}
+.grimorio-descricao:empty::before { content: 'Nenhuma descrição registrada.'; color: #555; font-style: italic; }
+
+/* Grid de áreas sociais */
+.grimorio-areas-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+}
+@media (max-width: 500px) {
+  .grimorio-areas-grid { grid-template-columns: 1fr; }
+}
+
+.grimorio-area-card {
+  background: linear-gradient(160deg, #17141f, #0f0d14);
+  border: 1px solid rgba(60,40,60,.5);
+  border-top: 2px solid rgba(156,42,42,.4);
+  padding: .85rem 1rem; cursor: default;
+  transition: border-color .2s, box-shadow .2s;
+  min-height: 80px;
+}
+.grimorio-area-card:hover {
+  border-color: rgba(193,63,63,.5);
+  box-shadow: 0 0 16px rgba(156,42,42,.1);
+}
+.grimorio-area-title {
+  font-size: .67rem; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: .5rem;
+  display: flex; align-items: center; gap: .35rem;
+}
+.grimorio-area-content {
+  font-size: .82rem; color: #b8b8c8; line-height: 1.6;
+  font-style: italic;
+}
+.grimorio-area-content.vazio { color: #444; }
+.grimorio-area-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: .3rem;
+}
+.grimorio-area-list li {
+  font-size: .8rem; color: #b0b0c4;
+  display: flex; align-items: flex-start; gap: .4rem;
+}
+.grimorio-area-list li::before {
+  content: '▸'; color: var(--accent); flex-shrink: 0; margin-top: .05rem;
+}
+
+/* Linha do tempo */
+.grimorio-timeline {
+  display: flex; flex-direction: column; gap: .5rem;
+}
+.grimorio-timeline-item {
+  display: flex; gap: .75rem; align-items: flex-start;
+}
+.grimorio-timeline-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0; margin-top: .4rem;
+  box-shadow: 0 0 8px rgba(193,63,63,.5);
+}
+.grimorio-timeline-text { font-size: .8rem; color: #b0b0c4; line-height: 1.5; }
+.grimorio-timeline-text strong { color: var(--silver); font-family: 'Playfair Display', serif; }
+
+/* Galeria de fotos */
+.grimorio-galeria {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem;
+  margin-top: .75rem;
+}
+.grimorio-galeria img {
+  width: 100%; aspect-ratio: 1; object-fit: cover;
+  border: 1px solid rgba(60,40,60,.5); border-radius: 3px;
+  cursor: pointer; transition: border-color .2s, opacity .2s;
+}
+.grimorio-galeria img:hover { border-color: var(--accent-light); opacity: .85; }
+
+/* Conquistas / feitos */
+.grimorio-badges {
+  display: flex; flex-wrap: wrap; gap: .5rem;
+}
+.grimorio-badge {
+  background: rgba(180,140,30,.08); border: 1px solid rgba(180,140,30,.3);
+  padding: .3rem .75rem; font-size: .74rem; color: var(--gold-light);
+  letter-spacing: .5px;
+}
+
+/* Campos editáveis no perfil (só o próprio player / GM) */
+.grimorio-edit-btn {
+  display: none;
+  position: absolute; top: .5rem; right: .5rem;
+  background: rgba(180,140,30,.85); border: none; color: #1a1200;
+  font-size: .62rem; font-weight: 700; padding: .2rem .5rem;
+  cursor: pointer; border-radius: 2px; letter-spacing: .5px;
+  transition: background .2s;
+}
+.grimorio-edit-btn:hover { background: var(--gold-light); }
+
 /* LOGIN */
 #login-screen { position:fixed; inset:0; z-index:1000; background:radial-gradient(ellipse at 30% 40%,#1a0a0a 0%,#0c0c0f 60%); display:flex; align-items:center; justify-content:center; flex-direction:column; }
 .login-ornament { font-family:'Playfair Display',serif; font-size:.75rem; letter-spacing:5px; text-transform:uppercase; color:var(--accent-light); margin-bottom:.5rem; }
@@ -678,42 +926,700 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   cursor: pointer; border-radius: 2px; transition: opacity .15s;
 }
 
-/* ═══ RANKING ═══ */
-#secao-ranking { }
-.ranking-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-.ranking-card {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-top: 2px solid var(--accent);
-  padding: 1rem;
-  cursor: pointer;
-  transition: border-color .2s, transform .15s;
-  position: relative;
+/* ═══════════════════════════════════════════════════════════
+   LIVRO DAS LENDAS — RANKING VISUAL SYSTEM
+═══════════════════════════════════════════════════════════ */
+
+/* Header épico */
+.lendas-header {
   text-align: center;
+  padding: 2rem 0 1.5rem;
+  position: relative;
 }
-.ranking-card:hover { border-color: var(--accent-light); transform: translateY(-2px); }
-.ranking-card-pos {
-  position: absolute; top: .5rem; left: .7rem;
+.lendas-runes {
+  font-size: 1rem; letter-spacing: 8px; color: rgba(193,63,63,.3);
+  margin-bottom: .5rem; font-family: 'Playfair Display', serif;
+}
+.lendas-title {
   font-family: 'Playfair Display', serif;
-  font-size: .75rem; color: var(--text-muted); letter-spacing: 1px;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: #f5f0f8;
+  letter-spacing: -1px; line-height: 1.1;
+  text-shadow: 0 0 40px rgba(156,42,42,.3), 0 2px 20px rgba(0,0,0,.8);
+  margin: .3rem 0 .5rem;
 }
-.ranking-card-pos.ouro { color: var(--gold-light); }
-.ranking-card-pos.prata { color: #c5c5d1; }
-.ranking-card-pos.bronze { color: #c88a4a; }
-.ranking-avatar {
-  width: 72px; height: 72px; border-radius: 50%;
-  object-fit: cover; border: 2px solid var(--border);
-  margin: .25rem auto .6rem;
+.lendas-subtitle {
+  font-size: .85rem; color: var(--text-muted);
+  letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1.5rem;
+}
+.lendas-header-actions {
+  display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap;
+}
+.lendas-refresh-btn, .lendas-personalizar-btn {
+  background: none;
+  border: 1px solid rgba(156,42,42,.5);
+  color: var(--accent-light);
+  padding: .45rem 1.2rem;
+  font-family: inherit; font-size: .82rem;
+  cursor: pointer; letter-spacing: 1px;
+  transition: all .25s;
+}
+.lendas-refresh-btn:hover { background: rgba(156,42,42,.15); border-color: var(--accent-light); }
+.lendas-personalizar-btn {
+  border-color: rgba(180,140,30,.4); color: var(--gold);
+}
+.lendas-personalizar-btn:hover { background: rgba(180,140,30,.12); border-color: var(--gold-light); }
+
+/* Abas de categoria */
+.lendas-tabs-wrap {
+  margin: 1.5rem 0 1.25rem;
+  border-bottom: 1px solid rgba(156,42,42,.2);
+}
+.lendas-tabs {
+  display: flex; gap: 0; overflow-x: auto;
+  scrollbar-width: none;
+}
+.lendas-tabs::-webkit-scrollbar { display: none; }
+.lendas-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  padding: .65rem 1.1rem;
+  font-family: inherit; font-size: .82rem;
+  cursor: pointer; white-space: nowrap;
+  letter-spacing: .5px;
+  transition: all .2s;
+}
+.lendas-tab:hover { color: var(--text); }
+.lendas-tab.active {
+  color: var(--accent-light);
+  border-bottom-color: var(--accent);
+}
+.lendas-tab-label {
+  font-size: .72rem; color: var(--text-muted);
+  letter-spacing: 2px; padding: .4rem 0 .6rem;
+  opacity: .7;
+}
+
+/* Loading state */
+.lendas-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+.lendas-loading-rune {
+  font-size: 2.5rem;
+  animation: runeFloat 2s ease-in-out infinite;
+  margin-bottom: 1rem;
+  color: var(--accent);
   display: block;
+}
+@keyframes runeFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: .6; }
+  50% { transform: translateY(-8px) rotate(10deg); opacity: 1; }
+}
+
+/* ═══ GRID DE CARTÕES ═══ */
+.lendas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin: .5rem 0 2rem;
+}
+
+/* CARTÃO base */
+.lenda-card {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid rgba(60,40,60,.6);
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+  min-height: 280px;
+  display: flex; flex-direction: column;
+  background: linear-gradient(160deg, #131118 0%, #0d0b12 100%);
+}
+.lenda-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(193,63,63,.5);
+  box-shadow: 0 12px 40px rgba(0,0,0,.7), 0 0 30px rgba(156,42,42,.12);
+}
+
+/* WALLPAPER do cartão */
+.lenda-card-wallpaper {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center;
+  opacity: .18;
+  transition: opacity .3s;
+}
+.lenda-card:hover .lenda-card-wallpaper { opacity: .25; }
+
+/* GIF overlay para poder */
+.lenda-card-gif {
+  position: absolute; inset: 0; z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.lenda-card-gif img {
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: .08;
+  mix-blend-mode: screen;
+  transition: opacity .3s;
+}
+.lenda-card:hover .lenda-card-gif img { opacity: .14; }
+
+/* Gradiente de overlay acima do wallpaper */
+.lenda-card-overlay {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(to bottom,
+    rgba(8,6,12,.3) 0%,
+    rgba(8,6,12,.6) 55%,
+    rgba(8,6,12,.92) 100%
+  );
+}
+
+/* Conteúdo do cartão */
+.lenda-card-body {
+  position: relative; z-index: 3;
+  display: flex; flex-direction: column;
+  height: 100%;
+  padding: .85rem .9rem 1rem;
+}
+
+/* Posição (rank) */
+.lenda-card-rank {
+  position: absolute; top: .7rem; left: .8rem;
+  z-index: 10;
+  font-family: 'Playfair Display', serif;
+  font-size: .7rem; letter-spacing: 2px;
+  color: var(--text-muted);
+  text-shadow: 0 1px 4px rgba(0,0,0,.9);
+}
+.lenda-card-rank.ouro { color: var(--gold-light); text-shadow: 0 0 12px rgba(180,140,30,.6); }
+.lenda-card-rank.prata { color: #d0d0e0; text-shadow: 0 0 8px rgba(200,200,220,.3); }
+.lenda-card-rank.bronze { color: #c88a4a; text-shadow: 0 0 8px rgba(200,140,74,.3); }
+
+/* Badge de facção */
+.lenda-card-faccao-badge {
+  position: absolute; top: .65rem; right: .8rem;
+  z-index: 10;
+  font-size: .6rem; letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: .2rem .55rem;
+  background: rgba(156,42,42,.25);
+  border: 1px solid rgba(193,63,63,.35);
+  color: var(--accent-light);
+  backdrop-filter: blur(4px);
+}
+
+/* Avatar */
+.lenda-avatar-wrap {
+  display: flex; justify-content: center;
+  margin: 1.5rem 0 .8rem;
+}
+.lenda-avatar {
+  width: 78px; height: 78px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 2px solid rgba(193,63,63,.5);
+  box-shadow: 0 4px 20px rgba(0,0,0,.7), 0 0 20px rgba(156,42,42,.15);
   background: var(--bg-input);
+  display: block;
 }
-.ranking-avatar-placeholder {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: var(--bg-input); border: 2px solid var(--border);
-  margin: .25rem auto .6rem;
+.lenda-avatar-placeholder {
+  width: 78px; height: 78px;
+  border-radius: 6px;
+  background: linear-gradient(160deg, #1a0a0a, #0d0b12);
+  border: 2px solid rgba(193,63,63,.4);
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.6rem; color: var(--accent);
+  font-size: 2rem; color: rgba(193,63,63,.6);
+  box-shadow: 0 4px 20px rgba(0,0,0,.6);
 }
+
+/* Info do personagem */
+.lenda-nome {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; color: #f5f0f8; line-height: 1.2;
+  text-align: center; margin-bottom: .15rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,.9);
+}
+.lenda-alcunha {
+  font-size: .72rem; color: var(--text-muted);
+  text-align: center; font-style: italic;
+  margin-bottom: .5rem;
+}
+.lenda-poder {
+  font-size: .73rem; color: var(--accent-light);
+  text-align: center; letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: .2rem .6rem;
+  background: rgba(156,42,42,.1);
+  border: 1px solid rgba(193,63,63,.2);
+  margin: 0 auto .5rem;
+  max-width: calc(100% - 1rem);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Meta info (nível, facção, cidade) */
+.lenda-meta {
+  display: flex; flex-wrap: wrap;
+  gap: .3rem; justify-content: center;
+  margin-top: auto;
+}
+.lenda-meta-chip {
+  font-size: .65rem; letter-spacing: .5px;
+  color: var(--text-muted);
+  padding: .15rem .5rem;
+  border: 1px solid rgba(60,40,60,.6);
+  background: rgba(0,0,0,.3);
+}
+.lenda-meta-chip.nivel { color: var(--gold); border-color: rgba(180,140,30,.3); }
+.lenda-meta-chip.rank { color: var(--accent-light); border-color: rgba(193,63,63,.3); }
+
+/* Barra de poder */
+.lenda-power-bar {
+  height: 2px;
+  margin-top: .75rem;
+  border-radius: 1px;
+  position: relative;
+  background: rgba(60,40,60,.4);
+  overflow: hidden;
+}
+.lenda-power-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width 1s ease;
+}
+
+/* Tema: estilos de barra */
+.tema-abismo   .lenda-power-fill { background: linear-gradient(to right, #1a0a1a, #5a1a5a); }
+.tema-sangue   .lenda-power-fill { background: linear-gradient(to right, #3a0000, #c13f3f); }
+.tema-guerra   .lenda-power-fill { background: linear-gradient(to right, #1a0a00, #b87020); }
+.tema-vampirico .lenda-power-fill { background: linear-gradient(to right, #0a0010, #7a0a5a); }
+.tema-soberano .lenda-power-fill { background: linear-gradient(to right, #1a1000, #d4ad3a); }
+.tema-infernal .lenda-power-fill { background: linear-gradient(to right, #1a0500, #e05010); }
+.tema-glacial  .lenda-power-fill { background: linear-gradient(to right, #001a1a, #40a0c0); }
+.tema-cosmico  .lenda-power-fill { background: linear-gradient(to right, #050010, #5020c0); }
+
+/* Efeitos de tema nas bordas do cartão */
+.tema-abismo   .lenda-card { border-top: 2px solid #5a1a5a; }
+.tema-sangue   .lenda-card { border-top: 2px solid #9c2a2a; }
+.tema-guerra   .lenda-card { border-top: 2px solid #b87020; }
+.tema-vampirico .lenda-card { border-top: 2px solid #7a0a5a; }
+.tema-soberano .lenda-card { border-top: 2px solid #d4ad3a; }
+.tema-infernal .lenda-card { border-top: 2px solid #e05010; }
+.tema-glacial  .lenda-card { border-top: 2px solid #40a0c0; }
+.tema-cosmico  .lenda-card { border-top: 2px solid #5020c0; }
+
+/* ═══ MODAL LIVRO DAS LENDAS (perfil público) ═══ */
+.livro-overlay {
+  position: fixed; inset: 0; z-index: 960;
+  background: rgba(0,0,0,.92);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  backdrop-filter: blur(6px);
+}
+.livro-modal {
+  width: 100%; max-width: 700px;
+  max-height: 93vh;
+  overflow-y: auto;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(193,63,63,.35) transparent;
+  border: 1px solid rgba(193,63,63,.3);
+  box-shadow: 0 20px 80px rgba(0,0,0,.95), 0 0 100px rgba(156,42,42,.08);
+}
+.livro-modal::-webkit-scrollbar { width: 4px; }
+.livro-modal::-webkit-scrollbar-thumb { background: rgba(193,63,63,.4); }
+
+/* Banner do livro — suporta wallpaper/GIF */
+.livro-banner {
+  height: 200px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a0505 0%, #0d0b18 50%, #0a0008 100%);
+}
+.livro-banner-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: .35;
+  transition: opacity .5s;
+}
+.livro-banner-gif {
+  position: absolute; inset: 0;
+  overflow: hidden;
+}
+.livro-banner-gif img {
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: .4;
+  mix-blend-mode: screen;
+}
+.livro-banner-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(10,6,16,.2) 0%,
+    rgba(10,6,16,.5) 50%,
+    rgba(10,6,16,.95) 100%
+  );
+}
+.livro-banner-runes {
+  position: absolute; top: 1rem; left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem; letter-spacing: 12px;
+  color: rgba(193,63,63,.2);
+  font-family: 'Playfair Display', serif;
+  white-space: nowrap; pointer-events: none;
+}
+.livro-close {
+  position: absolute; top: .75rem; right: .75rem;
+  background: rgba(0,0,0,.7); border: 1px solid rgba(193,63,63,.35);
+  color: #aaa; width: 32px; height: 32px; border-radius: 50%;
+  cursor: pointer; font-size: 1rem; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.livro-close:hover { background: var(--accent); color: #fff; }
+
+/* Avatar flutuante */
+.livro-avatar-wrap {
+  position: absolute; bottom: -55px; left: 50%;
+  transform: translateX(-50%); z-index: 15;
+}
+.livro-avatar {
+  width: 110px; height: 110px; border-radius: 8px;
+  object-fit: cover;
+  border: 3px solid rgba(193,63,63,.6);
+  box-shadow: 0 6px 30px rgba(0,0,0,.9), 0 0 30px rgba(156,42,42,.25);
+  background: var(--bg-input); display: block;
+}
+.livro-avatar-placeholder {
+  width: 110px; height: 110px; border-radius: 8px;
+  border: 3px solid rgba(193,63,63,.5);
+  background: linear-gradient(160deg, #1a0a0a, #0d0b12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem; color: rgba(193,63,63,.6);
+  box-shadow: 0 6px 30px rgba(0,0,0,.8);
+}
+
+/* Identidade */
+.livro-identity {
+  padding: 4.5rem 2rem 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(60,40,60,.5);
+}
+.livro-nome {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.1rem; color: #f5f0f8; line-height: 1.1;
+  margin-bottom: .2rem;
+  text-shadow: 0 2px 20px rgba(0,0,0,.9);
+}
+.livro-alcunha {
+  font-size: .9rem; color: var(--text-muted);
+  font-style: italic; letter-spacing: .5px;
+  margin-bottom: .8rem;
+}
+.livro-poder-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: rgba(156,42,42,.1);
+  border: 1px solid rgba(193,63,63,.3);
+  padding: .45rem 1.3rem;
+  font-size: .85rem; color: var(--accent-light);
+  letter-spacing: 2px; text-transform: uppercase;
+  font-weight: 600; margin-bottom: 1rem;
+  box-shadow: 0 0 30px rgba(193,63,63,.1);
+}
+/* GIF do poder no badge */
+.livro-poder-gif {
+  width: 24px; height: 24px; object-fit: cover;
+  border-radius: 3px; vertical-align: middle;
+}
+
+.livro-tags {
+  display: flex; flex-wrap: wrap; gap: .5rem;
+  justify-content: center; margin-bottom: .9rem;
+}
+.livro-tag {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(60,40,60,.55);
+  padding: .25rem .8rem;
+  font-size: .73rem; color: var(--text-muted);
+  letter-spacing: .5px;
+}
+.livro-tag.rank { border-color: rgba(180,140,30,.4); color: var(--gold-light); background: rgba(180,140,30,.07); }
+.livro-tag.faccao { border-color: rgba(193,63,63,.35); color: var(--accent-light); background: rgba(156,42,42,.07); }
+.livro-tag.nivel { border-color: rgba(100,100,140,.4); color: #a0a0c0; }
+
+.livro-frase {
+  font-family: 'Playfair Display', serif;
+  font-size: .95rem; color: var(--silver);
+  font-style: italic; line-height: 1.6;
+  margin: .5rem 1.5rem 0;
+  padding: .65rem 1.1rem;
+  border-left: 2px solid rgba(193,63,63,.35);
+  background: rgba(255,255,255,.02);
+  text-align: left;
+}
+
+/* Corpo do Livro */
+.livro-body {
+  padding: 1.5rem 2rem 2rem;
+}
+.livro-section { margin-bottom: 1.5rem; }
+.livro-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: .7rem; letter-spacing: 3.5px;
+  text-transform: uppercase; color: var(--accent-light);
+  margin-bottom: .7rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.livro-section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, rgba(193,63,63,.4), transparent);
+}
+
+.livro-descricao {
+  font-size: .88rem; color: #c8c8d4; line-height: 1.75;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(60,40,60,.4);
+  border-left: 3px solid rgba(193,63,63,.3);
+  padding: 1rem 1.1rem;
+}
+.livro-2col {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .75rem;
+}
+@media (max-width: 520px) { .livro-2col { grid-template-columns: 1fr; } }
+
+.livro-area-card {
+  background: linear-gradient(160deg, #17141f, #0f0d14);
+  border: 1px solid rgba(60,40,60,.5);
+  border-top: 2px solid rgba(156,42,42,.3);
+  padding: .9rem 1rem;
+  min-height: 80px;
+}
+.livro-area-title {
+  font-size: .65rem; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text-muted);
+  margin-bottom: .5rem;
+  display: flex; align-items: center; gap: .35rem;
+}
+.livro-area-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: .35rem;
+}
+.livro-area-list li {
+  font-size: .8rem; color: #b0b0c4; line-height: 1.5;
+  display: flex; align-items: flex-start; gap: .4rem;
+}
+.livro-area-list li::before {
+  content: '▸'; color: var(--accent); flex-shrink: 0; margin-top: .05rem;
+}
+.livro-area-empty { font-size: .8rem; color: #444; font-style: italic; }
+
+/* Timeline */
+.livro-timeline { display: flex; flex-direction: column; gap: .6rem; }
+.livro-timeline-item { display: flex; gap: .75rem; align-items: flex-start; }
+.livro-timeline-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0; margin-top: .4rem;
+  box-shadow: 0 0 10px rgba(193,63,63,.6);
+}
+.livro-timeline-text { font-size: .8rem; color: #b0b0c4; line-height: 1.55; }
+.livro-timeline-text strong { color: var(--silver); font-family: 'Playfair Display', serif; }
+
+/* Badges */
+.livro-badges { display: flex; flex-wrap: wrap; gap: .5rem; }
+.livro-badge {
+  background: rgba(180,140,30,.08); border: 1px solid rgba(180,140,30,.3);
+  padding: .3rem .8rem; font-size: .73rem; color: var(--gold-light);
+  letter-spacing: .5px;
+}
+
+/* GIF section */
+.livro-gif-section {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: .6rem;
+  margin-top: .5rem;
+}
+.livro-gif-item {
+  position: relative; aspect-ratio: 16/9;
+  overflow: hidden; border: 1px solid rgba(60,40,60,.5);
+  border-radius: 3px;
+  background: rgba(0,0,0,.5);
+}
+.livro-gif-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .3s;
+}
+.livro-gif-item:hover img { transform: scale(1.05); }
+.livro-gif-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,.8));
+  font-size: .62rem; color: var(--text-muted);
+  letter-spacing: 1px; padding: .3rem .5rem;
+  text-transform: uppercase;
+}
+
+/* Galeria */
+.livro-galeria {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem;
+  margin-top: .75rem;
+}
+.livro-galeria img {
+  width: 100%; aspect-ratio: 1; object-fit: cover;
+  border: 1px solid rgba(60,40,60,.5);
+  cursor: pointer; transition: border-color .2s, opacity .2s;
+  border-radius: 2px;
+}
+.livro-galeria img:hover { border-color: var(--accent-light); opacity: .85; }
+
+/* Rodapé do livro */
+.livro-footer {
+  margin-top: 1.5rem; padding-top: .75rem;
+  border-top: 1px solid rgba(60,40,60,.4);
+  text-align: center; font-size: .7rem;
+  color: #444; letter-spacing: 2px;
+}
+
+/* ═══ MODAL PERSONALIZAÇÃO ═══ */
+.personalizar-overlay {
+  position: fixed; inset: 0; z-index: 970;
+  background: rgba(0,0,0,.88);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+.personalizar-modal {
+  background: linear-gradient(160deg, #131118 0%, #0d0b12 100%);
+  border: 1px solid rgba(180,140,30,.3);
+  width: 100%; max-width: 580px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 80px rgba(0,0,0,.9), 0 0 60px rgba(180,140,30,.06);
+  scrollbar-width: thin;
+}
+.personalizar-header {
+  padding: 1.5rem 1.75rem 1rem;
+  border-bottom: 1px solid rgba(60,40,60,.5);
+}
+.personalizar-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem; color: var(--gold-light);
+  margin-bottom: .2rem;
+}
+.personalizar-sub {
+  font-size: .78rem; color: var(--text-muted); letter-spacing: 1px;
+}
+.personalizar-body { padding: 1.25rem 1.75rem 1.75rem; }
+.personalizar-section-title {
+  font-size: .68rem; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: .75rem; margin-top: 1.25rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.personalizar-section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, rgba(180,140,30,.3), transparent);
+}
+.personalizar-section-title:first-child { margin-top: 0; }
+
+/* Grade de temas */
+.temas-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem;
+}
+@media (max-width: 480px) { .temas-grid { grid-template-columns: repeat(2, 1fr); } }
+.tema-btn {
+  background: var(--bg-elevated);
+  border: 2px solid var(--border);
+  padding: .65rem .5rem;
+  cursor: pointer; text-align: center;
+  transition: all .2s; font-size: .8rem;
+  font-family: inherit; color: var(--text-muted);
+  display: flex; flex-direction: column;
+  align-items: center; gap: .3rem;
+}
+.tema-btn:hover { border-color: rgba(193,63,63,.5); color: var(--text); }
+.tema-btn.selecionado { border-color: var(--gold); color: var(--gold-light); background: rgba(180,140,30,.08); }
+.tema-btn .tema-icon { font-size: 1.5rem; display: block; }
+.tema-btn .tema-nome { font-size: .7rem; letter-spacing: 1px; }
+
+/* Grade de wallpapers */
+.wallpapers-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem;
+}
+.wp-btn {
+  border: 2px solid var(--border);
+  cursor: pointer; text-align: center;
+  transition: all .2s;
+  aspect-ratio: 16/9; overflow: hidden;
+  position: relative;
+  background: var(--bg-elevated);
+}
+.wp-btn:hover { border-color: rgba(193,63,63,.5); }
+.wp-btn.selecionado { border-color: var(--gold); }
+.wp-btn-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,.8));
+  font-size: .6rem; color: #aaa; letter-spacing: .5px;
+  padding: .25rem .4rem; text-align: center;
+}
+.wp-btn-preview {
+  width: 100%; height: 100%; object-fit: cover;
+  position: absolute; inset: 0;
+  opacity: .6;
+}
+
+/* GIF inputs */
+.gif-input-group {
+  display: flex; flex-direction: column; gap: .5rem;
+  margin-top: .5rem;
+}
+.gif-input-row {
+  display: grid; grid-template-columns: 1fr auto; gap: .5rem; align-items: center;
+}
+.gif-input-row label {
+  font-size: .7rem; color: var(--text-muted); margin-bottom: .25rem;
+  letter-spacing: 1px; display: block;
+}
+.gif-input-row input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: .45rem .65rem;
+  font-family: inherit; font-size: .82rem;
+  outline: none;
+  transition: border-color .2s;
+  width: 100%;
+}
+.gif-input-row input:focus { border-color: var(--accent-light); }
+.gif-preview-sm {
+  width: 40px; height: 40px; object-fit: cover;
+  border: 1px solid var(--border); border-radius: 3px;
+  display: none;
+}
+
+/* Botões de ação da personalização */
+.personalizar-actions {
+  display: flex; gap: .75rem; margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+.personalizar-btn-salvar {
+  background: var(--gold); border: none; color: #1a1200;
+  padding: .55rem 1.5rem; font-family: 'Playfair Display', serif;
+  font-size: .95rem; cursor: pointer; font-weight: 700;
+  transition: background .2s;
+}
+.personalizar-btn-salvar:hover { background: var(--gold-light); }
+.personalizar-btn-cancelar {
+  background: none; border: 1px solid var(--border);
+  color: var(--text-muted); padding: .55rem 1.2rem;
+  font-family: inherit; font-size: .9rem; cursor: pointer;
+  transition: all .2s;
+}
+.personalizar-btn-cancelar:hover { border-color: var(--accent-light); color: var(--accent-light); }
+
+/* compat: manter .ranking-avatar / .ranking-nome para fallback se algo referenciar */
+.ranking-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); margin: .25rem auto .6rem; display: block; background: var(--bg-input); }
+.ranking-avatar-placeholder { width: 72px; height: 72px; border-radius: 50%; background: var(--bg-input); border: 2px solid var(--border); margin: .25rem auto .6rem; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--accent); }
 .ranking-nome { font-family: 'Playfair Display', serif; font-size: .95rem; color: #f0f0f5; margin-bottom: .2rem; }
 .ranking-poder { font-size: .78rem; color: var(--accent-light); margin-bottom: .4rem; }
 .ranking-nucleos { font-size: .72rem; color: var(--gold); letter-spacing: 1px; }
@@ -1837,6 +2743,14 @@ main { margin-left: 0 !important; }
       </ul>
     </div>
 
+    <!-- Grimório — visível para todos -->
+    <div>
+      <div class="sidebar-section-label">📖 Grimório</div>
+      <ul class="sidebar-links">
+        <li><a data-nav="secao-ranking" onclick="navTo(&#39;secao-ranking&#39;)">🏆 Ranking dos Despertos</a></li>
+      </ul>
+    </div>
+
     <!-- Player/GM ficha -->
     <div id="sb-ficha-section">
       <div class="sidebar-section-label">🎭 Personagens</div>
@@ -1928,6 +2842,9 @@ main { margin-left: 0 !important; }
           <code>modForca</code> <code>modDestreza</code> <code>modVigor</code> <code>modIntelecto</code> <code>modAlma</code> <code>modCarisma</code><br>
           <strong style="color:var(--silver)">Extras:</strong>
           <code>maestria</code> <code>pvBase</code> <code>staBase</code> <code>bonusPV</code> <code>bonusPE</code> <code>bonusCA</code> <code>attrMod</code>
+          <br><br>
+          <button onclick="restaurarFormulasPadrao()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.4rem 1rem;font-family:inherit;font-size:.82rem;cursor:pointer;letter-spacing:.5px" onmouseover="this.style.background='rgba(156,42,42,.12)'" onmouseout="this.style.background='none'">↺ Restaurar Fórmulas Padrão</button>
+          <span style="font-size:.78rem;color:var(--text-muted)">— corrige fórmulas salvas incorretamente (ex: PE retornando sempre 0).</span>
         </div>
 
         <!-- PV -->
@@ -1978,6 +2895,22 @@ main { margin-left: 0 !important; }
               <button class="apply-formula-btn" onclick="aplicarFormula('pe')">Aplicar</button>
             </div>
             <div class="formula-result" id="res-pe">✓ Fórmula salva e aplicada.</div>
+          </div>
+        </div>
+
+        <!-- CUSTO DE ENERGIA -->
+        <div class="formula-editor">
+          <div class="formula-editor-header">
+            <span class="formula-editor-title">Custo de cada Ponto de Energia</span>
+          </div>
+          <div class="formula-editor-body">
+            <div class="formula-desc">Calculado automaticamente, sem precisar editar nada: <code>INT((STA máx ÷ 2) ÷ PE máx)</code></div>
+            <div class="formula-vars">Aparece no campo <strong>Custo</strong> do bloco de PE da ficha, e é usado para descontar PE/STA quando você gasta Pontos de Energia.</div>
+            <div class="formula-desc" style="margin-top:.5rem">
+              <strong style="color:var(--silver)">PE Atual</strong> = PE máx − (Gasto PE × Custo)<br>
+              <strong style="color:var(--silver)">STA Atual</strong> = STA máx + Bônus − Gasto STA − (Gasto PE × Custo)<br>
+              <strong style="color:var(--silver)">PV Atual</strong> = PV máx + PV Temporário − Gasto PV
+            </div>
           </div>
         </div>
 
@@ -2134,17 +3067,39 @@ main { margin-left: 0 !important; }
 
     <section id="cap10" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 10</span><h1>Perícias</h1><div class="table-wrapper"><table><thead><tr><th>Perícia</th><th>Atributo</th><th>Uso</th></tr></thead><tbody><tr><td>Atletismo</td><td>FOR</td><td>Escaladas, saltos, feitos físicos</td></tr><tr><td>Luta</td><td>DES</td><td>Ataques corpo a corpo</td></tr><tr><td>Acrobacia</td><td>DES</td><td>Equilíbrio e movimentação</td></tr><tr><td>Furtividade</td><td>DES</td><td>Infiltração e ocultação</td></tr><tr><td>Pontaria</td><td>DES</td><td>Ataques à distância</td></tr><tr><td>Prestidigitação</td><td>DES</td><td>Manipulação de objetos</td></tr><tr><td>Reflexos</td><td>DES</td><td>Reações rápidas</td></tr><tr><td>Fortitude</td><td>VIG</td><td>Resistir venenos e doenças</td></tr><tr><td>Integridade</td><td>VIG</td><td>Resistir danos prolongados</td></tr><tr><td>Intuição</td><td>INT</td><td>Perceber intenções</td></tr><tr><td>Medicina</td><td>INT</td><td>Primeiros socorros</td></tr><tr><td>Percepção</td><td>INT</td><td>Notar detalhes e ameaças</td></tr><tr><td>Astúcia</td><td>INT</td><td>Improvisação e lógica</td></tr><tr><td>Investigação</td><td>INT</td><td>Reunir pistas</td></tr><tr><td>História</td><td>INT</td><td>Conhecimentos históricos</td></tr><tr><td>Ofícios</td><td>INT</td><td>Criação de itens</td></tr><tr><td>Religião</td><td>INT</td><td>Conhecimentos espirituais</td></tr><tr><td>Magia</td><td>ALM</td><td>Energia sobrenatural</td></tr><tr><td>Feitiçaria</td><td>ALM</td><td>Técnicas mágicas</td></tr><tr><td>Vontade</td><td>ALM</td><td>Resistência mental</td></tr><tr><td>Persuasão</td><td>CAR</td><td>Convencer e negociar</td></tr><tr><td>Enganação</td><td>CAR</td><td>Mentir e blefar</td></tr><tr><td>Intimidação</td><td>CAR</td><td>Pressionar e impor</td></tr><tr><td>Performance</td><td>CAR</td><td>Atuação e entretenimento</td></tr></tbody></table></div></section>
 
-    <!-- RANKING -->
+    <!-- RANKING — LIVRO DAS LENDAS -->
     <section id="secao-ranking" class="section-anchor">
       <div class="divider"></div>
-      <span class="chapter-number">Classificação Geral</span>
-      <h1>🏆 Ranking dos Despertos</h1>
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem">
-        <p style="color:var(--text-muted);margin:0">Classificação por nível e núcleos absorvidos. Clique num Desperto para ver o perfil público.</p>
-        <button onclick="carregarRanking()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.4rem 1rem;font-family:inherit;font-size:.82rem;cursor:pointer;letter-spacing:.5px;transition:all .2s" onmouseover="this.style.background='rgba(156,42,42,.12)'" onmouseout="this.style.background='none'">↺ Atualizar</button>
+      <div class="lendas-header">
+        <div class="lendas-runes">ᚱ ᚢ ᚾ ᚨ ᛊ ᛏ ᚢ ᛗ</div>
+        <span class="chapter-number" style="color:var(--accent-light);letter-spacing:4px">📖 LIVRO DAS LENDAS</span>
+        <h1 class="lendas-title">Crônicas do Abismo</h1>
+        <p class="lendas-subtitle">Os Despertos mais temidos do mundo conhecido</p>
+        <div class="lendas-header-actions">
+          <button class="lendas-refresh-btn" onclick="carregarRanking()">↺ Atualizar</button>
+          <button class="lendas-personalizar-btn" onclick="abrirPersonalizacao()">⚙ Personalizar Perfil</button>
+        </div>
       </div>
-      <div id="ranking-grid" class="ranking-grid">
-        <p style="color:var(--text-muted);font-size:.85rem;grid-column:1/-1">☁ Carregando ranking...</p>
+
+      <!-- ABAS DE RANKING -->
+      <div class="lendas-tabs-wrap">
+        <div class="lendas-tabs" id="lendas-tabs">
+          <button class="lendas-tab active" onclick="mudarAbaRanking('geral',this)">🏆 Mais Temidos</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('vitorias',this)">⚔️ Mais Vitórias</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('antigos',this)">📜 Mais Antigos</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('nivel',this)">👑 Maiores Níveis</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('abismo',this)">🌑 Lendas do Abismo</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('semana',this)">🔥 Destaques da Semana</button>
+        </div>
+        <div class="lendas-tab-label" id="lendas-tab-label">Classificação por poder e núcleos absorvidos</div>
+      </div>
+
+      <!-- GRID DE CARTÕES -->
+      <div id="ranking-grid" class="lendas-grid">
+        <div class="lendas-loading">
+          <div class="lendas-loading-rune">☽</div>
+          <p>Invocando os registros do Abismo...</p>
+        </div>
       </div>
     </section>
 
@@ -2384,117 +3339,312 @@ function getDespertar(dados) {
 let _rankingInterval = null;
 let _inputListener = null;
 
+// ═══ LIVRO DAS LENDAS — estado global ═══
+let _lendasFichas = []; // cache de todas as fichas
+let _abaAtual = 'geral';
+let _personalizacoes = {}; // { docId: { tema, wallpaper, gifPoder, gifTransformacao, gifSuprema } }
+
+const TEMAS = {
+  abismo:   { icon: '🌑', nome: 'Abismo',    cor: '#5a1a5a' },
+  sangue:   { icon: '🩸', nome: 'Sangue',    cor: '#9c2a2a' },
+  guerra:   { icon: '⚔️', nome: 'Guerra',    cor: '#b87020' },
+  vampirico:{ icon: '🦇', nome: 'Vampírico', cor: '#7a0a5a' },
+  soberano: { icon: '👑', nome: 'Soberano',  cor: '#d4ad3a' },
+  infernal: { icon: '🔥', nome: 'Infernal',  cor: '#e05010' },
+  glacial:  { icon: '❄️', nome: 'Glacial',   cor: '#40a0c0' },
+  cosmico:  { icon: '🌌', nome: 'Cósmico',   cor: '#5020c0' },
+};
+
+const WALLPAPERS = [
+  { id: 'lua_sangrenta',   nome: 'Lua Sangrenta',    url: 'https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=800&q=80' },
+  { id: 'nevoa_negra',     nome: 'Névoa Negra',      url: 'https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=800&q=80' },
+  { id: 'castelo_sombrio', nome: 'Castelo Sombrio',  url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&q=80' },
+  { id: 'trono_sombras',   nome: 'Trono das Sombras',url: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&q=80' },
+  { id: 'catedral_gotica', nome: 'Catedral Gótica',  url: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80' },
+  { id: 'abismo_infinito', nome: 'Abismo Infinito',  url: 'https://images.unsplash.com/photo-1446776899648-aa78eefe8ed0?w=800&q=80' },
+  { id: 'corvos',          nome: 'Corvos Voando',    url: 'https://images.unsplash.com/photo-1618945524163-32451704cbb8?w=800&q=80' },
+  { id: 'runas',           nome: 'Runas Brilhando',  url: 'https://images.unsplash.com/photo-1501139083538-0139583c060f?w=800&q=80' },
+  { id: 'chamas_azuis',    nome: 'Chamas Azuis',     url: 'https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=800&q=80' },
+  { id: 'cinzas',          nome: 'Cinzas Flutuando', url: 'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=800&q=80' },
+  { id: 'floresta_escura', nome: 'Floresta Sombria', url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80' },
+  { id: 'pedra_musgo',     nome: 'Pedra Ancestral',  url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80' },
+];
+
+const ABA_LABELS = {
+  geral:    'Classificação por poder e núcleos absorvidos',
+  vitorias: 'Personagens com mais vitórias registradas',
+  antigos:  'Os Despertos mais antigos do sistema',
+  nivel:    'Classificação por nível de progressão',
+  abismo:   'Lendas que tocaram o fundo do Abismo',
+  semana:   'Destaques das últimas sessões desta semana',
+};
+
+function mudarAbaRanking(aba, btn) {
+  _abaAtual = aba;
+  document.querySelectorAll('.lendas-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const label = document.getElementById('lendas-tab-label');
+  if (label) label.textContent = ABA_LABELS[aba] || '';
+  renderizarCartoes(_lendasFichas, aba);
+}
+
+function _ordenarFichas(fichas, aba) {
+  const now = Date.now();
+  const semana = 7 * 24 * 3600 * 1000;
+  switch(aba) {
+    case 'vitorias':
+      return [...fichas].sort((a,b) => (parseInt(b.vitorias)||0) - (parseInt(a.vitorias)||0));
+    case 'antigos':
+      return [...fichas].sort((a,b) => (a.ts||9e15) - (b.ts||9e15));
+    case 'nivel':
+      return [...fichas].sort((a,b) => (parseInt(b.nivel)||0) - (parseInt(a.nivel)||0));
+    case 'abismo':
+      return [...fichas].filter(f => (parseInt(f.nucleos)||0) >= 1)
+                        .sort((a,b) => (parseInt(b.nucleos)||0) - (parseInt(a.nucleos)||0));
+    case 'semana':
+      return [...fichas].filter(f => f.ts && (now - f.ts) < semana)
+                        .sort((a,b) => (parseInt(b.nivel)||0) - (parseInt(a.nivel)||0));
+    default: // geral
+      return [...fichas].sort((a,b) => b.score - a.score || b.nucleos - a.nucleos || b.nivel - a.nivel);
+  }
+}
+
+function renderizarCartoes(fichas, aba) {
+  const grid = document.getElementById('ranking-grid');
+  if (!grid) return;
+
+  const ordenados = _ordenarFichas(fichas, aba);
+
+  if (!ordenados.length) {
+    const msgs = {
+      abismo: 'Nenhum Desperto tocou o Abismo ainda.',
+      semana: 'Nenhuma atividade registrada esta semana.',
+    };
+    grid.innerHTML = `<div class="lendas-loading"><div class="lendas-loading-rune">☽</div><p style="color:var(--text-muted);font-size:.85rem">${msgs[aba] || 'Nenhum personagem encontrado.'}</p></div>`;
+    return;
+  }
+
+  const maxScore = Math.max(1, ...ordenados.map(f => f.score));
+  grid.innerHTML = '';
+
+  ordenados.forEach((f, i) => {
+    const pos = i + 1;
+    const posClass = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : '';
+    const posLabel = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`;
+    const pct = Math.max(4, Math.round((f.score / maxScore) * 100));
+
+    // personalizações
+    const pid = _fsDocId(f.user, f.nomePersonagem);
+    const p = _personalizacoes[pid] || {};
+    const tema = p.tema || 'sangue';
+    const wp = WALLPAPERS.find(w => w.id === p.wallpaper);
+
+    const avatarHtml = f.foto
+      ? `<img class="lenda-avatar" src="${f.foto}" alt="${f.nome}" onerror="this.outerHTML='<div class=\'lenda-avatar-placeholder\'>⚔</div>'">`
+      : `<div class="lenda-avatar-placeholder">⚔</div>`;
+
+    const card = document.createElement('div');
+    card.className = `lenda-card-outer tema-${tema}`;
+    card.innerHTML = `
+      <div class="lenda-card" onclick="abrirPerfilPublico(${JSON.stringify(JSON.stringify(f)).slice(1,-1)})">
+        ${wp ? `<div class="lenda-card-wallpaper" style="background-image:url('${wp.url}')"></div>` : ''}
+        ${p.gifPoder ? `<div class="lenda-card-gif"><img src="${p.gifPoder}" alt="" onerror="this.style.display='none'"></div>` : ''}
+        <div class="lenda-card-overlay"></div>
+        <div class="lenda-card-body">
+          <span class="lenda-card-rank ${posClass}">${posLabel}</span>
+          ${f.faccao ? `<span class="lenda-card-faccao-badge">${f.faccao}</span>` : ''}
+          <div class="lenda-avatar-wrap">${avatarHtml}</div>
+          <div class="lenda-nome">${f.nome}</div>
+          ${f.alcunha ? `<div class="lenda-alcunha">"${f.alcunha}"</div>` : ''}
+          ${f.poder && f.poder !== '—' ? `<div class="lenda-poder">${f.poder}</div>` : ''}
+          <div class="lenda-meta">
+            <span class="lenda-meta-chip nivel">Nv. ${f.nivel}</span>
+            ${f.rank ? `<span class="lenda-meta-chip rank">${f.rank}</span>` : ''}
+            ${f.cidade ? `<span class="lenda-meta-chip">🏙 ${f.cidade}</span>` : ''}
+            <span class="lenda-meta-chip">◆ ${f.nucleos}</span>
+          </div>
+          <div class="lenda-power-bar">
+            <div class="lenda-power-fill" style="width:${pct}%"></div>
+          </div>
+        </div>
+      </div>`;
+    // Usar onclick com dado serializado (evitar closure em loop)
+    card.querySelector('.lenda-card').onclick = () => abrirPerfilPublico(f);
+    grid.appendChild(card);
+  });
+}
+
+// Normaliza um documento da coleção rankingGlobal em um objeto "ficha"
+// usado pelo Livro das Lendas. TODOS os campos são opcionais: registros
+// salvos antes da introdução de um campo (ex: facção, gênero, grimório
+// social) simplesmente recebem o valor padrão correspondente abaixo —
+// nenhuma ficha antiga quebra por falta de campo.
+function _fichaFromRankingGlobal(docId, d) {
+  d = d || {};
+  const nucleos = parseInt(d.nucleos) || 0;
+  const nivel = parseInt(d.nivel) || 1;
+  const user = d.user || '';
+  const personagem = d.personagem || docId.slice((user + '_').length) || docId;
+  return {
+    user,
+    info: USUARIOS[user] || { nome: d.nome || personagem, role: 'player' },
+    nomePersonagem: personagem,
+    nome: d.nome || personagem,
+    nivel: nivel.toString(),
+    poder: d.poder || '—',
+    nucleos,
+    score: (typeof d.score === 'number') ? d.score : (nivel * 10 + nucleos),
+    ts: d.ts || 0,
+    vitorias: parseInt(d.vitorias) || 0,
+    foto: d.foto || null,
+    despertar: d.despertar || 'Desperto',
+    // ─ Campos públicos (Capítulo 6 / Grimório) ─
+    alcunha: d.alcunha || '',
+    classe: d.classe || '',
+    rank: d.rank || '',
+    faccao: d.faccao || '',
+    cidade: d.cidade || '',
+    genero: d.genero || '',
+    frase: d.frase || '',
+    descricaoPublica: d.descricaoPublica || '',
+    // ─ Grimório — Perfil Público (perfil social) ─
+    socHistoria: d.socHistoria || '',
+    socFeitos: d.socFeitos || '',
+    socConquistas: d.socConquistas || '',
+    socTitulos: d.socTitulos || '',
+    socAliados: d.socAliados || '',
+    socRivais: d.socRivais || '',
+    socTimeline: d.socTimeline || '',
+  };
+}
+
+// Constrói o objeto "ficha" a partir de uma ficha individual antiga
+// (coleções fichas/chars/fotos) — usado apenas no fallback, para
+// personagens que ainda não possuem registro em rankingGlobal.
+async function _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId) {
+  const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
+  if (!fichaSnap.exists()) return null;
+  if (fichaSnap.data().status === 'arquivado') return null;
+
+  const raw = fichaSnap.data().dados;
+  const dados = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+
+  let fotoPrincipal = null;
+  try {
+    const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(user, nomePersonagem)));
+    if (fotoSnap.exists()) fotoPrincipal = fotoSnap.data().principal || null;
+  } catch(e) {}
+
+  const nucleoRaw = dados['f-nucleo'] || '0';
+  const nucleos = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
+  const nivel = parseInt(dados['f-nivel'] || '1') || 1;
+  const nomeExibido = dados['f-nome'] || nomePersonagem;
+  const score = nivel * 10 + nucleos;
+  const ts = fichaSnap.data().ts || 0;
+
+  return {
+    user, info,
+    nome: nomeExibido,
+    nomePersonagem,
+    nivel: nivel.toString(),
+    poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
+    nucleos, score, ts,
+    vitorias: parseInt(dados['f-vitorias'] || '0') || 0,
+    foto: fotoPrincipal,
+    despertar: getDespertar(dados),
+    alcunha: dados['f-alcunha'] || '',
+    classe: dados['f-classe'] || '',
+    rank: dados['f-rank'] || '',
+    faccao: dados['f-faccao'] || '',
+    cidade: dados['f-cidade'] || '',
+    genero: dados['f-genero'] || '',
+    frase: dados['f-frase'] || '',
+    descricaoPublica: dados['f-descricao-publica'] || '',
+    socHistoria: dados['soc-historia'] || '',
+    socFeitos: dados['soc-feitos'] || '',
+    socConquistas: dados['soc-conquistas'] || '',
+    socTitulos: dados['soc-titulos'] || '',
+    socAliados: dados['soc-aliados'] || '',
+    socRivais: dados['soc-rivais'] || '',
+    socTimeline: dados['soc-timeline'] || '',
+  };
+}
+
 async function carregarRanking() {
   const grid = document.getElementById('ranking-grid');
   if (!grid) return;
   if (!window.db || !window.doc || !window.getDoc) {
-    grid.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;grid-column:1/-1">Firebase não disponível.</p>';
+    grid.innerHTML = '<div class="lendas-loading"><p style="color:var(--text-muted)">Firebase não disponível.</p></div>';
     return;
   }
 
-  grid.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;grid-column:1/-1">☁ Carregando ranking...</p>';
+  grid.innerHTML = `<div class="lendas-loading"><div class="lendas-loading-rune">☽</div><p>Invocando os registros do Abismo...</p></div>`;
 
-  // TODOS os usuários (player + adm + gm) têm personagens no ranking
-  const todos = Object.entries(USUARIOS);
   const fichas = [];
+  const idsConhecidos = new Set();
 
+  // ═══ FONTE PRINCIPAL: rankingGlobal ═══════════════════════════════
+  // Uma única leitura de coleção traz TODOS os personagens (players,
+  // GMs, ADMs, antigos e novos) sem depender de USUARIOS e sem o
+  // custo de N×M leituras (1 leitura por usuário × personagens).
+  if (window.collection && window.getDocs) {
+    try {
+      const rankingSnap = await window.getDocs(window.collection(window.db, 'rankingGlobal'));
+      rankingSnap.forEach(docSnap => {
+        const d = docSnap.data() || {};
+        if (d.status === 'arquivado') return; // compat: registros antigos podem ter sido marcados assim
+        fichas.push(_fichaFromRankingGlobal(docSnap.id, d));
+        idsConhecidos.add(docSnap.id);
+      });
+    } catch(e) {
+      console.warn('[Ranking] Erro ao ler rankingGlobal, usando apenas fallback por ficha:', e);
+    }
+  } else {
+    console.warn('[Ranking] collection/getDocs indisponíveis — usando apenas fallback por ficha.');
+  }
+
+  // ═══ FALLBACK: fichas antigas ainda não migradas para rankingGlobal ═══
+  // Cobre personagens criados/salvos antes desta atualização (que ainda
+  // não passaram por updateRankingEntry). Na próxima vez que o jogador
+  // salvar a ficha, o registro passa a existir em rankingGlobal.
+  const todos = Object.entries(USUARIOS);
   for (const [user, info] of todos) {
     try {
       const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
       let listaPersonagens = [];
-      if (listaSnap.exists()) {
-        listaPersonagens = JSON.parse(listaSnap.data().lista || '[]');
-      }
-      if (listaPersonagens.length === 0) continue;
+      if (listaSnap.exists()) listaPersonagens = JSON.parse(listaSnap.data().lista || '[]');
+      if (!listaPersonagens.length) continue;
 
       for (const nomePersonagem of listaPersonagens) {
+        const fichaDocId = _fsDocId(user, nomePersonagem);
+        if (idsConhecidos.has(fichaDocId)) continue; // já coberto por rankingGlobal
+
         try {
-          const fichaDocId = _fsDocId(user, nomePersonagem);
-          const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
-          let dados = {};
-          if (fichaSnap.exists()) {
-            const raw = fichaSnap.data().dados;
-            dados = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+          const f = await _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId);
+          if (f) {
+            fichas.push(f);
+            idsConhecidos.add(fichaDocId);
           }
-
-          // Pula personagens arquivados
-          if (fichaSnap.exists() && fichaSnap.data().status === 'arquivado') continue;
-
-          // Foto principal do personagem
-          let fotoPrincipal = null;
-          try {
-            const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(user, nomePersonagem)));
-            if (fotoSnap.exists()) fotoPrincipal = fotoSnap.data().principal || null;
-          } catch(e) {}
-
-          // Conta núcleos absorvidos
-          const nucleoRaw = dados['f-nucleo'] || '0';
-          const nucleos = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
-
-          // Nível
-          const nivel = parseInt(dados['f-nivel'] || '1') || 1;
-
-          // Nome exibido
-          const nomeExibido = dados['f-nome'] || nomePersonagem;
-
-          // Score: nível * 10 + núcleos (para ordenação significativa)
-          const score = nivel * 10 + nucleos;
-
-          fichas.push({
-            user, info,
-            nome: nomeExibido,
-            nomePersonagem,
-            nivel: dados['f-nivel'] || '1',
-            poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
-            nucleos, score,
-            foto: fotoPrincipal,
-            despertar: getDespertar(dados),
-          });
-        } catch(e) {
-          console.warn('[Ranking] Erro ao carregar personagem:', user, nomePersonagem, e);
-        }
+        } catch(e) { console.warn('[Ranking] fallback', user, nomePersonagem, e); }
       }
-    } catch(e) {
-      console.warn('[Ranking] Erro ao carregar usuário:', user, e);
-    }
+    } catch(e) { console.warn('[Ranking] user:', user, e); }
   }
 
-  // Ordena por score (nível × 10 + núcleos) decrescente
-  fichas.sort((a, b) => b.score - a.score || b.nucleos - a.nucleos || b.nivel - a.nivel);
-
-  grid.innerHTML = '';
-
-  if (fichas.length === 0) {
-    grid.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;grid-column:1/-1">Nenhum personagem encontrado no ranking.</p>';
-    return;
+  // ═══ PERSONALIZAÇÕES (tema, wallpaper, gifs) ═══
+  // Leitura individual — não reintroduz o custo N×M, pois o ranking em
+  // si já é resolvido em 1 leitura via rankingGlobal.
+  for (const f of fichas) {
+    const pid = _fsDocId(f.user, f.nomePersonagem);
+    if (_personalizacoes[pid]) continue;
+    try {
+      const pSnap = await window.getDoc(window.doc(window.db, 'personalizacoes', pid));
+      if (pSnap.exists()) _personalizacoes[pid] = pSnap.data();
+    } catch(e) {}
   }
 
-  fichas.forEach((f, i) => {
-    const pos = i + 1;
-    const posClass = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : '';
-    const posLabel = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`;
-    const maxScore = fichas[0].score || 1;
-    const pct = Math.max(4, Math.round((f.score / maxScore) * 100));
+  _lendasFichas = fichas;
+  renderizarCartoes(_lendasFichas, _abaAtual);
 
-    const card = document.createElement('div');
-    card.className = 'ranking-card';
-    card.onclick = () => abrirPerfilPublico(f);
-    card.innerHTML = `
-      <span class="ranking-card-pos ${posClass}">${posLabel}</span>
-      ${f.foto
-        ? `<img class="ranking-avatar" src="${f.foto}" alt="${f.nome}">`
-        : `<div class="ranking-avatar-placeholder">⚔</div>`}
-      <div class="ranking-nome">${f.nome}</div>
-      <div class="ranking-poder">${f.poder !== '—' ? f.poder : '<span style="color:#555">—</span>'}</div>
-      <div style="font-size:.72rem;color:var(--text-muted);margin-top:.2rem">Nv. ${f.nivel}</div>
-      <div class="ranking-nucleos">◆ ${f.nucleos} núcleo${f.nucleos !== 1 ? 's' : ''}</div>
-      <div class="ranking-card-despertar">${f.despertar}</div>
-      <div class="ranking-bar" style="width:${pct}%"></div>
-    `;
-    grid.appendChild(card);
-  });
-
-  // Atualização automática a cada 30s
   if (!_rankingInterval) {
     _rankingInterval = setInterval(() => {
       if (document.getElementById('ranking-grid')) carregarRanking();
@@ -2503,31 +3653,379 @@ async function carregarRanking() {
 }
 
 function abrirPerfilPublico(f) {
-  document.getElementById('modal-perfil-overlay')?.remove();
+  // Remove modal anterior
+  document.getElementById('livro-overlay')?.remove();
+  document.getElementById('grimorio-overlay')?.remove();
+
   const overlay = document.createElement('div');
-  overlay.className = 'modal-perfil-overlay';
-  overlay.id = 'modal-perfil-overlay';
-  overlay.innerHTML = `
-    <div class="modal-perfil">
-      <div class="modal-perfil-banner">
-        ${f.foto
-          ? `<img class="modal-perfil-avatar" src="${f.foto}" alt="${f.nome}">`
-          : `<div class="modal-perfil-avatar-placeholder">⚔</div>`}
-        <button class="modal-perfil-close" onclick="document.getElementById('modal-perfil-overlay').remove()">✕</button>
+  overlay.className = 'livro-overlay';
+  overlay.id = 'livro-overlay';
+
+  // helpers
+  function linhas(str) { return (str||'').split('\n').map(s=>s.trim()).filter(Boolean); }
+  function listaHTML(arr, vazio='Nenhum registro.') {
+    if (!arr.length) return `<span class="livro-area-empty">${vazio}</span>`;
+    return `<ul class="livro-area-list">${arr.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+  }
+
+  const pid = _fsDocId(f.user, f.nomePersonagem || f.nome);
+  const p = _personalizacoes[pid] || {};
+  const tema = p.tema || 'sangue';
+  const temaInfo = TEMAS[tema] || TEMAS.sangue;
+  const wp = WALLPAPERS.find(w => w.id === p.wallpaper);
+
+  // Títulos
+  const titulosArr = (f.socTitulos||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const titulosHtml = titulosArr.length
+    ? titulosArr.map(t=>`<span class="livro-badge">${t}</span>`).join('')
+    : '<span style="color:#444;font-size:.8rem;font-style:italic">Nenhum título ostentado.</span>';
+
+  // Avatar
+  const avatarHtml = f.foto
+    ? `<img class="livro-avatar" src="${f.foto}" alt="${f.nome}" onerror="this.outerHTML='<div class=\"livro-avatar-placeholder\">⚔</div>'">`
+    : `<div class="livro-avatar-placeholder">⚔</div>`;
+
+  // Tags
+  const tags = [];
+  if (f.despertar) tags.push(`<span class="livro-tag">${f.despertar}</span>`);
+  if (f.rank) tags.push(`<span class="livro-tag rank">◆ ${f.rank}</span>`);
+  if (f.faccao) tags.push(`<span class="livro-tag faccao">${f.faccao}</span>`);
+  if (f.cidade) tags.push(`<span class="livro-tag">🏙 ${f.cidade}</span>`);
+  if (f.genero) tags.push(`<span class="livro-tag">${f.genero}</span>`);
+  tags.push(`<span class="livro-tag nivel">Nível ${f.nivel}</span>`);
+  if (f.nucleos) tags.push(`<span class="livro-tag">◆ ${f.nucleos} núcleos</span>`);
+
+  // Timeline
+  const timelineArr = linhas(f.socTimeline);
+  const timelineHtml = timelineArr.length
+    ? timelineArr.map(ev => {
+        const parts = ev.split('—');
+        const titulo = parts[0].trim();
+        const resto = parts.slice(1).join('—').trim();
+        return `<div class="livro-timeline-item"><div class="livro-timeline-dot"></div><div class="livro-timeline-text"><strong>${titulo}</strong>${resto ? ' — ' + resto : ''}</div></div>`;
+      }).join('')
+    : '<span class="livro-area-empty">Nenhum evento registrado.</span>';
+
+  // Conquistas
+  const conquistasArr = linhas(f.socConquistas);
+  const conquistasHtml = conquistasArr.length
+    ? `<div class="livro-badges">${conquistasArr.map(c=>`<span class="livro-badge">🌑 ${c}</span>`).join('')}</div>`
+    : '<span class="livro-area-empty">Nenhuma conquista registrada.</span>';
+
+  // Tema visual
+  const temaCss = `
+    --livro-accent: ${temaInfo.cor};
+    --livro-accent-glow: ${temaInfo.cor}33;
+    background: linear-gradient(160deg, #131118 0%, #0d0b12 100%);
+    border-color: rgba(${parseInt(temaInfo.cor.slice(1,3),16)},${parseInt(temaInfo.cor.slice(3,5),16)},${parseInt(temaInfo.cor.slice(5,7),16)},.35);
+  `;
+
+  // GIF sections
+  const gifsHtml = (p.gifPoder || p.gifTransformacao || p.gifSuprema) ? `
+    <div class="livro-section">
+      <div class="livro-section-title">✨ Manifestações</div>
+      <div class="livro-gif-section">
+        ${p.gifPoder ? `<div class="livro-gif-item"><img src="${p.gifPoder}" alt="Poder" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Poder</div></div>` : ''}
+        ${p.gifTransformacao ? `<div class="livro-gif-item"><img src="${p.gifTransformacao}" alt="Transformação" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Transformação</div></div>` : ''}
+        ${p.gifSuprema ? `<div class="livro-gif-item"><img src="${p.gifSuprema}" alt="Suprema" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Habilidade Suprema</div></div>` : ''}
       </div>
-      <div class="modal-perfil-body">
-        <div class="modal-perfil-nome">${f.nome}</div>
-        <div class="modal-perfil-nivel">Nível ${f.nivel} • ${f.info.nome}</div>
-        <div class="modal-perfil-poder">${f.poder !== '—' ? '⚡ ' + f.poder : '—'}</div>
-        <div style="text-align:center;margin-bottom:.5rem"><span class="despertar-badge">${f.despertar || 'Desperto'}</span></div>
-        <div style="text-align:center;color:var(--gold);font-size:.82rem">◆ ${f.nucleos} núcleo${f.nucleos !== 1 ? 's' : ''} absorvido${f.nucleos !== 1 ? 's' : ''}</div>
-        <div id="modal-perfil-galeria" class="modal-perfil-fotos" style="margin-top:1.25rem"></div>
+    </div>` : '';
+
+  overlay.innerHTML = `
+    <div class="livro-modal" style="${temaCss}">
+
+      <!-- BANNER -->
+      <div class="livro-banner">
+        ${wp ? `<div class="livro-banner-bg" style="background-image:url('${wp.url}')"></div>` : ''}
+        ${p.gifPoder ? `<div class="livro-banner-gif"><img src="${p.gifPoder}" alt="" onerror="this.style.display='none'"></div>` : ''}
+        <div class="livro-banner-gradient"></div>
+        <div class="livro-banner-runes">ᚱ ᚢ ᚾ ᚨ ᛊ ᛏ ᚢ ᛗ</div>
+        <div class="livro-avatar-wrap">${avatarHtml}</div>
+        <button class="livro-close" onclick="document.getElementById('livro-overlay').remove()">✕</button>
+      </div>
+
+      <!-- IDENTIDADE -->
+      <div class="livro-identity">
+        <div class="livro-nome">${f.nome}</div>
+        ${f.alcunha ? `<div class="livro-alcunha">"${f.alcunha}"</div>` : ''}
+        ${f.poder && f.poder !== '—' ? `
+        <div class="livro-poder-badge">
+          ${p.gifPoder ? `<img class="livro-poder-gif" src="${p.gifPoder}" alt="" onerror="this.style.display='none'">` : '🔷'}
+          ${f.poder}
+        </div>` : ''}
+        <div class="livro-tags">${tags.join('')}</div>
+        ${f.frase ? `<div class="livro-frase">"${f.frase}"</div>` : ''}
+      </div>
+
+      <!-- CORPO -->
+      <div class="livro-body">
+
+        ${f.descricaoPublica ? `
+        <div class="livro-section">
+          <div class="livro-section-title">◈ Descrição</div>
+          <div class="livro-descricao">${f.descricaoPublica.replace(/\n/g,'<br>')}</div>
+        </div>` : ''}
+
+        ${gifsHtml}
+
+        <div class="livro-section">
+          <div class="livro-section-title">👑 Títulos</div>
+          <div class="livro-badges">${titulosHtml}</div>
+        </div>
+
+        ${f.socHistoria ? `
+        <div class="livro-section">
+          <div class="livro-section-title">📜 História</div>
+          <div class="livro-descricao">${f.socHistoria.replace(/\n/g,'<br>')}</div>
+        </div>` : ''}
+
+        <div class="livro-section">
+          <div class="livro-section-title">🏆 Feitos &amp; Conquistas</div>
+          <div class="livro-2col">
+            <div class="livro-area-card">
+              <div class="livro-area-title">🏆 Feitos em Batalha</div>
+              ${listaHTML(linhas(f.socFeitos), 'Nenhum feito registrado.')}
+            </div>
+            <div class="livro-area-card">
+              <div class="livro-area-title">🌑 Conquistas do Abismo</div>
+              ${conquistasHtml}
+            </div>
+          </div>
+        </div>
+
+        <div class="livro-section">
+          <div class="livro-section-title">⚔️ Aliados &amp; Rivais</div>
+          <div class="livro-2col">
+            <div class="livro-area-card">
+              <div class="livro-area-title">🤝 Aliados</div>
+              ${listaHTML(linhas(f.socAliados), 'Nenhum aliado registrado.')}
+            </div>
+            <div class="livro-area-card">
+              <div class="livro-area-title">⚔️ Rivais</div>
+              ${listaHTML(linhas(f.socRivais), 'Nenhum rival registrado.')}
+            </div>
+          </div>
+        </div>
+
+        <div class="livro-section">
+          <div class="livro-section-title">📅 Linha do Tempo</div>
+          <div class="livro-timeline">${timelineHtml}</div>
+        </div>
+
+        <div class="livro-section" id="livro-galeria-section" style="display:none">
+          <div class="livro-section-title">📷 Galeria</div>
+          <div class="livro-galeria" id="livro-galeria-fotos"></div>
+        </div>
+
+        <div class="livro-footer">
+          ${temaInfo.icon} LIVRO DAS LENDAS • Crônicas do Abismo ${temaInfo.icon}
+        </div>
       </div>
     </div>`;
+
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
-  // carrega galeria do personagem
-  carregarGaleriaPublica(f.user, f.nomePersonagem || f.personagem);
+  _carregarGaleriaLivro(f.user, f.nomePersonagem || f.nome);
+}
+
+function _carregarGaleriaLivro(user, personagem) {
+  const container = document.getElementById('livro-galeria-fotos');
+  const section = document.getElementById('livro-galeria-section');
+  if (!container || !section || !window.db || !window.doc || !window.getDoc) return;
+  window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(user, personagem))).then(snap => {
+    if (!snap.exists()) return;
+    const gal = (snap.data().galeria || []).filter(Boolean);
+    if (!gal.length) return;
+    section.style.display = '';
+    container.innerHTML = gal.map(src =>
+      `<img src="${src}" alt="foto" onclick="abrirLightbox('${src.replace(/'/g,"\'")}')">`
+    ).join('');
+  }).catch(()=>{});
+}
+
+// ═══ PERSONALIZAÇÃO DO PERFIL ═══
+function abrirPersonalizacao() {
+  if (!usuarioAtual || !personagemAtual) {
+    alert('Entre com sua conta e selecione um personagem para personalizar.');
+    return;
+  }
+  document.getElementById('personalizar-overlay')?.remove();
+  _temaSeleccionado = null;
+  _wallpaperSelecionado = null;
+  const pid = _fsDocId(usuarioAtual, personagemAtual);
+  const p = _personalizacoes[pid] || {};
+
+  const temasBtns = Object.entries(TEMAS).map(([id, t]) =>
+    `<button class="tema-btn ${p.tema === id || (!p.tema && id === 'sangue') ? 'selecionado' : ''}"
+      onclick="selecionarTema('${id}',this)">
+      <span class="tema-icon">${t.icon}</span>
+      <span class="tema-nome">${t.nome}</span>
+    </button>`
+  ).join('');
+
+  const wpsBtns = WALLPAPERS.map(w =>
+    `<button class="wp-btn ${p.wallpaper === w.id ? 'selecionado' : ''}"
+      onclick="selecionarWallpaper('${w.id}',this)"
+      title="${w.nome}">
+      <img class="wp-btn-preview" src="${w.url}" alt="${w.nome}" onerror="this.style.display='none'">
+      <span class="wp-btn-label">${w.nome}</span>
+    </button>`
+  ).join('');
+
+  const overlay = document.createElement('div');
+  overlay.id = 'personalizar-overlay';
+  overlay.className = 'personalizar-overlay';
+  overlay.innerHTML = `
+    <div class="personalizar-modal">
+      <div class="personalizar-header">
+        <div class="personalizar-title">⚙ Personalizar Perfil</div>
+        <div class="personalizar-sub">Aparência de ${personagemAtual} no Livro das Lendas</div>
+      </div>
+      <div class="personalizar-body">
+
+        <div class="personalizar-section-title">Tema Visual</div>
+        <div class="temas-grid">${temasBtns}</div>
+
+        <div class="personalizar-section-title">Wallpaper do Perfil</div>
+        <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.6rem">Aparece no banner e no cartão do ranking. Selecione ou cole uma URL personalizada.</p>
+        <div class="wallpapers-grid">${wpsBtns}</div>
+        <div style="margin-top:.6rem;display:flex;gap:.5rem;align-items:center">
+          <input type="text" id="wp-custom-url" placeholder="Ou cole URL de imagem personalizada (https://...)"
+            value="${p.wallpaperUrl||''}"
+            style="flex:1;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.45rem .65rem;font-family:inherit;font-size:.82rem;outline:none">
+          <button onclick="usarWallpaperCustom()" style="background:none;border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.45rem .85rem;font-family:inherit;font-size:.8rem;cursor:pointer">Usar</button>
+        </div>
+
+        <div class="personalizar-section-title">GIFs do Personagem</div>
+        <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.6rem">
+          Cole URLs de GIFs (hospedados no Firebase Storage ou qualquer CDN).<br>
+          <strong style="color:var(--accent-light)">Não armazene GIFs em base64 — use apenas URLs.</strong>
+        </p>
+        <div class="gif-input-group">
+          <div>
+            <div class="gif-input-row">
+              <div>
+                <label>🔷 GIF — Poder Principal</label>
+                <input type="text" id="gif-poder" placeholder="https://storage.googleapis.com/..." value="${p.gifPoder||''}" oninput="previewGif('gif-poder','prev-poder')">
+              </div>
+              <img id="prev-poder" class="gif-preview-sm" src="${p.gifPoder||''}" onerror="this.style.display='none'" style="${p.gifPoder?'display:block':''}">
+            </div>
+          </div>
+          <div>
+            <div class="gif-input-row">
+              <div>
+                <label>🌀 GIF — Transformação</label>
+                <input type="text" id="gif-transformacao" placeholder="https://storage.googleapis.com/..." value="${p.gifTransformacao||''}" oninput="previewGif('gif-transformacao','prev-trans')">
+              </div>
+              <img id="prev-trans" class="gif-preview-sm" src="${p.gifTransformacao||''}" onerror="this.style.display='none'" style="${p.gifTransformacao?'display:block':''}">
+            </div>
+          </div>
+          <div>
+            <div class="gif-input-row">
+              <div>
+                <label>⚡ GIF — Habilidade Suprema</label>
+                <input type="text" id="gif-suprema" placeholder="https://storage.googleapis.com/..." value="${p.gifSuprema||''}" oninput="previewGif('gif-suprema','prev-suprema')">
+              </div>
+              <img id="prev-suprema" class="gif-preview-sm" src="${p.gifSuprema||''}" onerror="this.style.display='none'" style="${p.gifSuprema?'display:block':''}">
+            </div>
+          </div>
+        </div>
+
+        <div class="personalizar-actions">
+          <button class="personalizar-btn-cancelar" onclick="document.getElementById('personalizar-overlay').remove()">Cancelar</button>
+          <button class="personalizar-btn-salvar" onclick="salvarPersonalizacao()">✓ Salvar Personalização</button>
+        </div>
+      </div>
+    </div>`;
+
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+let _temaSeleccionado = null;
+let _wallpaperSelecionado = null;
+
+function selecionarTema(id, btn) {
+  _temaSeleccionado = id;
+  document.querySelectorAll('.tema-btn').forEach(b => b.classList.remove('selecionado'));
+  btn.classList.add('selecionado');
+}
+
+function selecionarWallpaper(id, btn) {
+  _wallpaperSelecionado = id;
+  document.querySelectorAll('.wp-btn').forEach(b => b.classList.remove('selecionado'));
+  btn.classList.add('selecionado');
+  document.getElementById('wp-custom-url').value = '';
+}
+
+function usarWallpaperCustom() {
+  _wallpaperSelecionado = null;
+  document.querySelectorAll('.wp-btn').forEach(b => b.classList.remove('selecionado'));
+}
+
+function previewGif(inputId, imgId) {
+  const url = document.getElementById(inputId)?.value?.trim();
+  const img = document.getElementById(imgId);
+  if (!img) return;
+  if (url) { img.src = url; img.style.display = 'block'; }
+  else { img.style.display = 'none'; }
+}
+
+async function salvarPersonalizacao() {
+  if (!usuarioAtual || !personagemAtual) return;
+  const pid = _fsDocId(usuarioAtual, personagemAtual);
+  const old = _personalizacoes[pid] || {};
+
+  const tema = _temaSeleccionado || old.tema || 'sangue';
+
+  const wallpaper = _wallpaperSelecionado || old.wallpaper || '';
+
+  const wallpaperUrl = document.getElementById('wp-custom-url')?.value?.trim() || '';
+  const gifPoder = document.getElementById('gif-poder')?.value?.trim() || '';
+  const gifTransformacao = document.getElementById('gif-transformacao')?.value?.trim() || '';
+  const gifSuprema = document.getElementById('gif-suprema')?.value?.trim() || '';
+
+  const dados = {
+    tema: tema,
+    wallpaper: wallpaper || old.wallpaper || '',
+    wallpaperUrl: wallpaperUrl || old.wallpaperUrl || '',
+    gifPoder, gifTransformacao, gifSuprema,
+    ts: Date.now(),
+    user: usuarioAtual,
+    personagem: personagemAtual,
+  };
+
+  _personalizacoes[pid] = dados;
+
+  // Salva no Firestore — apenas a URL, nunca base64
+  if (window.db && window.doc && window.setDoc) {
+    try {
+      await window.setDoc(window.doc(window.db, 'personalizacoes', pid), dados);
+      console.log('[Personalizacao] Salvo:', pid);
+    } catch(e) { console.warn('[Personalizacao] Erro ao salvar:', e); }
+  }
+
+  document.getElementById('personalizar-overlay')?.remove();
+
+  // Re-renderiza o ranking com as novas personalizações
+  if (_lendasFichas.length) renderizarCartoes(_lendasFichas, _abaAtual);
+}
+async function carregarGaleriaPublicaGrimorio(user, personagem) {
+  const container = document.getElementById('grimorio-galeria-fotos');
+  const section = document.getElementById('grimorio-galeria-section');
+  if (!container || !section) return;
+  if (!window.db || !window.doc || !window.getDoc) return;
+  try {
+    const snap = await window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(user, personagem)));
+    if (!snap.exists()) return;
+    const gal = snap.data().galeria || [];
+    const fotos = gal.filter(Boolean);
+    if (!fotos.length) return;
+    section.style.display = '';
+    container.innerHTML = fotos.map(src =>
+      `<img src="${src}" alt="foto" onclick="abrirLightbox('${src.replace(/'/g,"\\'")}'">`
+    ).join('');
+  } catch(e) {}
 }
 
 async function carregarGaleriaPublica(user, personagem) {
@@ -2901,7 +4399,7 @@ function atualizarFichaHero() {
         <div class="ficha-hero-info">
           <div class="ficha-hero-nome" id="ficha-hero-nome-display">${nome || '<span style="color:var(--text-muted);font-size:1rem">Nome do Personagem</span>'}</div>
           ${alcunha ? `<div class="ficha-hero-alcunha">"${alcunha}"</div>` : '<div class="ficha-hero-alcunha"></div>'}
-          ${poder ? `<div class="ficha-hero-poder">⚡ ${poder}</div>` : ''}
+          ${poder ? `<div class="ficha-hero-poder">🔷 ${poder}</div>` : ''}
           <div class="ficha-hero-recursos">
             <div class="ficha-hero-recurso-pill">Nv. <strong>${nivel}</strong></div>
             <div class="ficha-hero-recurso-pill">PV <strong>${pvMax}</strong></div>
@@ -2919,7 +4417,7 @@ function atualizarFichaHero() {
 
 
 // Campos NARRATIVOS — apenas o próprio player pode editar
-const CAMPOS_NARRATIVOS = ['f-aparencia','f-roupas','r-tracos','r-ideais','r-ligacoes','r-defeitos','r-historia','r-eventos','r-npcs','f-cabelos','f-olhos','f-pele','f-genero','f-idade','f-altura','f-peso'];
+const CAMPOS_NARRATIVOS = ['f-aparencia','f-roupas','r-tracos','r-ideais','r-ligacoes','r-defeitos','r-historia','r-eventos','r-npcs','f-cabelos','f-olhos','f-pele','f-genero','f-idade','f-altura','f-peso','f-frase','f-descricao-publica','soc-historia','soc-feitos','soc-conquistas','soc-titulos','soc-aliados','soc-rivais','soc-timeline'];
 
 let usuarioAtual = null;
 let roleAtual = null;
@@ -3331,6 +4829,15 @@ async function deletarPersonagem(nome) {
         });
       }
     } catch(e) {}
+
+    // 4b. Remove a entrada correspondente de rankingGlobal — personagens
+    // arquivados não devem mais aparecer no Livro das Lendas.
+    try {
+      if (window.deleteDoc) {
+        const rankingDocId = _fsDocId(usuarioAtual, nome);
+        await window.deleteDoc(window.doc(window.db, 'rankingGlobal', rankingDocId));
+      }
+    } catch(e) { console.warn('[Ranking] Erro ao remover rankingGlobal:', e); }
   }
 
   // 5. Remove da lista ativa
@@ -3502,7 +5009,41 @@ function getFormulas() {
     'per-es':   'attrMod + floor(nivel / 2) + floor(maestria * 1.5)',
   };
   const saved = JSON.parse(localStorage.getItem('tp_formulas') || '{}');
-  return { ...def, ...saved };
+  const merged = { ...def, ...saved };
+
+  // ─── Auto-correção: fórmula de PE corrompida ───
+  // A fórmula de PE NUNCA deve depender de pvBase/staBase — esse padrão
+  // (ex: "floor((pvBase/2)/staBase) + bonusPE") pertence ao cálculo do
+  // CUSTO de cada Ponto de Energia, e foi salva por engano no campo de PE
+  // através do editor de fórmulas. Como pvBase ≈ staBase, essa expressão
+  // resulta em floor(0.5) = 0, fazendo PE Máx = 0 + bonusPE sempre.
+  if (typeof merged.pe === 'string' && /\bpvBase\b|\bstaBase\b/.test(merged.pe)) {
+    console.warn('[Fórmulas] PE inválido detectado (depende de pvBase/staBase), restaurando padrão. Valor anterior:', merged.pe);
+    merged.pe = def.pe;
+    salvarFormulas(merged); // persiste a correção localmente e na nuvem (config/formulas)
+  }
+
+  return merged;
+}
+
+// Restaura todas as fórmulas para os valores oficiais da Torre do Pesadelo
+// (localStorage + Firestore compartilhado), e recalcula a ficha aberta.
+function restaurarFormulasPadrao() {
+  const def = {
+    pv:         '(vigor + alma) * (2 + floor(nivel / 2))',
+    sta:        '(vigor + alma) * (2 + floor(nivel / 2))',
+    pe:         '(floor(nivel / 2) + 2) * (modAlma + modIntelecto)',
+    ca:         '10 + modDestreza + ceil(modVigor / 2) + bonusCA',
+    init:       'modDestreza',
+    maestria:   '1 + ceil(nivel / 4)',
+    'per-base': 'attrMod + floor(nivel / 2)',
+    'per-mt':   'attrMod + floor(nivel / 2) + maestria',
+    'per-es':   'attrMod + floor(nivel / 2) + floor(maestria * 1.5)',
+  };
+  salvarFormulas(def);
+  carregarFormulaEditor();
+  if (document.getElementById('a-for')) calcTudo();
+  alert('✓ Fórmulas restauradas para o padrão oficial da Torre do Pesadelo.');
 }
 
 function salvarFormulas(f) {
@@ -3558,44 +5099,52 @@ function avaliarFormula(expr, ctx) {
   // Parser seguro — sem new Function() / eval
   // Aceita apenas: números, operadores + - * / % ** ( ) , espaços
   // e nomes de variáveis e funções whitelisted.
+  //
+  // BUG CORRIGIDO: o loop de substituição de variáveis não deve tocar
+  // nos nomes das funções matemáticas (floor, ceil, round...).
+  // Antes, como ctx podia conter { floor: Math.floor, ... }, o loop
+  // substituía \bfloor\b por "0" ANTES do replace para Math.floor,
+  // transformando ex. "floor(nivel/2)" em "0(1)" e causando "0 is not
+  // a function" — todas as fórmulas que usam floor/ceil retornavam 0,
+  // fazendo PV, STA, PE, CA e Perícias ficarem sempre no mínimo (1 ou 0).
+  const FUNCS = ['floor','ceil','round','abs','min','max','sqrt','pow'];
   try {
-    // 1) Valida caracteres permitidos (nomes de var, operadores, números, parênteses)
-    const VARS_RE = Object.keys(ctx).join('|');
-    const FUNCS = ['floor','ceil','round','abs','min','max','sqrt','pow'];
     const FUNCS_RE = FUNCS.join('|');
-    const allowed = new RegExp(
-      `^[\\s\\d\\.\\+\\-\\*\\/\\%\\(\\)\\,]|(${VARS_RE})|(${FUNCS_RE})`
+    // Contexto apenas de variáveis numéricas — funções excluídas
+    const varCtx = Object.fromEntries(
+      Object.entries(ctx).filter(([k]) => !FUNCS.includes(k))
     );
-    // Verifica caractere a caractere usando tokenização simples
+    const VARS_RE = Object.keys(varCtx).join('|') || '__never__';
+
+    // 1) Valida: após remover nomes conhecidos (funcs + vars) e caracteres
+    //    permitidos, não deve sobrar nenhum token desconhecido.
     const clean = expr.replace(
       new RegExp(`\\b(${FUNCS_RE}|${VARS_RE})\\b`, 'g'), '0'
     ).replace(/[\d\s\.\+\-\*\/\%\(\)\,\*\*]/g, '');
     if (clean.length > 0) {
-      console.warn('[avaliarFormula] Expressão bloqueada por conter tokens não permitidos:', expr);
+      console.warn('[avaliarFormula] Expressão bloqueada por conter tokens não permitidos:', expr, '| restante:', clean);
       return 0;
     }
 
-    // 2) Avalia substituindo variáveis e chamando Math diretamente
-    const { floor, ceil, round, abs, min, max, sqrt, pow } = Math;
+    // 2) Substitui apenas VARIÁVEIS (não funções) pelos valores numéricos
     let safeExpr = expr;
-    // Substitui nomes de variáveis pelos seus valores numéricos
-    Object.entries(ctx).forEach(([k, v]) => {
+    Object.entries(varCtx).forEach(([k, v]) => {
       safeExpr = safeExpr.replace(new RegExp(`\\b${k}\\b`, 'g'), String(Number(v) || 0));
     });
-    // Substitui funções matemáticas whitelisted
+    // 3) Substitui nomes de funções whitelisted por Math.*
     safeExpr = safeExpr
       .replace(/\bfloor\b/g, 'Math.floor')
-      .replace(/\bceil\b/g, 'Math.ceil')
+      .replace(/\bceil\b/g,  'Math.ceil')
       .replace(/\bround\b/g, 'Math.round')
-      .replace(/\babs\b/g, 'Math.abs')
-      .replace(/\bmin\b/g, 'Math.min')
-      .replace(/\bmax\b/g, 'Math.max')
-      .replace(/\bsqrt\b/g, 'Math.sqrt')
-      .replace(/\bpow\b/g, 'Math.pow');
-    // Após substituição, a expressão deve conter apenas dígitos, pontos, operadores e Math.*
+      .replace(/\babs\b/g,   'Math.abs')
+      .replace(/\bmin\b/g,   'Math.min')
+      .replace(/\bmax\b/g,   'Math.max')
+      .replace(/\bsqrt\b/g,  'Math.sqrt')
+      .replace(/\bpow\b/g,   'Math.pow');
+    // 4) Verificação final: só dígitos, operadores e Math.*
     const finalCheck = safeExpr.replace(/Math\.(floor|ceil|round|abs|min|max|sqrt|pow)/g, '0');
     if (/[a-zA-Z_$]/.test(finalCheck)) {
-      console.warn('[avaliarFormula] Expressão bloqueada após substituição:', expr);
+      console.warn('[avaliarFormula] Expressão bloqueada após substituição:', expr, '->', safeExpr);
       return 0;
     }
     // eslint-disable-next-line no-new-func
@@ -3681,6 +5230,13 @@ function calcTudo() {
   set('r-init',    fmtMod(Math.round(avaliarFormula(f['init'], ctx))));
   set('r-maestria', '+' + Math.round(maestria));
 
+  // ── Custo de cada Ponto de Energia: INT((STA máx ÷ 2) ÷ PE máx) ──
+  const staMaxTotal = staBase + bonusSTA;
+  const peMaxTotal  = parseInt(document.getElementById('r-pe')?.textContent) || 0;
+  const peCusto = peMaxTotal > 0 ? Math.floor((staMaxTotal / 2) / peMaxTotal) : 0;
+  const peCustoEl = document.getElementById('pe-custo');
+  if (peCustoEl) peCustoEl.value = peCusto;
+
   // ── Recalcula valores atuais (gasto) ──
   calcRecursoAtual('pv');
   calcRecursoAtual('sta');
@@ -3709,7 +5265,9 @@ function calcRecursoAtual(tipo) {
     const staMax = parseInt(document.getElementById('r-sta')?.textContent) || 0;
     const staExtra = parseInt(document.getElementById('sta-extra')?.value) || 0;
     const staGasto = parseInt(document.getElementById('sta-gasto')?.value) || 0;
-    const atual = (staMax + staExtra) - staGasto;
+    const peGasto = parseInt(document.getElementById('pe-gasto')?.value) || 0;
+    const peCusto = parseInt(document.getElementById('pe-custo')?.value) || 0;
+    const atual = (staMax + staExtra) - staGasto - (peGasto * peCusto);
     const el = document.getElementById('sta-atual-display');
     if (el) {
       el.textContent = atual;
@@ -3718,7 +5276,8 @@ function calcRecursoAtual(tipo) {
   } else if (tipo === 'pe') {
     const peMax = parseInt(document.getElementById('r-pe')?.textContent) || 0;
     const peGasto = parseInt(document.getElementById('pe-gasto')?.value) || 0;
-    const atual = peMax - peGasto;
+    const peCusto = parseInt(document.getElementById('pe-custo')?.value) || 0;
+    const atual = peMax - (peGasto * peCusto);
     const el = document.getElementById('pe-atual-display');
     if (el) {
       el.textContent = atual;
@@ -3798,6 +5357,16 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       ${fieldGroup('Altura','f-altura')}
       ${fieldGroup('Peso','f-peso')}
       ${fieldGroup('Gênero','f-genero')}
+    </div>
+    <div class="field-row cols-4">
+      ${fieldGroup('Classe','f-classe')}
+      ${fieldGroup('Rank','f-rank')}
+      ${fieldGroup('Facção','f-faccao')}
+      ${fieldGroup('Cidade / Origem','f-cidade')}
+    </div>
+    <div class="field-row cols-2">
+      ${fieldGroup('Frase Marcante','f-frase','textarea')}
+      ${fieldGroup('Descrição Pública','f-descricao-publica','textarea')}
     </div>
   </div>
 </div>
@@ -3942,6 +5511,63 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
 
 
 
+<!-- GRIMÓRIO DOS DESPERTOS — SISTEMA SOCIAL (PERFIL PÚBLICO) -->
+<div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem;border-top:3px solid rgba(100,60,150,.6)!important">
+  <div class="ficha-panel-title" style="color:#b090e0;border-bottom-color:rgba(100,60,150,.2)">
+    📖 Grimório dos Despertos — Perfil Público
+  </div>
+  <div class="ficha-panel-body">
+    <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem">Estas informações ficam visíveis a todos no Ranking. Preencha para enriquecer seu perfil público.</p>
+
+    <!-- SEÇÃO: HISTÓRIA -->
+    <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+      <div style="font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
+        📜 História <span style="flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;display:inline-block"></span>
+      </div>
+      ${fieldGroup('Origem & Passado (resumo público)','soc-historia','textarea')}
+    </div>
+
+    <!-- SEÇÃO: FEITOS & CONQUISTAS -->
+    <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+      <div style="font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
+        🏆 Feitos & 🌑 Conquistas <span style="flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;display:inline-block"></span>
+      </div>
+      <div class="field-row cols-2">
+        ${fieldGroup('Feitos (um por linha)','soc-feitos','textarea')}
+        ${fieldGroup('Conquistas Desbloqueadas (um por linha)','soc-conquistas','textarea')}
+      </div>
+    </div>
+
+    <!-- SEÇÃO: TÍTULOS -->
+    <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+      <div style="font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
+        👑 Títulos <span style="flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;display:inline-block"></span>
+      </div>
+      ${fieldGroup('Títulos ostentados (separados por vírgula)','soc-titulos')}
+    </div>
+
+    <!-- SEÇÃO: ALIADOS & RIVAIS -->
+    <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+      <div style="font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
+        🤝 Aliados & ⚔️ Rivais <span style="flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;display:inline-block"></span>
+      </div>
+      <div class="field-row cols-2">
+        ${fieldGroup('Aliados (um por linha, pode incluir nota)','soc-aliados','textarea')}
+        ${fieldGroup('Rivais (um por linha, pode incluir nota)','soc-rivais','textarea')}
+      </div>
+    </div>
+
+    <!-- SEÇÃO: LINHA DO TEMPO -->
+    <div>
+      <div style="font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
+        📅 Linha do Tempo <span style="flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;display:inline-block"></span>
+      </div>
+      <p style="font-size:.77rem;color:var(--text-muted);margin-bottom:.5rem">Insira eventos no formato: <code style="font-size:.75rem;color:var(--accent-light)">Evento — Breve descrição</code> (um por linha)</p>
+      ${fieldGroup('Eventos da Linha do Tempo','soc-timeline','textarea')}
+    </div>
+  </div>
+</div>
+
 <!-- APARÊNCIA — após Lore, acima dos recursos -->
 <div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem">
   <div class="ficha-panel-title">◆ Aparência</div>
@@ -4000,7 +5626,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           <!-- STA -->
           <div style="background:linear-gradient(160deg,#161220,#0e0c14);border:1px solid rgba(50,40,65,.5);border-top:2px solid rgba(100,80,140,.7);padding:.75rem .6rem">
             <div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:#a080d0;margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem">
-              STA <span class="info-btn" style="font-size:.65rem">ⓘ<span class="tooltip">Igual ao PV base</span></span>
+              STA <span class="info-btn" style="font-size:.65rem">ⓘ<span class="tooltip">Máx = PV base. Atual = Máx + Bônus − Gasto − (Gasto PE × Custo PE)</span></span>
             </div>
             <div style="text-align:center;font-family:'Playfair Display',serif;font-size:1.6rem;color:#a080d0;line-height:1;margin-bottom:.3rem" id="r-sta">0</div>
             <div style="font-size:.58rem;color:#555;text-align:center;margin-bottom:.5rem">máximo</div>
@@ -4027,7 +5653,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           <!-- PE -->
           <div style="background:linear-gradient(160deg,#161220,#0e0c14);border:1px solid rgba(50,40,65,.5);border-top:2px solid rgba(180,140,30,.7);padding:.75rem .6rem">
             <div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem">
-              PE <span class="info-btn" style="font-size:.65rem">ⓘ<span class="tooltip">(⌊nível÷2⌋ + 2) × (modAlma + modIntelecto)</span></span>
+              PE <span class="info-btn" style="font-size:.65rem">ⓘ<span class="tooltip">Máx = (⌊nível÷2⌋ + 2) × (modAlma + modIntelecto). Custo de cada PE = INT((STA máx ÷ 2) ÷ PE máx). Atual = Máx − (Gasto × Custo)</span></span>
             </div>
             <div style="text-align:center;font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold-light);line-height:1;margin-bottom:.3rem" id="r-pe">0</div>
             <div style="font-size:.58rem;color:#555;text-align:center;margin-bottom:.5rem">máximo</div>
@@ -4041,8 +5667,8 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
                 <input type="number" id="pe-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pe');salvarLocal()">
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
-                <span style="font-size:.6rem;color:var(--gold);white-space:nowrap">Custo</span>
-                <input type="number" id="pe-custo" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(180,140,30,.3);color:var(--gold);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="salvarLocal()">
+                <span style="font-size:.6rem;color:var(--gold);white-space:nowrap" title="INT((STA máx ÷ 2) ÷ PE máx)">Custo</span>
+                <input type="number" id="pe-custo" value="0" readonly style="width:44px;background:var(--bg-input);border:1px solid rgba(180,140,30,.3);color:var(--gold);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" title="Custo de cada Ponto de Energia = INT((STA máx ÷ 2) ÷ PE máx) — calculado automaticamente">
               </div>
               <div style="border-top:1px solid var(--border);padding-top:.3rem;text-align:center">
                 <div style="font-size:.55rem;color:var(--gold-light);letter-spacing:1px;margin-bottom:.1rem">ATUAL</div>
@@ -4476,6 +6102,9 @@ function coletarDados() {
     // ficha base
     'f-nome','f-nivel','f-raca','f-antecedente','f-nucleo-prog','f-alcunha','f-despertar',
     'f-idade','f-altura','f-peso','f-genero','f-cabelos','f-olhos','f-pele','f-poder-nome','f-aparencia','f-roupas',
+    'f-classe','f-rank','f-faccao','f-cidade','f-frase','f-descricao-publica',
+    // social (grimório)
+    'soc-historia','soc-feitos','soc-conquistas','soc-titulos','soc-aliados','soc-rivais','soc-timeline',
     // atributos
     'a-for','a-des','a-vig','a-int','a-alm','a-car',
     // recursos
@@ -4595,7 +6224,25 @@ async function updateRankingEntry(user, personagem, dados, foto) {
       foto: foto || null,
       despertar: dados['f-despertar'] || 'Desperto',
       score: (parseInt(dados['f-nivel'] || '1') || 1) * 10 + nucleos,
-      ts: Date.now()
+      vitorias: parseInt(dados['f-vitorias'] || '0') || 0,
+      status: 'ativo',
+      ts: Date.now(),
+      // novos campos de perfil público
+      alcunha: dados['f-alcunha'] || '',
+      classe: dados['f-classe'] || '',
+      rank: dados['f-rank'] || '',
+      faccao: dados['f-faccao'] || '',
+      cidade: dados['f-cidade'] || '',
+      genero: dados['f-genero'] || '',
+      frase: dados['f-frase'] || '',
+      descricaoPublica: dados['f-descricao-publica'] || '',
+      socHistoria: dados['soc-historia'] || '',
+      socFeitos: dados['soc-feitos'] || '',
+      socConquistas: dados['soc-conquistas'] || '',
+      socTitulos: dados['soc-titulos'] || '',
+      socAliados: dados['soc-aliados'] || '',
+      socRivais: dados['soc-rivais'] || '',
+      socTimeline: dados['soc-timeline'] || '',
     });
   } catch(e) {
     console.warn('[Ranking] Erro ao atualizar rankingGlobal:', e);
@@ -5508,7 +7155,9 @@ function filtrarSidebar(termoRaw) {
     doc,
     getDoc,
     setDoc,
-    deleteDoc
+    deleteDoc,
+    collection,
+    getDocs
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   console.log("[Firebase] Módulo carregado.");
@@ -5531,10 +7180,12 @@ function filtrarSidebar(termoRaw) {
   window.getDoc   = getDoc;
   window.setDoc   = setDoc;
   window.deleteDoc = deleteDoc;
+  window.collection = collection;
+  window.getDocs     = getDocs;
   // AVISO DE SEGURANÇA (P17): estas globais existem por compatibilidade com o código principal.
   // TODO: migrar para Firebase Auth + Security Rules para eliminar a necessidade disso.
 
-  console.log("[Firebase] SDK pronto. db, doc, getDoc, setDoc, deleteDoc disponíveis globalmente.");
+  console.log("[Firebase] SDK pronto. db, doc, getDoc, setDoc, deleteDoc, collection, getDocs disponíveis globalmente.");
 </script>
 
 </body></html>
