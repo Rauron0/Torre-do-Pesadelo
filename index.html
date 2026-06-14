@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/Gamer/Downloads/index_7.html -->
+<!-- saved from url=(0046)file:///C:/Users/Gamer/Downloads/index_11.html -->
 <html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Torre do Pesadelo • Portal do Jogador</title>
-<link href="./index_files/css2" rel="stylesheet">
+<link href="file:///C:/Users/Gamer/Downloads/index_files/css2" rel="stylesheet">
 <style>
 :root {
   --bg: #0c0c0f; --bg-surface: #141418; --bg-elevated: #1c1c22; --bg-input: #18181e;
@@ -357,6 +357,18 @@ tr:hover td { background:rgba(156,42,42,.05); }
 .ficha-expand-area { display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
 .ficha-expand-area > .ficha-panel-body { overflow:hidden; min-height:0; }
 .ficha-expand-area.aberta { grid-template-rows:1fr; }
+
+/* Indicador visual na barra quando recolhida */
+.ficha-expand-toggle:not(.aberto-inline)::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.ficha-expand-toggle:hover::before { opacity: .5; }
 
 .ficha-panel-body { padding:1.2rem; }
 .field-row { display:grid; gap:.75rem; margin-bottom:.75rem; }
@@ -1021,178 +1033,249 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   50% { transform: translateY(-8px) rotate(10deg); opacity: 1; }
 }
 
-/* ═══ GRID DE CARTÕES ═══ */
+/* ═══════════════════════════════════════════════════════════
+   CRÔNICAS DAS TORRES — CARDS DARK FANTASY (redesign total)
+═══════════════════════════════════════════════════════════ */
+
+/* GRID responsivo */
 .lendas-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
   margin: .5rem 0 2rem;
 }
+@media (max-width: 900px) {
+  .lendas-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+}
+@media (max-width: 600px) {
+  .lendas-grid { grid-template-columns: repeat(2, 1fr); gap: .75rem; }
+}
+@media (max-width: 360px) {
+  .lendas-grid { grid-template-columns: 1fr; }
+}
 
-/* CARTÃO base */
+/* OUTER wrapper para tema */
+.lenda-card-outer { display: contents; }
+
+/* CARTÃO base — estrutura nova: foto grande em cima */
 .lenda-card {
   position: relative;
   cursor: pointer;
   overflow: hidden;
-  border: 1px solid rgba(60,40,60,.6);
-  transition: transform .25s, box-shadow .25s, border-color .25s;
-  min-height: 280px;
-  display: flex; flex-direction: column;
-  background: linear-gradient(160deg, #131118 0%, #0d0b12 100%);
+  border: 1px solid rgba(60,40,60,.65);
+  border-top: 3px solid rgba(156,42,42,.8);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(170deg, #16121e 0%, #0d0b12 100%);
+  transition: transform .3s cubic-bezier(.2,.8,.3,1), box-shadow .35s, border-color .3s;
+  animation: cardFadeIn .4s ease both;
 }
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hover suave com glow arcano */
 .lenda-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(193,63,63,.5);
-  box-shadow: 0 12px 40px rgba(0,0,0,.7), 0 0 30px rgba(156,42,42,.12);
+  transform: translateY(-6px) scale(1.015);
+  border-color: rgba(193,63,63,.7);
+  box-shadow:
+    0 16px 48px rgba(0,0,0,.8),
+    0 0 0 1px rgba(193,63,63,.15),
+    0 0 40px rgba(156,42,42,.18);
+}
+.lenda-card:hover .lenda-card-foto-img { transform: scale(1.06); }
+.lenda-card:hover .lenda-card-glow { opacity: 1; }
+
+/* Glow arcano interno */
+.lenda-card-glow {
+  position: absolute;
+  inset: 0; z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .4s;
+  background: radial-gradient(ellipse at 50% 0%, rgba(193,63,63,.12) 0%, transparent 70%);
+}
+
+/* FOTO — grande, centrada, ocupa topo do card */
+.lenda-card-foto {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #0c0a12;
+}
+@media (max-width: 600px) {
+  .lenda-card-foto { height: 130px; }
 }
 
 /* WALLPAPER do cartão */
 .lenda-card-wallpaper {
   position: absolute; inset: 0; z-index: 0;
   background-size: cover; background-position: center;
-  opacity: .18;
+  opacity: .15;
   transition: opacity .3s;
 }
-.lenda-card:hover .lenda-card-wallpaper { opacity: .25; }
+.lenda-card:hover .lenda-card-wallpaper { opacity: .22; }
 
-/* GIF overlay para poder */
+/* GIF overlay */
 .lenda-card-gif {
   position: absolute; inset: 0; z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
+  pointer-events: none; overflow: hidden;
 }
 .lenda-card-gif img {
   width: 100%; height: 100%; object-fit: cover;
-  opacity: .08;
-  mix-blend-mode: screen;
-  transition: opacity .3s;
+  opacity: .08; mix-blend-mode: screen; transition: opacity .3s;
 }
 .lenda-card:hover .lenda-card-gif img { opacity: .14; }
 
-/* Gradiente de overlay acima do wallpaper */
-.lenda-card-overlay {
+/* Foto do personagem — object-fit cover sempre centrado */
+.lenda-card-foto-img {
   position: absolute; inset: 0; z-index: 2;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform .4s cubic-bezier(.2,.8,.3,1);
+  display: block;
+}
+.lenda-card-foto-placeholder {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem; color: rgba(193,63,63,.35);
+  background: linear-gradient(160deg, #1a0a0a 0%, #0d0b12 100%);
+}
+
+/* Gradiente sobre a foto */
+.lenda-card-foto-gradient {
+  position: absolute; inset: 0; z-index: 3;
   background: linear-gradient(to bottom,
-    rgba(8,6,12,.3) 0%,
-    rgba(8,6,12,.6) 55%,
-    rgba(8,6,12,.92) 100%
+    transparent 30%,
+    rgba(13,11,18,.7) 70%,
+    rgba(13,11,18,.98) 100%
   );
 }
 
-/* Conteúdo do cartão */
+/* Rank badge — sobre a foto */
+.lenda-card-rank {
+  position: absolute; top: .6rem; left: .65rem;
+  z-index: 10;
+  font-family: 'Playfair Display', serif;
+  font-size: .75rem; letter-spacing: 1.5px;
+  padding: .2rem .55rem;
+  background: rgba(0,0,0,.65);
+  border: 1px solid rgba(60,40,60,.6);
+  color: var(--text-muted);
+  backdrop-filter: blur(4px);
+}
+.lenda-card-rank.ouro {
+  color: var(--gold-light);
+  border-color: rgba(180,140,30,.5);
+  background: rgba(30,20,0,.7);
+  box-shadow: 0 0 10px rgba(180,140,30,.3);
+}
+.lenda-card-rank.prata {
+  color: #d8d8ee; border-color: rgba(200,200,230,.3);
+  background: rgba(10,10,20,.7);
+}
+.lenda-card-rank.bronze {
+  color: #c88a4a; border-color: rgba(200,130,60,.35);
+  background: rgba(25,12,0,.7);
+}
+
+/* Badge de facção — topo direito sobre foto */
+.lenda-card-faccao-badge {
+  position: absolute; top: .6rem; right: .65rem;
+  z-index: 10;
+  font-size: .58rem; letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: .2rem .55rem;
+  background: rgba(156,42,42,.3);
+  border: 1px solid rgba(193,63,63,.4);
+  color: var(--accent-light);
+  backdrop-filter: blur(4px);
+  max-width: 90px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* CORPO do card (abaixo da foto) */
 .lenda-card-body {
   position: relative; z-index: 3;
   display: flex; flex-direction: column;
-  height: 100%;
-  padding: .85rem .9rem 1rem;
+  padding: .8rem .85rem .9rem;
+  gap: .3rem;
+  flex: 1;
 }
 
-/* Posição (rank) */
-.lenda-card-rank {
-  position: absolute; top: .7rem; left: .8rem;
-  z-index: 10;
-  font-family: 'Playfair Display', serif;
-  font-size: .7rem; letter-spacing: 2px;
-  color: var(--text-muted);
-  text-shadow: 0 1px 4px rgba(0,0,0,.9);
-}
-.lenda-card-rank.ouro { color: var(--gold-light); text-shadow: 0 0 12px rgba(180,140,30,.6); }
-.lenda-card-rank.prata { color: #d0d0e0; text-shadow: 0 0 8px rgba(200,200,220,.3); }
-.lenda-card-rank.bronze { color: #c88a4a; text-shadow: 0 0 8px rgba(200,140,74,.3); }
-
-/* Badge de facção */
-.lenda-card-faccao-badge {
-  position: absolute; top: .65rem; right: .8rem;
-  z-index: 10;
-  font-size: .6rem; letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: .2rem .55rem;
-  background: rgba(156,42,42,.25);
-  border: 1px solid rgba(193,63,63,.35);
-  color: var(--accent-light);
-  backdrop-filter: blur(4px);
+/* Linha divisória gótica */
+.lenda-card-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(193,63,63,.4), transparent);
+  margin: .25rem 0;
 }
 
-/* Avatar */
-.lenda-avatar-wrap {
-  display: flex; justify-content: center;
-  margin: 1.5rem 0 .8rem;
-}
-.lenda-avatar {
-  width: 78px; height: 78px;
-  border-radius: 6px;
-  object-fit: cover;
-  border: 2px solid rgba(193,63,63,.5);
-  box-shadow: 0 4px 20px rgba(0,0,0,.7), 0 0 20px rgba(156,42,42,.15);
-  background: var(--bg-input);
-  display: block;
-}
-.lenda-avatar-placeholder {
-  width: 78px; height: 78px;
-  border-radius: 6px;
-  background: linear-gradient(160deg, #1a0a0a, #0d0b12);
-  border: 2px solid rgba(193,63,63,.4);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2rem; color: rgba(193,63,63,.6);
-  box-shadow: 0 4px 20px rgba(0,0,0,.6);
-}
-
-/* Info do personagem */
+/* Nome */
 .lenda-nome {
   font-family: 'Playfair Display', serif;
   font-size: 1rem; color: #f5f0f8; line-height: 1.2;
-  text-align: center; margin-bottom: .15rem;
+  text-align: center;
   text-shadow: 0 2px 8px rgba(0,0,0,.9);
 }
-.lenda-alcunha {
-  font-size: .72rem; color: var(--text-muted);
-  text-align: center; font-style: italic;
-  margin-bottom: .5rem;
+@media (max-width: 600px) {
+  .lenda-nome { font-size: .9rem; }
 }
+
+/* Alcunha */
+.lenda-alcunha {
+  font-size: .7rem; color: var(--text-muted);
+  text-align: center; font-style: italic;
+}
+
+/* Poder */
 .lenda-poder {
-  font-size: .73rem; color: var(--accent-light);
+  font-size: .68rem; color: var(--accent-light);
   text-align: center; letter-spacing: 1px;
   text-transform: uppercase;
   padding: .2rem .6rem;
   background: rgba(156,42,42,.1);
-  border: 1px solid rgba(193,63,63,.2);
-  margin: 0 auto .5rem;
-  max-width: calc(100% - 1rem);
+  border: 1px solid rgba(193,63,63,.25);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* Meta info (nível, facção, cidade) */
+/* Meta chips */
 .lenda-meta {
   display: flex; flex-wrap: wrap;
   gap: .3rem; justify-content: center;
-  margin-top: auto;
+  margin-top: auto; padding-top: .4rem;
 }
 .lenda-meta-chip {
-  font-size: .65rem; letter-spacing: .5px;
+  font-size: .62rem; letter-spacing: .4px;
   color: var(--text-muted);
-  padding: .15rem .5rem;
+  padding: .15rem .45rem;
   border: 1px solid rgba(60,40,60,.6);
   background: rgba(0,0,0,.3);
 }
-.lenda-meta-chip.nivel { color: var(--gold); border-color: rgba(180,140,30,.3); }
-.lenda-meta-chip.rank { color: var(--accent-light); border-color: rgba(193,63,63,.3); }
+.lenda-meta-chip.nivel { color: var(--gold); border-color: rgba(180,140,30,.35); background: rgba(30,20,0,.3); }
+.lenda-meta-chip.rank  { color: var(--accent-light); border-color: rgba(193,63,63,.35); }
+@media (max-width: 600px) {
+  .lenda-meta-chip { font-size: .58rem; padding: .12rem .38rem; }
+}
 
 /* Barra de poder */
 .lenda-power-bar {
   height: 2px;
-  margin-top: .75rem;
+  margin-top: .5rem;
   border-radius: 1px;
-  position: relative;
   background: rgba(60,40,60,.4);
   overflow: hidden;
 }
 .lenda-power-fill {
-  height: 100%;
-  border-radius: 1px;
-  transition: width 1s ease;
+  height: 100%; border-radius: 1px;
+  transition: width 1.2s cubic-bezier(.2,.8,.3,1);
 }
 
-/* Tema: estilos de barra */
+/* ── TEMAS ── */
+/* Barra de poder */
 .tema-abismo   .lenda-power-fill { background: linear-gradient(to right, #1a0a1a, #5a1a5a); }
 .tema-sangue   .lenda-power-fill { background: linear-gradient(to right, #3a0000, #c13f3f); }
 .tema-guerra   .lenda-power-fill { background: linear-gradient(to right, #1a0a00, #b87020); }
@@ -1202,44 +1285,177 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .tema-glacial  .lenda-power-fill { background: linear-gradient(to right, #001a1a, #40a0c0); }
 .tema-cosmico  .lenda-power-fill { background: linear-gradient(to right, #050010, #5020c0); }
 
-/* Efeitos de tema nas bordas do cartão */
-.tema-abismo   .lenda-card { border-top: 2px solid #5a1a5a; }
-.tema-sangue   .lenda-card { border-top: 2px solid #9c2a2a; }
-.tema-guerra   .lenda-card { border-top: 2px solid #b87020; }
-.tema-vampirico .lenda-card { border-top: 2px solid #7a0a5a; }
-.tema-soberano .lenda-card { border-top: 2px solid #d4ad3a; }
-.tema-infernal .lenda-card { border-top: 2px solid #e05010; }
-.tema-glacial  .lenda-card { border-top: 2px solid #40a0c0; }
-.tema-cosmico  .lenda-card { border-top: 2px solid #5020c0; }
+/* Bordas do card por tema */
+.tema-abismo   .lenda-card { border-top-color: #5a1a5a; }
+.tema-sangue   .lenda-card { border-top-color: #9c2a2a; }
+.tema-guerra   .lenda-card { border-top-color: #b87020; }
+.tema-vampirico .lenda-card { border-top-color: #7a0a5a; }
+.tema-soberano .lenda-card { border-top-color: #d4ad3a; }
+.tema-infernal .lenda-card { border-top-color: #e05010; }
+.tema-glacial  .lenda-card { border-top-color: #40a0c0; }
+.tema-cosmico  .lenda-card { border-top-color: #5020c0; }
 
-/* ═══ MODAL LIVRO DAS LENDAS (perfil público) ═══ */
+/* Glow hover por tema */
+.tema-abismo .lenda-card:hover   { box-shadow: 0 16px 48px rgba(0,0,0,.8), 0 0 40px rgba(90,26,90,.3); }
+.tema-sangue .lenda-card:hover   { box-shadow: 0 16px 48px rgba(0,0,0,.8), 0 0 40px rgba(156,42,42,.3); }
+.tema-guerra .lenda-card:hover   { box-shadow: 0 16px 48px rgba(0,0,0,.8), 0 0 40px rgba(184,112,32,.25); }
+.tema-vampirico .lenda-card:hover { box-shadow: 0 16px 48px rgba(0,0,0,.8), 0 0 40px rgba(122,10,90,.3); }
+.tema-soberano .lenda-card:hover  { box-shadow: 0 16px 48px rgba(0,0,0,.8), 0 0 40px rgba(212,173,58,.25); }
+.tema-infernal .lenda-card:hover  { box-shadow: 0 16px 48px rgba(0,0,0,.8), 0 0 40px rgba(224,80,16,.3); }
+.tema-glacial .lenda-card:hover   { box-shadow: 0 16px 48px rgba(0,0,0,.8), 0 0 40px rgba(64,160,192,.25); }
+.tema-cosmico .lenda-card:hover   { box-shadow: 0 16px 48px rgba(0,0,0,.8), 0 0 40px rgba(80,32,192,.3); }
+
+/* Compatibilidade: .lenda-avatar antigo (para perfis que ainda usam) */
+.lenda-avatar-wrap { display: none; }
+.lenda-avatar {
+  width: 78px; height: 78px; border-radius: 6px;
+  object-fit: cover; object-position: center top;
+  border: 2px solid rgba(193,63,63,.5);
+  background: var(--bg-input); display: block;
+}
+.lenda-avatar-placeholder {
+  width: 78px; height: 78px; border-radius: 6px;
+  background: linear-gradient(160deg,#1a0a0a,#0d0b12);
+  border: 2px solid rgba(193,63,63,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; color: rgba(193,63,63,.6);
+}
+
+/* ═══ MODAL LIVRO DOS DESPERTOS (perfil público) — VERSÃO 3.0 ═══
+   Inspirado em Facebook / Black Desert / Lost Ark / World of Warcraft
+   Estética: Dark Fantasy · Medieval · Gótica
+═══════════════════════════════════════════════════════════════ */
 .livro-overlay {
   position: fixed; inset: 0; z-index: 960;
-  background: rgba(0,0,0,.92);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1rem;
+  background: rgba(0,0,0,.94);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 1rem 1rem 3rem;
   overflow-y: auto;
-  backdrop-filter: blur(6px);
+  overflow-x: hidden;
+  backdrop-filter: blur(8px);
+  -webkit-overflow-scrolling: touch;
 }
 .livro-modal {
-  width: 100%; max-width: 700px;
-  max-height: 93vh;
-  overflow-y: auto;
+  width: 100%; max-width: 760px;
   position: relative;
   scrollbar-width: thin;
-  scrollbar-color: rgba(193,63,63,.35) transparent;
-  border: 1px solid rgba(193,63,63,.3);
-  box-shadow: 0 20px 80px rgba(0,0,0,.95), 0 0 100px rgba(156,42,42,.08);
+  scrollbar-color: var(--livro-accent, rgba(193,63,63,.5)) transparent;
+  border: 1px solid var(--livro-border, rgba(193,63,63,.3));
+  box-shadow: 0 20px 80px rgba(0,0,0,.98), 0 0 120px var(--livro-glow, rgba(156,42,42,.1));
+  animation: livroEntrada .35s cubic-bezier(.2,.8,.3,1);
+  /* Tema padrão — substituído por JS */
+  --livro-accent: #9c2a2a;
+  --livro-accent-rgb: 156,42,42;
+  --livro-border: rgba(193,63,63,.35);
+  --livro-glow: rgba(156,42,42,.15);
+  --livro-section-line: rgba(193,63,63,.4);
+  --livro-badge-bg: rgba(156,42,42,.1);
+  --livro-badge-border: rgba(193,63,63,.3);
+  --livro-timeline-dot: #9c2a2a;
+  --livro-card-top: rgba(156,42,42,.35);
+}
+@keyframes livroEntrada {
+  from { opacity: 0; transform: translateY(20px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 .livro-modal::-webkit-scrollbar { width: 4px; }
-.livro-modal::-webkit-scrollbar-thumb { background: rgba(193,63,63,.4); }
+.livro-modal::-webkit-scrollbar-thumb { background: var(--livro-accent); border-radius: 2px; }
 
-/* Banner do livro — suporta wallpaper/GIF */
+/* ── Temas aplicados via variáveis CSS no livro-modal ── */
+/* Abismo */
+.livro-tema-abismo {
+  --livro-accent: #7a2a9a; --livro-accent-rgb: 122,42,154;
+  --livro-border: rgba(122,42,154,.4); --livro-glow: rgba(90,26,90,.2);
+  --livro-section-line: rgba(122,42,154,.5); --livro-badge-bg: rgba(90,26,90,.15);
+  --livro-badge-border: rgba(122,42,154,.4); --livro-timeline-dot: #7a2a9a;
+  --livro-card-top: rgba(90,26,90,.5);
+  background: linear-gradient(160deg, #110818 0%, #0a050f 100%) !important;
+}
+/* Sangue */
+.livro-tema-sangue {
+  --livro-accent: #c13f3f; --livro-accent-rgb: 193,63,63;
+  --livro-border: rgba(193,63,63,.35); --livro-glow: rgba(156,42,42,.18);
+  --livro-section-line: rgba(193,63,63,.45); --livro-badge-bg: rgba(156,42,42,.1);
+  --livro-badge-border: rgba(193,63,63,.35); --livro-timeline-dot: #c13f3f;
+  --livro-card-top: rgba(156,42,42,.4);
+  background: linear-gradient(160deg, #131118 0%, #0d0b12 100%) !important;
+}
+/* Guerra */
+.livro-tema-guerra {
+  --livro-accent: #c87828; --livro-accent-rgb: 200,120,40;
+  --livro-border: rgba(200,120,40,.4); --livro-glow: rgba(184,112,32,.18);
+  --livro-section-line: rgba(200,120,40,.5); --livro-badge-bg: rgba(100,50,0,.15);
+  --livro-badge-border: rgba(200,120,40,.4); --livro-timeline-dot: #c87828;
+  --livro-card-top: rgba(184,112,32,.45);
+  background: linear-gradient(160deg, #120d08 0%, #0c0906 100%) !important;
+}
+/* Vampírico */
+.livro-tema-vampirico {
+  --livro-accent: #9a1a7a; --livro-accent-rgb: 154,26,122;
+  --livro-border: rgba(154,26,122,.4); --livro-glow: rgba(122,10,90,.2);
+  --livro-section-line: rgba(154,26,122,.5); --livro-badge-bg: rgba(80,0,60,.15);
+  --livro-badge-border: rgba(154,26,122,.4); --livro-timeline-dot: #9a1a7a;
+  --livro-card-top: rgba(122,10,90,.5);
+  background: linear-gradient(160deg, #100614 0%, #08030e 100%) !important;
+}
+/* Soberano */
+.livro-tema-soberano {
+  --livro-accent: #d4ad3a; --livro-accent-rgb: 212,173,58;
+  --livro-border: rgba(212,173,58,.4); --livro-glow: rgba(180,140,30,.2);
+  --livro-section-line: rgba(212,173,58,.5); --livro-badge-bg: rgba(80,60,0,.15);
+  --livro-badge-border: rgba(212,173,58,.4); --livro-timeline-dot: #d4ad3a;
+  --livro-card-top: rgba(180,140,30,.5);
+  background: linear-gradient(160deg, #12100a 0%, #0c0a04 100%) !important;
+}
+/* Infernal */
+.livro-tema-infernal {
+  --livro-accent: #e05020; --livro-accent-rgb: 224,80,32;
+  --livro-border: rgba(224,80,32,.4); --livro-glow: rgba(200,60,10,.2);
+  --livro-section-line: rgba(224,80,32,.5); --livro-badge-bg: rgba(100,30,0,.15);
+  --livro-badge-border: rgba(224,80,32,.4); --livro-timeline-dot: #e05020;
+  --livro-card-top: rgba(200,60,10,.5);
+  background: linear-gradient(160deg, #130806 0%, #0d0402 100%) !important;
+}
+/* Glacial */
+.livro-tema-glacial {
+  --livro-accent: #50b8d8; --livro-accent-rgb: 80,184,216;
+  --livro-border: rgba(80,184,216,.35); --livro-glow: rgba(64,160,192,.18);
+  --livro-section-line: rgba(80,184,216,.45); --livro-badge-bg: rgba(0,50,80,.15);
+  --livro-badge-border: rgba(80,184,216,.35); --livro-timeline-dot: #50b8d8;
+  --livro-card-top: rgba(64,160,192,.4);
+  background: linear-gradient(160deg, #080e14 0%, #050a10 100%) !important;
+}
+/* Cósmico */
+.livro-tema-cosmico {
+  --livro-accent: #7050e0; --livro-accent-rgb: 112,80,224;
+  --livro-border: rgba(112,80,224,.4); --livro-glow: rgba(80,32,192,.2);
+  --livro-section-line: rgba(112,80,224,.5); --livro-badge-bg: rgba(40,10,100,.15);
+  --livro-badge-border: rgba(112,80,224,.4); --livro-timeline-dot: #7050e0;
+  --livro-card-top: rgba(80,32,192,.5);
+  background: linear-gradient(160deg, #08060f 0%, #05030d 100%) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   1. BANNER — ocupa toda a largura superior
+═══════════════════════════════════════════════════ */
 .livro-banner {
-  height: 200px;
+  height: 260px;
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, #1a0505 0%, #0d0b18 50%, #0a0008 100%);
+  flex-shrink: 0;
+}
+@media (max-width: 720px) {
+  .livro-banner { height: 200px; }
+}
+@media (max-width: 520px) {
+  .livro-banner { height: 160px; }
+}
+.livro-banner-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
 }
 .livro-banner-bg {
   position: absolute; inset: 0;
@@ -1259,10 +1475,11 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-banner-gradient {
   position: absolute; inset: 0;
   background: linear-gradient(to bottom,
-    rgba(10,6,16,.2) 0%,
-    rgba(10,6,16,.5) 50%,
-    rgba(10,6,16,.95) 100%
+    rgba(10,6,16,.15) 0%,
+    rgba(10,6,16,.45) 55%,
+    rgba(10,6,16,.96) 100%
   );
+  pointer-events: none;
 }
 .livro-banner-runes {
   position: absolute; top: 1rem; left: 50%;
@@ -1272,68 +1489,145 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   font-family: 'Playfair Display', serif;
   white-space: nowrap; pointer-events: none;
 }
+.livro-banner-placeholder {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: .4rem;
+  color: rgba(255,255,255,.18);
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 4px; text-transform: uppercase; font-size: .8rem;
+}
+.livro-banner-placeholder .icon { font-size: 1.8rem; opacity: .5; }
+
+/* Botão de editar banner — canto superior direito do banner */
+.livro-banner-edit {
+  position: absolute; top: .75rem; right: 3.25rem;
+  z-index: 20;
+  background: rgba(0,0,0,.55); border: 1px solid var(--livro-border, rgba(193,63,63,.35));
+  color: var(--text); padding: .4rem .9rem;
+  font-family: inherit; font-size: .72rem; letter-spacing: 1.5px;
+  text-transform: uppercase; cursor: pointer;
+  display: flex; align-items: center; gap: .4rem;
+  transition: all .2s; backdrop-filter: blur(4px);
+}
+.livro-banner-edit:hover {
+  background: var(--livro-accent, var(--accent));
+  color: #fff; border-color: var(--livro-accent, var(--accent));
+}
+@media (max-width: 560px) {
+  .livro-banner-edit { right: 3rem; padding: .35rem .65rem; font-size: 0; }
+  .livro-banner-edit .lbl { display: none; }
+}
+
 .livro-close {
   position: absolute; top: .75rem; right: .75rem;
   background: rgba(0,0,0,.7); border: 1px solid rgba(193,63,63,.35);
   color: #aaa; width: 32px; height: 32px; border-radius: 50%;
-  cursor: pointer; font-size: 1rem; z-index: 20;
+  cursor: pointer; font-size: 1rem; z-index: 25;
   display: flex; align-items: center; justify-content: center;
   transition: all .2s;
 }
 .livro-close:hover { background: var(--accent); color: #fff; }
 
-/* Avatar flutuante */
+/* ═══════════════════════════════════════════════════
+   2. FOTO PRINCIPAL — centralizada, destaque máximo
+═══════════════════════════════════════════════════ */
 .livro-avatar-wrap {
-  position: absolute; bottom: -55px; left: 50%;
-  transform: translateX(-50%); z-index: 15;
+  position: absolute;
+  left: 50%;
+  top: calc(260px - 84px); /* banner 260px - metade do frame (168px) */
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex; flex-direction: column; align-items: center;
+}
+@media (max-width: 720px) {
+  .livro-avatar-wrap { top: calc(200px - 66px); } /* banner 200px - metade do frame (132px) */
+}
+@media (max-width: 520px) {
+  .livro-avatar-wrap { top: calc(160px - 52px); } /* banner 160px - metade do frame (104px) */
+}
+.livro-avatar-frame {
+  position: relative;
+  width: 168px; height: 168px;
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(145deg, var(--livro-accent, #c13f3f), #1a0a0a 60%, var(--livro-accent, #c13f3f));
+  box-shadow: 0 8px 36px rgba(0,0,0,.95), 0 0 50px var(--livro-glow, rgba(156,42,42,.3));
+}
+@media (max-width: 720px) {
+  .livro-avatar-frame { width: 132px; height: 132px; }
+}
+@media (max-width: 520px) {
+  .livro-avatar-frame { width: 104px; height: 104px; padding: 3px; }
 }
 .livro-avatar {
-  width: 110px; height: 110px; border-radius: 8px;
-  object-fit: cover;
-  border: 3px solid rgba(193,63,63,.6);
-  box-shadow: 0 6px 30px rgba(0,0,0,.9), 0 0 30px rgba(156,42,42,.25);
+  width: 100%; height: 100%; border-radius: 50%;
+  object-fit: cover; object-position: center top;
+  border: 3px solid #0a0a0e;
   background: var(--bg-input); display: block;
+  cursor: pointer;
+  transition: filter .2s;
 }
+.livro-avatar:hover { filter: brightness(1.08); }
 .livro-avatar-placeholder {
-  width: 110px; height: 110px; border-radius: 8px;
-  border: 3px solid rgba(193,63,63,.5);
+  width: 100%; height: 100%; border-radius: 50%;
+  border: 3px solid #0a0a0e;
   background: linear-gradient(160deg, #1a0a0a, #0d0b12);
   display: flex; align-items: center; justify-content: center;
-  font-size: 3rem; color: rgba(193,63,63,.6);
-  box-shadow: 0 6px 30px rgba(0,0,0,.8);
+  font-size: 3.2rem; color: var(--livro-accent, rgba(193,63,63,.6));
+  cursor: pointer;
+}
+@media (max-width: 520px) {
+  .livro-avatar-placeholder { font-size: 2.2rem; }
+}
+/* Botão flutuante de editar/ampliar a foto principal */
+.livro-avatar-actions {
+  position: absolute; bottom: 2px; right: 2px;
+  display: flex; gap: .3rem;
+}
+.livro-avatar-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(10,8,14,.92); border: 1px solid var(--livro-border, rgba(193,63,63,.4));
+  color: var(--text); display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; cursor: pointer; transition: all .2s;
+  box-shadow: 0 2px 10px rgba(0,0,0,.6);
+}
+.livro-avatar-btn:hover {
+  background: var(--livro-accent, var(--accent)); color: #fff;
+}
+@media (max-width: 520px) {
+  .livro-avatar-btn { width: 28px; height: 28px; font-size: .85rem; }
 }
 
-/* Identidade */
+/* ═══════════════════════════════════════════════════
+   3. IDENTIDADE — Nome / Alcunha / Tags
+═══════════════════════════════════════════════════ */
 .livro-identity {
-  padding: 4.5rem 2rem 1.5rem;
+  padding: 5.5rem 2rem 1.5rem;
   text-align: center;
   border-bottom: 1px solid rgba(60,40,60,.5);
+  position: relative;
+}
+@media (max-width: 720px) {
+  .livro-identity { padding: 4.6rem 1.5rem 1.3rem; }
+}
+@media (max-width: 520px) {
+  .livro-identity { padding: 3.8rem 1rem 1.2rem; }
 }
 .livro-nome {
   font-family: 'Playfair Display', serif;
   font-size: 2.1rem; color: #f5f0f8; line-height: 1.1;
   margin-bottom: .2rem;
-  text-shadow: 0 2px 20px rgba(0,0,0,.9);
+  text-shadow: 0 2px 20px rgba(0,0,0,.9), 0 0 40px var(--livro-glow, rgba(156,42,42,.2));
+}
+@media (max-width: 520px) {
+  .livro-nome { font-size: 1.5rem; }
 }
 .livro-alcunha {
   font-size: .9rem; color: var(--text-muted);
   font-style: italic; letter-spacing: .5px;
   margin-bottom: .8rem;
-}
-.livro-poder-badge {
-  display: inline-flex; align-items: center; gap: .5rem;
-  background: rgba(156,42,42,.1);
-  border: 1px solid rgba(193,63,63,.3);
-  padding: .45rem 1.3rem;
-  font-size: .85rem; color: var(--accent-light);
-  letter-spacing: 2px; text-transform: uppercase;
-  font-weight: 600; margin-bottom: 1rem;
-  box-shadow: 0 0 30px rgba(193,63,63,.1);
-}
-/* GIF do poder no badge */
-.livro-poder-gif {
-  width: 24px; height: 24px; object-fit: cover;
-  border-radius: 3px; vertical-align: middle;
+  display: inline-flex; align-items: center; gap: .4rem;
 }
 
 .livro-tags {
@@ -1348,44 +1642,112 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   letter-spacing: .5px;
 }
 .livro-tag.rank { border-color: rgba(180,140,30,.4); color: var(--gold-light); background: rgba(180,140,30,.07); }
-.livro-tag.faccao { border-color: rgba(193,63,63,.35); color: var(--accent-light); background: rgba(156,42,42,.07); }
+.livro-tag.faccao { border-color: var(--livro-badge-border, rgba(193,63,63,.35)); color: var(--livro-accent, #c13f3f); background: var(--livro-badge-bg, rgba(156,42,42,.07)); }
 .livro-tag.nivel { border-color: rgba(100,100,140,.4); color: #a0a0c0; }
 
 .livro-frase {
   font-family: 'Playfair Display', serif;
   font-size: .95rem; color: var(--silver);
   font-style: italic; line-height: 1.6;
-  margin: .5rem 1.5rem 0;
+  margin: .5rem auto 0;
   padding: .65rem 1.1rem;
-  border-left: 2px solid rgba(193,63,63,.35);
+  max-width: 520px;
+  border-left: 2px solid var(--livro-section-line, rgba(193,63,63,.35));
   background: rgba(255,255,255,.02);
   text-align: left;
+  position: relative;
 }
+@media (max-width: 520px) {
+  .livro-frase { margin: .5rem 0 0; font-size: .86rem; }
+}
+
+/* ═══════════════════════════════════════════════════
+   4. CARD DE PODER PRINCIPAL — Prisma + Nome + GIF
+═══════════════════════════════════════════════════ */
+.livro-poder-card {
+  margin: 1.25rem auto 0;
+  max-width: 460px;
+  background: linear-gradient(160deg, rgba(255,255,255,.04), rgba(0,0,0,.25));
+  border: 1px solid var(--livro-border, rgba(193,63,63,.35));
+  box-shadow: 0 0 30px var(--livro-glow, rgba(156,42,42,.1)) inset, 0 4px 24px rgba(0,0,0,.5);
+  overflow: hidden;
+  position: relative;
+}
+.livro-poder-card-header {
+  display: flex; align-items: center; justify-content: center; gap: .7rem;
+  padding: .8rem 1.1rem;
+  border-bottom: 1px solid rgba(60,40,60,.45);
+}
+.livro-poder-prisma {
+  width: 30px; height: 30px; object-fit: contain;
+  filter: drop-shadow(0 0 8px var(--livro-glow, rgba(193,63,63,.5)));
+  flex-shrink: 0;
+}
+.livro-poder-nome {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem; color: var(--livro-accent, #c13f3f);
+  letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
+}
+@media (max-width: 520px) {
+  .livro-poder-nome { font-size: 1rem; letter-spacing: 1.5px; }
+}
+.livro-poder-card-gif {
+  width: 100%; aspect-ratio: 16/9;
+  background: rgba(0,0,0,.55);
+  overflow: hidden;
+  position: relative;
+}
+.livro-poder-card-gif img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.livro-poder-card-empty {
+  width: 100%; aspect-ratio: 16/9;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: .35rem;
+  color: #555; font-size: .78rem; letter-spacing: 1px;
+  background: rgba(0,0,0,.35);
+}
+.livro-poder-card-empty .icon { font-size: 1.6rem; opacity: .5; }
 
 /* Corpo do Livro */
 .livro-body {
   padding: 1.5rem 2rem 2rem;
 }
-.livro-section { margin-bottom: 1.5rem; }
+@media (max-width: 520px) {
+  .livro-body { padding: 1.2rem 1rem 2rem; }
+}
+.livro-section { margin-bottom: 1.75rem; }
 .livro-section-title {
   font-family: 'Playfair Display', serif;
   font-size: .7rem; letter-spacing: 3.5px;
-  text-transform: uppercase; color: var(--accent-light);
-  margin-bottom: .7rem;
+  text-transform: uppercase; color: var(--livro-accent, #c13f3f);
+  margin-bottom: .75rem;
   display: flex; align-items: center; gap: .5rem;
+  padding-bottom: .4rem;
 }
 .livro-section-title::after {
   content: ''; flex: 1; height: 1px;
-  background: linear-gradient(to right, rgba(193,63,63,.4), transparent);
+  background: linear-gradient(to right, var(--livro-section-line, rgba(193,63,63,.4)), transparent);
 }
+.livro-section-title .livro-edit-link {
+  flex: none; font-family: inherit; font-size: .62rem; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--text-muted);
+  background: none; border: 1px solid rgba(60,40,60,.6);
+  padding: .2rem .6rem; cursor: pointer; transition: all .2s;
+}
+.livro-section-title .livro-edit-link:hover {
+  border-color: var(--livro-accent, var(--accent)); color: var(--livro-accent, var(--accent));
+}
+.livro-section-title.with-edit::after { display: none; }
 
 .livro-descricao {
   font-size: .88rem; color: #c8c8d4; line-height: 1.75;
   background: rgba(255,255,255,.02);
   border: 1px solid rgba(60,40,60,.4);
-  border-left: 3px solid rgba(193,63,63,.3);
+  border-left: 3px solid var(--livro-section-line, rgba(193,63,63,.3));
   padding: 1rem 1.1rem;
 }
+.livro-descricao:empty::before { content: 'Nenhuma descrição registrada.'; color: #555; font-style: italic; }
 .livro-2col {
   display: grid; grid-template-columns: 1fr 1fr; gap: .75rem;
 }
@@ -1394,9 +1756,14 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-area-card {
   background: linear-gradient(160deg, #17141f, #0f0d14);
   border: 1px solid rgba(60,40,60,.5);
-  border-top: 2px solid rgba(156,42,42,.3);
+  border-top: 2px solid var(--livro-card-top, rgba(156,42,42,.3));
   padding: .9rem 1rem;
   min-height: 80px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.livro-area-card:hover {
+  border-color: var(--livro-border, rgba(193,63,63,.4));
+  box-shadow: 0 0 20px rgba(var(--livro-accent-rgb, 156,42,42),.08);
 }
 .livro-area-title {
   font-size: .65rem; letter-spacing: 2px;
@@ -1413,7 +1780,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   display: flex; align-items: flex-start; gap: .4rem;
 }
 .livro-area-list li::before {
-  content: '▸'; color: var(--accent); flex-shrink: 0; margin-top: .05rem;
+  content: '▸'; color: var(--livro-accent, #c13f3f); flex-shrink: 0; margin-top: .05rem;
 }
 .livro-area-empty { font-size: .8rem; color: #444; font-style: italic; }
 
@@ -1422,8 +1789,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-timeline-item { display: flex; gap: .75rem; align-items: flex-start; }
 .livro-timeline-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: var(--accent); flex-shrink: 0; margin-top: .4rem;
-  box-shadow: 0 0 10px rgba(193,63,63,.6);
+  background: var(--livro-timeline-dot, #9c2a2a); flex-shrink: 0; margin-top: .4rem;
+  box-shadow: 0 0 10px var(--livro-glow, rgba(193,63,63,.6));
 }
 .livro-timeline-text { font-size: .8rem; color: #b0b0c4; line-height: 1.55; }
 .livro-timeline-text strong { color: var(--silver); font-family: 'Playfair Display', serif; }
@@ -1431,22 +1798,45 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 /* Badges */
 .livro-badges { display: flex; flex-wrap: wrap; gap: .5rem; }
 .livro-badge {
+  background: var(--livro-badge-bg, rgba(180,140,30,.08));
+  border: 1px solid var(--livro-badge-border, rgba(180,140,30,.3));
+  padding: .3rem .8rem; font-size: .73rem;
+  color: var(--livro-accent, var(--gold-light));
+  letter-spacing: .5px;
+  transition: box-shadow .2s;
+}
+.livro-badge:hover {
+  box-shadow: 0 0 12px var(--livro-glow, rgba(180,140,30,.2));
+}
+/* Badges de conquista */
+.livro-badge-conquista {
   background: rgba(180,140,30,.08); border: 1px solid rgba(180,140,30,.3);
   padding: .3rem .8rem; font-size: .73rem; color: var(--gold-light);
   letter-spacing: .5px;
 }
+/* Badges de título — distintos */
+.livro-badge-titulo {
+  background: rgba(100,60,150,.08); border: 1px solid var(--livro-badge-border, rgba(193,63,63,.3));
+  padding: .35rem .9rem; font-size: .73rem;
+  color: #d0c0f0; letter-spacing: .5px;
+}
 
-/* GIF section */
+/* GIF section (transformação / suprema) */
 .livro-gif-section {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: .6rem;
+  display: grid; grid-template-columns: repeat(2,1fr); gap: .6rem;
   margin-top: .5rem;
+}
+@media (max-width: 520px) {
+  .livro-gif-section { grid-template-columns: 1fr; }
 }
 .livro-gif-item {
   position: relative; aspect-ratio: 16/9;
-  overflow: hidden; border: 1px solid rgba(60,40,60,.5);
+  overflow: hidden; border: 1px solid var(--livro-border, rgba(60,40,60,.5));
   border-radius: 3px;
   background: rgba(0,0,0,.5);
+  transition: border-color .2s;
 }
+.livro-gif-item:hover { border-color: var(--livro-accent, #c13f3f); }
 .livro-gif-item img {
   width: 100%; height: 100%; object-fit: cover;
   transition: transform .3s;
@@ -1454,34 +1844,200 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-gif-item:hover img { transform: scale(1.05); }
 .livro-gif-label {
   position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(transparent, rgba(0,0,0,.8));
+  background: linear-gradient(transparent, rgba(0,0,0,.85));
   font-size: .62rem; color: var(--text-muted);
-  letter-spacing: 1px; padding: .3rem .5rem;
+  letter-spacing: 1px; padding: .4rem .5rem;
   text-transform: uppercase;
 }
 
-/* Galeria */
+/* ═══════════════════════════════════════════════════
+   5. GALERIA DO DESPERTO
+═══════════════════════════════════════════════════ */
 .livro-galeria {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem;
   margin-top: .75rem;
 }
-.livro-galeria img {
-  width: 100%; aspect-ratio: 1; object-fit: cover;
-  border: 1px solid rgba(60,40,60,.5);
-  cursor: pointer; transition: border-color .2s, opacity .2s;
-  border-radius: 2px;
+@media (max-width: 720px) {
+  .livro-galeria { grid-template-columns: repeat(4, 1fr); }
 }
-.livro-galeria img:hover { border-color: var(--accent-light); opacity: .85; }
+@media (max-width: 520px) {
+  .livro-galeria { grid-template-columns: repeat(3, 1fr); gap: .4rem; }
+}
+.livro-galeria-item {
+  position: relative; width: 100%; aspect-ratio: 1;
+  border: 1px solid rgba(60,40,60,.5);
+  border-radius: 2px; overflow: hidden;
+  cursor: pointer; transition: border-color .2s, opacity .2s;
+  background: rgba(255,255,255,.02);
+}
+.livro-galeria-item img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.livro-galeria-item:hover { border-color: var(--livro-accent, #c13f3f); opacity: .9; }
+.livro-galeria-empty {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: rgba(255,255,255,.12);
+  border: 1px dashed rgba(60,40,60,.6);
+}
+.livro-galeria-empty:hover { border-color: var(--livro-accent, #c13f3f); color: var(--livro-accent, #c13f3f); }
+.livro-galeria-empty.placeholder { cursor: default; }
 
 /* Rodapé do livro */
 .livro-footer {
-  margin-top: 1.5rem; padding-top: .75rem;
+  margin-top: 2rem; padding-top: .75rem;
   border-top: 1px solid rgba(60,40,60,.4);
   text-align: center; font-size: .7rem;
-  color: #444; letter-spacing: 2px;
+  color: var(--livro-accent, #555);
+  letter-spacing: 3px; opacity: .5;
 }
 
-/* ═══ MODAL PERSONALIZAÇÃO ═══ */
+/* ═══════════════════════════════════════════════════
+   6. LIGHTBOX — ampliação de imagens
+═══════════════════════════════════════════════════ */
+.foto-lightbox-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,.92);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem; cursor: zoom-out;
+  animation: livroEntrada .2s ease-out;
+}
+.foto-lightbox-overlay img {
+  max-width: 92vw; max-height: 90vh; object-fit: contain;
+  border: 1px solid var(--border); border-radius: 2px;
+  box-shadow: 0 10px 60px rgba(0,0,0,.9);
+}
+.foto-lightbox-close {
+  position: absolute; top: 1rem; right: 1.25rem;
+  background: rgba(0,0,0,.6); border: 1px solid rgba(193,63,63,.35);
+  color: #fff; width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════
+   7. EDITOR DO PERFIL PÚBLICO (modal de edição)
+═══════════════════════════════════════════════════ */
+.livro-edit-overlay {
+  position: fixed; inset: 0; z-index: 990;
+  background: rgba(0,0,0,.88);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem; overflow-y: auto;
+}
+.livro-edit-modal {
+  background: linear-gradient(160deg, #131118 0%, #0d0b12 100%);
+  border: 1px solid var(--livro-border, rgba(193,63,63,.35));
+  width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 80px rgba(0,0,0,.9), 0 0 60px var(--livro-glow, rgba(156,42,42,.08));
+  scrollbar-width: thin;
+}
+.livro-edit-header {
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(60,40,60,.5);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; color: var(--livro-accent, #c13f3f);
+  letter-spacing: 1px;
+}
+.livro-edit-body { padding: 1.1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.livro-edit-field label {
+  display: block; font-size: .68rem; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: .4rem;
+}
+.livro-edit-field input,
+.livro-edit-field textarea {
+  width: 100%; background: var(--bg-input); border: 1px solid var(--border);
+  color: var(--text); padding: .55rem .7rem; font-family: inherit;
+  font-size: .85rem; outline: none; resize: vertical;
+}
+.livro-edit-field input:focus,
+.livro-edit-field textarea:focus { border-color: var(--livro-accent, var(--accent)); }
+.livro-edit-actions {
+  display: flex; justify-content: flex-end; gap: .6rem;
+  padding-top: .5rem; border-top: 1px solid rgba(60,40,60,.4);
+}
+.livro-edit-btn-cancel {
+  background: none; border: 1px solid rgba(60,40,60,.6);
+  color: var(--text-muted); padding: .5rem 1.1rem;
+  font-family: inherit; font-size: .8rem; cursor: pointer; transition: all .2s;
+}
+.livro-edit-btn-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+.livro-edit-btn-save {
+  background: var(--livro-accent, var(--accent)); border: none;
+  color: #fff; padding: .5rem 1.3rem;
+  font-family: 'Playfair Display', serif; font-size: .85rem; letter-spacing: 1px;
+  cursor: pointer; transition: filter .2s;
+}
+.livro-edit-btn-save:hover { filter: brightness(1.15); }
+
+/* Menu de ações sobre imagem (avatar / banner / galeria) */
+.livro-img-actions-overlay {
+  position: fixed; inset: 0; z-index: 985;
+  background: rgba(0,0,0,.82);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.livro-img-actions-modal {
+  background: linear-gradient(160deg,#131118,#0e0c13);
+  border: 1px solid rgba(60,40,60,.7); padding: 1.4rem 1.6rem;
+  width: min(94vw, 340px); box-shadow: 0 8px 40px rgba(0,0,0,.8);
+}
+.livro-img-actions-title {
+  font-family: 'Playfair Display', serif; font-size: .8rem;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--livro-accent, var(--accent-light)); margin-bottom: 1rem;
+}
+.livro-img-actions-preview {
+  width: 100%; max-height: 180px; object-fit: contain;
+  border: 1px solid rgba(60,40,60,.5); margin-bottom: 1rem; display: block;
+}
+.livro-img-actions-list { display: flex; flex-direction: column; gap: .6rem; }
+.livro-img-actions-list button {
+  width: 100%; padding: .6rem; font-family: inherit; font-size: .85rem;
+  cursor: pointer; transition: all .2s; border-radius: 0;
+}
+.livro-img-actions-list .primary {
+  background: var(--livro-accent, var(--accent)); border: none; color: #fff;
+  font-family: 'Playfair Display', serif; letter-spacing: 1px;
+}
+.livro-img-actions-list .primary:hover { filter: brightness(1.15); }
+.livro-img-actions-list .danger {
+  background: rgba(156,42,42,.15); border: 1px solid rgba(193,63,63,.4); color: #f5a0a0;
+}
+.livro-img-actions-list .danger:hover { background: rgba(193,63,63,.25); }
+.livro-img-actions-list .secondary {
+  background: none; border: 1px solid rgba(50,40,65,.6); color: var(--text-muted);
+}
+.livro-img-actions-list .secondary:hover { border-color: var(--livro-accent, var(--accent-light)); }
+.livro-img-actions-list .cancel {
+  background: none; border: none; color: #555; font-size: .8rem; margin-top: .2rem; padding: .4rem;
+}
+
+/* ═══ CORREÇÕES MOBILE — Perfil Público (Android / iPhone / Tablet) ═══ */
+@media (max-width: 540px) {
+  .livro-overlay {
+    padding: .4rem .4rem 3rem;
+    align-items: flex-start;
+  }
+  .livro-modal { border-left: none; border-right: none; }
+  .livro-tags { gap: .35rem; }
+  .livro-tag { font-size: .68rem; padding: .2rem .6rem; }
+  .livro-poder-card { margin-top: 1rem; }
+  .livro-poder-card-header { padding: .6rem .8rem; gap: .5rem; }
+  .livro-poder-prisma { width: 24px; height: 24px; }
+  .livro-body { padding: 1rem .85rem 1.5rem; }
+  .livro-section { margin-bottom: 1.1rem; }
+  .livro-section-title { font-size: .61rem; letter-spacing: 2.5px; flex-wrap: wrap; }
+  .livro-descricao { font-size: .83rem; padding: .7rem .8rem; }
+  .livro-2col { grid-template-columns: 1fr; gap: .5rem; }
+  .livro-area-card { padding: .7rem .8rem; min-height: 60px; }
+  .livro-gif-section { grid-template-columns: 1fr; }
+  .livro-badge-titulo, .livro-badge-conquista { font-size: .67rem; padding: .22rem .6rem; }
+  .livro-timeline-text { font-size: .78rem; }
+  .livro-footer { letter-spacing: 2px; font-size: .65rem; margin-top: 1.5rem; }
+  .livro-banner-runes { display: none; }
+}
+
+
 .personalizar-overlay {
   position: fixed; inset: 0; z-index: 970;
   background: rgba(0,0,0,.88);
@@ -2600,7 +3156,7 @@ main { margin-left: 0 !important; }
 
 <!-- ═══ TORRE DO PESADELO: CENÁRIO ATMOSFÉRICO ═══ -->
 <div id="tp-scene" aria-hidden="true"></div>
-<canvas id="tp-atmosphere" aria-hidden="true"></canvas>
+<canvas id="tp-atmosphere" aria-hidden="true" width="1316" height="641"></canvas>
 
 <!-- Olhos na névoa (pares de olhos sincronizados) -->
 <div class="tp-eye" style="left:5%;top:38%;animation-delay:0s;animation-duration:9s;"></div>
@@ -2614,19 +3170,19 @@ main { margin-left: 0 !important; }
 
 <!-- Silhuetas de criaturas na névoa lateral -->
 <svg class="tp-silhuette" style="right:1.5%;bottom:6%;width:80px;height:140px;animation-delay:5s;" viewBox="0 0 80 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <ellipse cx="40" cy="26" rx="13" ry="15" fill="#090710"/>
-  <path d="M27 42 Q17 74 16 108 Q20 126 33 133 Q40 138 47 133 Q60 126 64 108 Q63 74 53 42 Z" fill="#090710"/>
-  <path d="M27 56 Q4 46 2 72 Q7 90 24 84 Q27 72 27 56Z" fill="#070511"/>
-  <path d="M53 56 Q76 46 78 72 Q73 90 56 84 Q53 72 53 56Z" fill="#070511"/>
-  <path d="M32 13 Q26 1 24 0" stroke="#0d0b16" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M48 13 Q54 1 56 0" stroke="#0d0b16" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <ellipse cx="40" cy="26" rx="13" ry="15" fill="#090710"></ellipse>
+  <path d="M27 42 Q17 74 16 108 Q20 126 33 133 Q40 138 47 133 Q60 126 64 108 Q63 74 53 42 Z" fill="#090710"></path>
+  <path d="M27 56 Q4 46 2 72 Q7 90 24 84 Q27 72 27 56Z" fill="#070511"></path>
+  <path d="M53 56 Q76 46 78 72 Q73 90 56 84 Q53 72 53 56Z" fill="#070511"></path>
+  <path d="M32 13 Q26 1 24 0" stroke="#0d0b16" stroke-width="3" fill="none" stroke-linecap="round"></path>
+  <path d="M48 13 Q54 1 56 0" stroke="#0d0b16" stroke-width="3" fill="none" stroke-linecap="round"></path>
 </svg>
 
 <svg class="tp-silhuette" style="left:2%;top:25%;width:50px;height:88px;animation-delay:14s;animation-duration:22s;" viewBox="0 0 50 88" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <ellipse cx="25" cy="16" rx="9" ry="11" fill="#090710"/>
-  <path d="M16 28 Q10 50 12 70 Q17 82 25 82 Q33 82 38 70 Q40 50 34 28 Z" fill="#090710"/>
-  <path d="M16 36 Q2 30 1 50 Q6 60 16 55Z" fill="#070511"/>
-  <path d="M34 36 Q48 30 49 50 Q44 60 34 55Z" fill="#070511"/>
+  <ellipse cx="25" cy="16" rx="9" ry="11" fill="#090710"></ellipse>
+  <path d="M16 28 Q10 50 12 70 Q17 82 25 82 Q33 82 38 70 Q40 50 34 28 Z" fill="#090710"></path>
+  <path d="M16 36 Q2 30 1 50 Q6 60 16 55Z" fill="#070511"></path>
+  <path d="M34 36 Q48 30 49 50 Q44 60 34 55Z" fill="#070511"></path>
 </svg>
 
 <script>
@@ -2728,8 +3284,8 @@ main { margin-left: 0 !important; }
     <div id="sb-gm-section" style="display:none">
       <div class="sidebar-section-label">⚔ Game Master</div>
       <ul class="sidebar-links">
-        <li><a data-nav="painel-gm" onclick="navTo(&#39;painel-gm&#39;);mostrarTab(&#39;tab-fichas&#39;)">Fichas dos Players</a></li>
-        <li><a data-nav="painel-gm" onclick="navTo(&#39;painel-gm&#39;);mostrarTab(&#39;tab-formulas&#39;)">Editor de Fórmulas</a></li>
+        <li><a data-nav="painel-gm" onclick="navTo(&#39;painel-gm&#39;);mostrarTab(&#39;tab-fichas&#39;)" class="active">Fichas dos Players</a></li>
+        <li><a data-nav="painel-gm" onclick="navTo(&#39;painel-gm&#39;);mostrarTab(&#39;tab-formulas&#39;)" class="active">Editor de Fórmulas</a></li>
         <li><a data-nav="secao-ranking" onclick="navTo(&#39;secao-ranking&#39;)">🏆 Ranking</a></li>
       </ul>
       <button class="btn-modo-editor" id="btn-modo-editor" onclick="toggleModoEditor()">✏ Modo Editor do Site</button>
@@ -2843,7 +3399,7 @@ main { margin-left: 0 !important; }
           <strong style="color:var(--silver)">Extras:</strong>
           <code>maestria</code> <code>pvBase</code> <code>staBase</code> <code>bonusPV</code> <code>bonusPE</code> <code>bonusCA</code> <code>attrMod</code>
           <br><br>
-          <button onclick="restaurarFormulasPadrao()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.4rem 1rem;font-family:inherit;font-size:.82rem;cursor:pointer;letter-spacing:.5px" onmouseover="this.style.background='rgba(156,42,42,.12)'" onmouseout="this.style.background='none'">↺ Restaurar Fórmulas Padrão</button>
+          <button onclick="restaurarFormulasPadrao()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.4rem 1rem;font-family:inherit;font-size:.82rem;cursor:pointer;letter-spacing:.5px" onmouseover="this.style.background=&#39;rgba(156,42,42,.12)&#39;" onmouseout="this.style.background=&#39;none&#39;">↺ Restaurar Fórmulas Padrão</button>
           <span style="font-size:.78rem;color:var(--text-muted)">— corrige fórmulas salvas incorretamente (ex: PE retornando sempre 0).</span>
         </div>
 
@@ -2858,7 +3414,7 @@ main { margin-left: 0 !important; }
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula PV Base</span>
               <input type="text" class="formula-input" id="form-pv" value="(vigor + alma) * (2 + floor(nivel / 2))">
-              <button class="apply-formula-btn" onclick="aplicarFormula('pv')">Aplicar</button>
+              <button class="apply-formula-btn" onclick="aplicarFormula(&#39;pv&#39;)">Aplicar</button>
             </div>
             <div class="formula-result" id="res-pv">✓ Fórmula salva e aplicada.</div>
           </div>
@@ -2875,7 +3431,7 @@ main { margin-left: 0 !important; }
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula STA</span>
               <input type="text" class="formula-input" id="form-sta" value="(vigor + alma) * (2 + floor(nivel / 2))">
-              <button class="apply-formula-btn" onclick="aplicarFormula('sta')">Aplicar</button>
+              <button class="apply-formula-btn" onclick="aplicarFormula(&#39;sta&#39;)">Aplicar</button>
             </div>
             <div class="formula-result" id="res-sta">✓ Fórmula salva e aplicada.</div>
           </div>
@@ -2892,7 +3448,7 @@ main { margin-left: 0 !important; }
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula PE</span>
               <input type="text" class="formula-input" id="form-pe" value="(floor(nivel / 2) + 2) * (modAlma + modIntelecto)">
-              <button class="apply-formula-btn" onclick="aplicarFormula('pe')">Aplicar</button>
+              <button class="apply-formula-btn" onclick="aplicarFormula(&#39;pe&#39;)">Aplicar</button>
             </div>
             <div class="formula-result" id="res-pe">✓ Fórmula salva e aplicada.</div>
           </div>
@@ -2904,7 +3460,7 @@ main { margin-left: 0 !important; }
             <span class="formula-editor-title">Custo de cada Ponto de Energia</span>
           </div>
           <div class="formula-editor-body">
-            <div class="formula-desc">Calculado automaticamente, sem precisar editar nada: <code>INT((STA máx ÷ 2) ÷ PE máx)</code></div>
+            <div class="formula-desc">Calculado automaticamente, sem precisar editar nada: <code>⌊STA máx ÷ PE máx⌋</code></div>
             <div class="formula-vars">Aparece no campo <strong>Custo</strong> do bloco de PE da ficha, e é usado para descontar PE/STA quando você gasta Pontos de Energia.</div>
             <div class="formula-desc" style="margin-top:.5rem">
               <strong style="color:var(--silver)">PE Atual</strong> = PE máx − (Gasto PE × Custo)<br>
@@ -2925,7 +3481,7 @@ main { margin-left: 0 !important; }
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula CA</span>
               <input type="text" class="formula-input" id="form-ca" value="10 + modDestreza + ceil(modVigor / 2) + bonusCA">
-              <button class="apply-formula-btn" onclick="aplicarFormula('ca')">Aplicar</button>
+              <button class="apply-formula-btn" onclick="aplicarFormula(&#39;ca&#39;)">Aplicar</button>
             </div>
             <div class="formula-result" id="res-ca">✓ Fórmula salva e aplicada.</div>
           </div>
@@ -2942,7 +3498,7 @@ main { margin-left: 0 !important; }
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula Iniciativa</span>
               <input type="text" class="formula-input" id="form-init" value="modDestreza">
-              <button class="apply-formula-btn" onclick="aplicarFormula('init')">Aplicar</button>
+              <button class="apply-formula-btn" onclick="aplicarFormula(&#39;init&#39;)">Aplicar</button>
             </div>
             <div class="formula-result" id="res-init">✓ Fórmula salva e aplicada.</div>
           </div>
@@ -2959,7 +3515,7 @@ main { margin-left: 0 !important; }
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Fórmula Maestria</span>
               <input type="text" class="formula-input" id="form-maestria" value="1 + ceil(nivel / 4)">
-              <button class="apply-formula-btn" onclick="aplicarFormula('maestria')">Aplicar</button>
+              <button class="apply-formula-btn" onclick="aplicarFormula(&#39;maestria&#39;)">Aplicar</button>
             </div>
             <div class="formula-result" id="res-maestria">✓ Fórmula salva e aplicada.</div>
           </div>
@@ -2976,17 +3532,17 @@ main { margin-left: 0 !important; }
             <div class="formula-row" style="margin-top:.75rem">
               <span class="formula-label">Sem treinamento</span>
               <input type="text" class="formula-input" id="form-per-base" value="attrMod + floor(nivel / 2)">
-              <button class="apply-formula-btn" onclick="aplicarFormula('per-base')">Aplicar</button>
+              <button class="apply-formula-btn" onclick="aplicarFormula(&#39;per-base&#39;)">Aplicar</button>
             </div>
             <div class="formula-row">
               <span class="formula-label">Com Maestria</span>
               <input type="text" class="formula-input" id="form-per-mt" value="attrMod + floor(nivel / 2) + maestria">
-              <button class="apply-formula-btn" onclick="aplicarFormula('per-mt')">Aplicar</button>
+              <button class="apply-formula-btn" onclick="aplicarFormula(&#39;per-mt&#39;)">Aplicar</button>
             </div>
             <div class="formula-row">
               <span class="formula-label">Com Especialização</span>
               <input type="text" class="formula-input" id="form-per-es" value="attrMod + floor(nivel / 2) + floor(maestria * 1.5)">
-              <button class="apply-formula-btn" onclick="aplicarFormula('per-es')">Aplicar</button>
+              <button class="apply-formula-btn" onclick="aplicarFormula(&#39;per-es&#39;)">Aplicar</button>
             </div>
             <div class="formula-result" id="res-per-base">✓ Salvo.</div>
             <div class="formula-result" id="res-per-mt">✓ Salvo.</div>
@@ -3073,7 +3629,7 @@ main { margin-left: 0 !important; }
       <div class="lendas-header">
         <div class="lendas-runes">ᚱ ᚢ ᚾ ᚨ ᛊ ᛏ ᚢ ᛗ</div>
         <span class="chapter-number" style="color:var(--accent-light);letter-spacing:4px">📖 LIVRO DAS LENDAS</span>
-        <h1 class="lendas-title">Crônicas do Abismo</h1>
+        <h1 class="lendas-title">Crônicas das Torres</h1>
         <p class="lendas-subtitle">Os Despertos mais temidos do mundo conhecido</p>
         <div class="lendas-header-actions">
           <button class="lendas-refresh-btn" onclick="carregarRanking()">↺ Atualizar</button>
@@ -3084,12 +3640,12 @@ main { margin-left: 0 !important; }
       <!-- ABAS DE RANKING -->
       <div class="lendas-tabs-wrap">
         <div class="lendas-tabs" id="lendas-tabs">
-          <button class="lendas-tab active" onclick="mudarAbaRanking('geral',this)">🏆 Mais Temidos</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking('vitorias',this)">⚔️ Mais Vitórias</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking('antigos',this)">📜 Mais Antigos</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking('nivel',this)">👑 Maiores Níveis</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking('abismo',this)">🌑 Lendas do Abismo</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking('semana',this)">🔥 Destaques da Semana</button>
+          <button class="lendas-tab active" onclick="mudarAbaRanking(&#39;geral&#39;,this)">🏆 Mais Temidos</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;vitorias&#39;,this)">⚔️ Mais Vitórias</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;antigos&#39;,this)">📜 Mais Antigos</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;nivel&#39;,this)">👑 Maiores Níveis</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;abismo&#39;,this)">🌑 Lendas do Abismo</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;semana&#39;,this)">🔥 Destaques da Semana</button>
         </div>
         <div class="lendas-tab-label" id="lendas-tab-label">Classificação por poder e núcleos absorvidos</div>
       </div>
@@ -3098,7 +3654,7 @@ main { margin-left: 0 !important; }
       <div id="ranking-grid" class="lendas-grid">
         <div class="lendas-loading">
           <div class="lendas-loading-rune">☽</div>
-          <p>Invocando os registros do Abismo...</p>
+          <p>Invocando os registros das Torres...</p>
         </div>
       </div>
     </section>
@@ -3336,8 +3892,28 @@ function getDespertar(dados) {
 // ═══════════════════════════════════════════════════════════════════════
 // ═══ RANKING — todos os personagens de todos os usuários ═══════════════
 // ═══════════════════════════════════════════════════════════════════════
-let _rankingInterval = null;
+let _rankingInterval    = null;
+let _rankingUnsubscribe = null; // unsubscribe do listener onSnapshot ativo
 let _inputListener = null;
+
+// ── Cache local do ranking (localStorage) ───────────────────────
+const _RANKING_CACHE_KEY = 'tp_ranking_cache_v1';
+function _salvarCacheRanking(fichas) {
+  try {
+    const leve = fichas.map(f => {
+      const c = Object.assign({}, f);
+      if (c.foto && c.foto.length > 500) delete c.foto;
+      return c;
+    });
+    localStorage.setItem(_RANKING_CACHE_KEY, JSON.stringify(leve));
+  } catch(e) {}
+}
+function _lerCacheRanking() {
+  try {
+    const raw = localStorage.getItem(_RANKING_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
 
 // ═══ LIVRO DAS LENDAS — estado global ═══
 let _lendasFichas = []; // cache de todas as fichas
@@ -3375,7 +3951,7 @@ const ABA_LABELS = {
   vitorias: 'Personagens com mais vitórias registradas',
   antigos:  'Os Despertos mais antigos do sistema',
   nivel:    'Classificação por nível de progressão',
-  abismo:   'Lendas que tocaram o fundo do Abismo',
+  abismo:   'Lendas que tocaram o fundo das Torres',
   semana:   'Destaques das últimas sessões desta semana',
 };
 
@@ -3439,24 +4015,32 @@ function renderizarCartoes(fichas, aba) {
     const tema = p.tema || 'sangue';
     const wp = WALLPAPERS.find(w => w.id === p.wallpaper);
 
-    const avatarHtml = f.foto
-      ? `<img class="lenda-avatar" src="${f.foto}" alt="${f.nome}" onerror="this.outerHTML='<div class=\'lenda-avatar-placeholder\'>⚔</div>'">`
-      : `<div class="lenda-avatar-placeholder">⚔</div>`;
+    // Foto: determina src e usa nova estrutura com foto grande
+    const fotoSrc = f.foto || null;
+    const fotoHtml = fotoSrc
+      ? `<img class="lenda-card-foto-img" src="${fotoSrc}" alt="${f.nome}" loading="lazy" onerror="this.outerHTML='<div class=\'lenda-card-foto-placeholder\'>⚔</div>'">`
+      : `<div class="lenda-card-foto-placeholder">⚔</div>`;
 
     const card = document.createElement('div');
     card.className = `lenda-card-outer tema-${tema}`;
     card.innerHTML = `
-      <div class="lenda-card" onclick="abrirPerfilPublico(${JSON.stringify(JSON.stringify(f)).slice(1,-1)})">
-        ${wp ? `<div class="lenda-card-wallpaper" style="background-image:url('${wp.url}')"></div>` : ''}
-        ${p.gifPoder ? `<div class="lenda-card-gif"><img src="${p.gifPoder}" alt="" onerror="this.style.display='none'"></div>` : ''}
-        <div class="lenda-card-overlay"></div>
-        <div class="lenda-card-body">
+      <div class="lenda-card">
+        <!-- FOTO GRANDE -->
+        <div class="lenda-card-foto">
+          ${wp ? `<div class="lenda-card-wallpaper" style="background-image:url('${wp.url}')"></div>` : ''}
+          ${p.gifPoder ? `<div class="lenda-card-gif"><img src="${p.gifPoder}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
+          ${fotoHtml}
+          <div class="lenda-card-foto-gradient"></div>
           <span class="lenda-card-rank ${posClass}">${posLabel}</span>
           ${f.faccao ? `<span class="lenda-card-faccao-badge">${f.faccao}</span>` : ''}
-          <div class="lenda-avatar-wrap">${avatarHtml}</div>
+        </div>
+        <!-- CORPO -->
+        <div class="lenda-card-glow"></div>
+        <div class="lenda-card-body">
           <div class="lenda-nome">${f.nome}</div>
           ${f.alcunha ? `<div class="lenda-alcunha">"${f.alcunha}"</div>` : ''}
-          ${f.poder && f.poder !== '—' ? `<div class="lenda-poder">${f.poder}</div>` : ''}
+          <div class="lenda-card-divider"></div>
+          ${f.poder && f.poder !== '—' ? `<div class="lenda-poder">🔷 ${f.poder}</div>` : ''}
           <div class="lenda-meta">
             <span class="lenda-meta-chip nivel">Nv. ${f.nivel}</span>
             ${f.rank ? `<span class="lenda-meta-chip rank">${f.rank}</span>` : ''}
@@ -3578,81 +4162,273 @@ async function carregarRanking() {
     return;
   }
 
-  grid.innerHTML = `<div class="lendas-loading"><div class="lendas-loading-rune">☽</div><p>Invocando os registros do Abismo...</p></div>`;
-
-  const fichas = [];
-  const idsConhecidos = new Set();
-
-  // ═══ FONTE PRINCIPAL: rankingGlobal ═══════════════════════════════
-  // Uma única leitura de coleção traz TODOS os personagens (players,
-  // GMs, ADMs, antigos e novos) sem depender de USUARIOS e sem o
-  // custo de N×M leituras (1 leitura por usuário × personagens).
-  if (window.collection && window.getDocs) {
-    try {
-      const rankingSnap = await window.getDocs(window.collection(window.db, 'rankingGlobal'));
-      rankingSnap.forEach(docSnap => {
-        const d = docSnap.data() || {};
-        if (d.status === 'arquivado') return; // compat: registros antigos podem ter sido marcados assim
-        fichas.push(_fichaFromRankingGlobal(docSnap.id, d));
-        idsConhecidos.add(docSnap.id);
-      });
-    } catch(e) {
-      console.warn('[Ranking] Erro ao ler rankingGlobal, usando apenas fallback por ficha:', e);
-    }
+  // ── 1. Mostra cache imediatamente enquanto carrega ──────────────
+  const cache = _lerCacheRanking();
+  if (cache && cache.length) {
+    _lendasFichas = cache;
+    renderizarCartoes(_lendasFichas, _abaAtual);
+    // Não mostra spinner — usuário já vê dados. Atualiza silenciosamente.
   } else {
-    console.warn('[Ranking] collection/getDocs indisponíveis — usando apenas fallback por ficha.');
+    grid.innerHTML = `<div class="lendas-loading">
+      <div class="lendas-loading-rune">☽</div>
+      <p>Invocando os registros das Torres...</p>
+    </div>`;
   }
 
-  // ═══ FALLBACK: fichas antigas ainda não migradas para rankingGlobal ═══
-  // Cobre personagens criados/salvos antes desta atualização (que ainda
-  // não passaram por updateRankingEntry). Na próxima vez que o jogador
-  // salvar a ficha, o registro passa a existir em rankingGlobal.
-  const todos = Object.entries(USUARIOS);
-  for (const [user, info] of todos) {
-    try {
-      const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
-      let listaPersonagens = [];
-      if (listaSnap.exists()) listaPersonagens = JSON.parse(listaSnap.data().lista || '[]');
-      if (!listaPersonagens.length) continue;
+  // ── 2. Cancela listener anterior se existir ─────────────────────
+  if (_rankingUnsubscribe) {
+    _rankingUnsubscribe();
+    _rankingUnsubscribe = null;
+  }
+  // Cancela também o setInterval legado
+  if (_rankingInterval) {
+    clearInterval(_rankingInterval);
+    _rankingInterval = null;
+  }
 
-      for (const nomePersonagem of listaPersonagens) {
-        const fichaDocId = _fsDocId(user, nomePersonagem);
-        if (idsConhecidos.has(fichaDocId)) continue; // já coberto por rankingGlobal
+  // ── 3. onSnapshot — atualização em tempo real ───────────────────
+  // Dispara imediatamente com dados do cache IndexedDB (offline-first),
+  // depois sincroniza com o servidor. Quando qualquer documento muda,
+  // o callback é chamado novamente automaticamente — sem polling.
+  if (window.onSnapshot) {
+    const colRef = window.collection(window.db, 'rankingGlobal');
+    _rankingUnsubscribe = window.onSnapshot(colRef,
+      (snap) => {
+        const fichas = [];
+        snap.forEach(docSnap => {
+          const d = docSnap.data() || {};
+          if (d.status === 'arquivado') return;
+          fichas.push(_fichaFromRankingGlobal(docSnap.id, d));
+        });
 
-        try {
-          const f = await _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId);
-          if (f) {
-            fichas.push(f);
-            idsConhecidos.add(fichaDocId);
-          }
-        } catch(e) { console.warn('[Ranking] fallback', user, nomePersonagem, e); }
+        // Fallback legado assíncrono (não bloqueia a renderização)
+        _aplicarFallbackLegado(fichas).then(fichasCompletas => {
+          _lendasFichas = fichasCompletas;
+          _salvarCacheRanking(fichasCompletas);
+          _carregarPersonalizacoesParalelo(fichasCompletas).then(() => {
+            renderizarCartoes(_lendasFichas, _abaAtual);
+          });
+        });
+      },
+      (err) => {
+        console.warn('[Ranking] onSnapshot erro, usando getDocs:', err);
+        _carregarRankingGetDocs(); // fallback para leitura única
       }
-    } catch(e) { console.warn('[Ranking] user:', user, e); }
-  }
-
-  // ═══ PERSONALIZAÇÕES (tema, wallpaper, gifs) ═══
-  // Leitura individual — não reintroduz o custo N×M, pois o ranking em
-  // si já é resolvido em 1 leitura via rankingGlobal.
-  for (const f of fichas) {
-    const pid = _fsDocId(f.user, f.nomePersonagem);
-    if (_personalizacoes[pid]) continue;
-    try {
-      const pSnap = await window.getDoc(window.doc(window.db, 'personalizacoes', pid));
-      if (pSnap.exists()) _personalizacoes[pid] = pSnap.data();
-    } catch(e) {}
-  }
-
-  _lendasFichas = fichas;
-  renderizarCartoes(_lendasFichas, _abaAtual);
-
-  if (!_rankingInterval) {
-    _rankingInterval = setInterval(() => {
-      if (document.getElementById('ranking-grid')) carregarRanking();
-    }, 30000);
+    );
+  } else {
+    // Navegador muito antigo — fallback para getDocs
+    await _carregarRankingGetDocs();
   }
 }
 
-function abrirPerfilPublico(f) {
+// ── Fallback para getDocs (sem onSnapshot) ───────────────────────
+async function _carregarRankingGetDocs() {
+  try {
+    const snap = await window.getDocs(window.collection(window.db, 'rankingGlobal'));
+    const fichas = [];
+    snap.forEach(docSnap => {
+      const d = docSnap.data() || {};
+      if (d.status === 'arquivado') return;
+      fichas.push(_fichaFromRankingGlobal(docSnap.id, d));
+    });
+    const fichasCompletas = await _aplicarFallbackLegado(fichas);
+    _lendasFichas = fichasCompletas;
+    _salvarCacheRanking(fichasCompletas);
+    await _carregarPersonalizacoesParalelo(fichasCompletas);
+    renderizarCartoes(_lendasFichas, _abaAtual);
+  } catch(e) {
+    console.error('[Ranking] Erro crítico ao carregar ranking:', e);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// _aplicarFallbackLegado
+// Complementa o ranking com personagens que ainda não foram
+// migrados para rankingGlobal (nunca re-salvos após a atualização).
+// Usa Promise.all para leituras em paralelo — sem await em loop.
+// ═══════════════════════════════════════════════════════════════
+async function _aplicarFallbackLegado(fichasDoRanking) {
+  if (!window.db || !window.doc || !window.getDoc) return fichasDoRanking;
+
+  const idsConhecidos = new Set(fichasDoRanking.map(f => _fsDocId(f.user, f.nomePersonagem)));
+  const fichasExtra = [];
+
+  // Lê a lista de personagens de todos os usuários em paralelo
+  const todosPares = Object.entries(USUARIOS);
+  const listasSnaps = await Promise.all(
+    todosPares.map(([user]) =>
+      window.getDoc(window.doc(window.db, 'chars', user)).catch(() => null)
+    )
+  );
+
+  // Monta a lista de personagens ausentes do ranking
+  const ausentes = [];
+  todosPares.forEach(([user, info], i) => {
+    const snap = listasSnaps[i];
+    if (!snap || !snap.exists()) return;
+    let lista = [];
+    try { lista = JSON.parse(snap.data().lista || '[]'); } catch(e) {}
+    lista.forEach(nomePersonagem => {
+      const docId = _fsDocId(user, nomePersonagem);
+      if (!idsConhecidos.has(docId)) {
+        ausentes.push({ user, info, nomePersonagem, fichaDocId: docId });
+      }
+    });
+  });
+
+  if (!ausentes.length) return fichasDoRanking;
+
+  // Lê todas as fichas ausentes em paralelo (não sequencial!)
+  const fichaSnaps = await Promise.all(
+    ausentes.map(a =>
+      window.getDoc(window.doc(window.db, 'fichas', a.fichaDocId)).catch(() => null)
+    )
+  );
+
+  // Lê fotos em paralelo
+  const fotoSnaps = await Promise.all(
+    ausentes.map(a =>
+      window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(a.user, a.nomePersonagem))).catch(() => null)
+    )
+  );
+
+  ausentes.forEach((a, i) => {
+    const fichaSnap = fichaSnaps[i];
+    const fotoSnap  = fotoSnaps[i];
+    if (!fichaSnap || !fichaSnap.exists()) return;
+    if (fichaSnap.data().status === 'arquivado') return;
+
+    const raw = fichaSnap.data().dados;
+    const dados = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+    const fotoPrincipal = (fotoSnap && fotoSnap.exists()) ? (fotoSnap.data().principal || null) : null;
+
+    const nucleoRaw = dados['f-nucleo'] || '0';
+    const nucleos   = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
+    const nivel     = parseInt(dados['f-nivel'] || '1') || 1;
+
+    fichasExtra.push({
+      user: a.user,
+      info: a.info,
+      nomePersonagem: a.nomePersonagem,
+      nome:      dados['f-nome']      || a.nomePersonagem,
+      nivel:     nivel.toString(),
+      poder:     dados['p-principal'] || dados['f-poder-nome'] || '—',
+      nucleos,
+      score:     nivel * 10 + nucleos,
+      ts:        fichaSnap.data().ts  || 0,
+      vitorias:  parseInt(dados['f-vitorias'] || '0') || 0,
+      foto:      fotoPrincipal,
+      despertar: getDespertar(dados),
+      alcunha:   dados['f-alcunha']   || '',
+      rank:      dados['f-rank']      || '',
+      faccao:    dados['f-faccao']    || '',
+      cidade:    dados['f-cidade']    || '',
+      _legado: {
+        classe:           dados['f-classe']            || '',
+        genero:           dados['f-genero']            || '',
+        frase:            dados['f-frase']             || '',
+        descricaoPublica: dados['f-descricao-publica'] || '',
+        socHistoria:      dados['soc-historia']        || '',
+        socFeitos:        dados['soc-feitos']          || '',
+        socConquistas:    dados['soc-conquistas']      || '',
+        socTitulos:       dados['soc-titulos']         || '',
+        socAliados:       dados['soc-aliados']         || '',
+        socRivais:        dados['soc-rivais']          || '',
+        socTimeline:      dados['soc-timeline']        || '',
+      },
+    });
+  });
+
+  return [...fichasDoRanking, ...fichasExtra];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// _carregarPersonalizacoesParalelo
+// Substitui o for..await..getDoc sequencial da versão antiga.
+// Carrega todas as personalizações em paralelo, respeitando o
+// cache em memória para não relê dados já conhecidos.
+// ═══════════════════════════════════════════════════════════════
+async function _carregarPersonalizacoesParalelo(fichas) {
+  if (!window.db || !window.doc || !window.getDoc) return;
+
+  // Filtra apenas as que ainda não estão em cache
+  const ausentes = fichas.filter(f => {
+    const pid = _fsDocId(f.user, f.nomePersonagem);
+    return !_personalizacoes[pid];
+  });
+
+  if (!ausentes.length) return; // tudo já em cache
+
+  // Carrega todas em paralelo — 1 Promise.all, não 1 await por item
+  const pids   = ausentes.map(f => _fsDocId(f.user, f.nomePersonagem));
+  const snaps  = await Promise.all(
+    pids.map(pid =>
+      window.getDoc(window.doc(window.db, 'personalizacoes', pid)).catch(() => null)
+    )
+  );
+
+  pids.forEach((pid, i) => {
+    const snap = snaps[i];
+    if (snap && snap.exists()) {
+      _personalizacoes[pid] = snap.data();
+    } else {
+      _personalizacoes[pid] = {}; // evita retentar desnecessariamente
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// carregarGrimorioPublico
+// Carrega os dados completos do perfil apenas quando o modal
+// de grimório é aberto. Não polui o carregamento do ranking.
+// Compatível com fichas antigas (fallback via _legado).
+// ═══════════════════════════════════════════════════════════════
+async function carregarGrimorioPublico(f) {
+  // Tenta grimorioPublico primeiro (nova estrutura)
+  if (window.db && window.doc && window.getDoc) {
+    try {
+      const docId = _fsDocId(f.user, f.nomePersonagem);
+      const snap = await window.getDoc(window.doc(window.db, 'grimorioPublico', docId));
+      if (snap.exists()) {
+        return snap.data();
+      }
+    } catch(e) {
+      console.warn('[Grimório] Erro ao ler grimorioPublico, usando legado:', e);
+    }
+  }
+
+  // Fallback: usa campos que vieram junto com rankingGlobal (fichas antigas)
+  if (f._legado) return f._legado;
+
+  // Último recurso: retorna objeto vazio (não quebra o modal)
+  return {
+    classe: f.classe || '', genero: f.genero || '',
+    frase: f.frase || '', descricaoPublica: f.descricaoPublica || '',
+    socHistoria: '', socFeitos: '', socConquistas: '',
+    socTitulos: '', socAliados: '', socRivais: '', socTimeline: '',
+  };
+}
+
+// Invalida cache local ao salvar (chamada em salvarFichaFirestore)
+function invalidarCacheRanking() {
+  try {
+    localStorage.removeItem(_RANKING_CACHE_KEY);
+  } catch(e) {}
+}
+
+// Destrói o listener onSnapshot ao fazer logout ou trocar de seção
+function destruirListenerRanking() {
+  if (_rankingUnsubscribe) {
+    _rankingUnsubscribe();
+    _rankingUnsubscribe = null;
+  }
+  if (_rankingInterval) {
+    clearInterval(_rankingInterval);
+    _rankingInterval = null;
+  }
+}
+
+async function abrirPerfilPublico(f) {
   // Remove modal anterior
   document.getElementById('livro-overlay')?.remove();
   document.getElementById('grimorio-overlay')?.remove();
@@ -3660,6 +4436,28 @@ function abrirPerfilPublico(f) {
   const overlay = document.createElement('div');
   overlay.className = 'livro-overlay';
   overlay.id = 'livro-overlay';
+  overlay.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:80vh;color:var(--text-muted);font-family:'Playfair Display',serif;font-size:1.1rem;">Carregando grimório...</div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+
+  // ── Carrega dados completos do grimório (sob demanda) ──
+  const grimorio = await carregarGrimorioPublico(f);
+  const fCompleto = {
+    ...f,
+    classe:           grimorio.classe           || f.classe           || '',
+    genero:           grimorio.genero           || f.genero           || '',
+    frase:            grimorio.frase            || f.frase            || '',
+    descricaoPublica: grimorio.descricaoPublica || f.descricaoPublica || '',
+    socHistoria:      grimorio.socHistoria      || '',
+    socFeitos:        grimorio.socFeitos        || '',
+    socConquistas:    grimorio.socConquistas    || '',
+    socTitulos:       grimorio.socTitulos       || '',
+    socAliados:       grimorio.socAliados       || '',
+    socRivais:        grimorio.socRivais        || '',
+    socTimeline:      grimorio.socTimeline      || '',
+  };
+  // Usa fCompleto para toda a montagem do modal
+  f = fCompleto;
 
   // helpers
   function linhas(str) { return (str||'').split('\n').map(s=>s.trim()).filter(Boolean); }
@@ -3668,22 +4466,23 @@ function abrirPerfilPublico(f) {
     return `<ul class="livro-area-list">${arr.map(i=>`<li>${i}</li>`).join('')}</ul>`;
   }
 
-  const pid = _fsDocId(f.user, f.nomePersonagem || f.nome);
+  const userPerfil = f.user;
+  const personagemPerfil = f.nomePersonagem || f.nome;
+  const pid = _fsDocId(userPerfil, personagemPerfil);
   const p = _personalizacoes[pid] || {};
   const tema = p.tema || 'sangue';
   const temaInfo = TEMAS[tema] || TEMAS.sangue;
   const wp = WALLPAPERS.find(w => w.id === p.wallpaper);
 
+  // É o dono deste perfil? (controla a exibição dos botões de edição)
+  const ehDono = !!(usuarioAtual && userPerfil && usuarioAtual === userPerfil &&
+                     personagemAtual && personagemPerfil && personagemAtual === personagemPerfil);
+
   // Títulos
   const titulosArr = (f.socTitulos||'').split(',').map(s=>s.trim()).filter(Boolean);
   const titulosHtml = titulosArr.length
-    ? titulosArr.map(t=>`<span class="livro-badge">${t}</span>`).join('')
+    ? titulosArr.map(t=>`<span class="livro-badge-titulo">👑 ${t}</span>`).join('')
     : '<span style="color:#444;font-size:.8rem;font-style:italic">Nenhum título ostentado.</span>';
-
-  // Avatar
-  const avatarHtml = f.foto
-    ? `<img class="livro-avatar" src="${f.foto}" alt="${f.nome}" onerror="this.outerHTML='<div class=\"livro-avatar-placeholder\">⚔</div>'">`
-    : `<div class="livro-avatar-placeholder">⚔</div>`;
 
   // Tags
   const tags = [];
@@ -3709,74 +4508,118 @@ function abrirPerfilPublico(f) {
   // Conquistas
   const conquistasArr = linhas(f.socConquistas);
   const conquistasHtml = conquistasArr.length
-    ? `<div class="livro-badges">${conquistasArr.map(c=>`<span class="livro-badge">🌑 ${c}</span>`).join('')}</div>`
+    ? `<div class="livro-badges">${conquistasArr.map(c=>`<span class="livro-badge-conquista">🌑 ${c}</span>`).join('')}</div>`
     : '<span class="livro-area-empty">Nenhuma conquista registrada.</span>';
 
-  // Tema visual
-  const temaCss = `
-    --livro-accent: ${temaInfo.cor};
-    --livro-accent-glow: ${temaInfo.cor}33;
-    background: linear-gradient(160deg, #131118 0%, #0d0b12 100%);
-    border-color: rgba(${parseInt(temaInfo.cor.slice(1,3),16)},${parseInt(temaInfo.cor.slice(3,5),16)},${parseInt(temaInfo.cor.slice(5,7),16)},.35);
-  `;
+  // Tema visual — aplica classe no modal em vez de inline style
+  const temaClass = `livro-tema-${tema}`;
 
-  // GIF sections
-  const gifsHtml = (p.gifPoder || p.gifTransformacao || p.gifSuprema) ? `
+  // GIF sections (transformação / suprema — adicionais ao card de poder principal)
+  const gifsHtml = (p.gifTransformacao || p.gifSuprema) ? `
     <div class="livro-section">
-      <div class="livro-section-title">✨ Manifestações</div>
+      <div class="livro-section-title">✨ Outras Manifestações</div>
       <div class="livro-gif-section">
-        ${p.gifPoder ? `<div class="livro-gif-item"><img src="${p.gifPoder}" alt="Poder" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Poder</div></div>` : ''}
-        ${p.gifTransformacao ? `<div class="livro-gif-item"><img src="${p.gifTransformacao}" alt="Transformação" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Transformação</div></div>` : ''}
-        ${p.gifSuprema ? `<div class="livro-gif-item"><img src="${p.gifSuprema}" alt="Suprema" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Habilidade Suprema</div></div>` : ''}
+        ${p.gifTransformacao ? `<div class="livro-gif-item"><img src="${p.gifTransformacao}" alt="Transformação" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">🌀 Transformação</div></div>` : ''}
+        ${p.gifSuprema ? `<div class="livro-gif-item"><img src="${p.gifSuprema}" alt="Suprema" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">⚡ Suprema</div></div>` : ''}
       </div>
     </div>` : '';
 
-  overlay.innerHTML = `
-    <div class="livro-modal" style="${temaCss}">
+  // ── BANNER ──
+  const bannerCustom = p.bannerUrl || '';
+  let bannerInner = '';
+  if (bannerCustom) {
+    bannerInner = `<img class="livro-banner-img" src="${bannerCustom}" alt="Banner" onerror="this.style.display='none'">`;
+  } else if (wp) {
+    bannerInner = `<div class="livro-banner-bg" style="background-image:url('${wp.url}')"></div>`;
+  } else if (p.wallpaperUrl) {
+    bannerInner = `<div class="livro-banner-bg" style="background-image:url('${p.wallpaperUrl}')"></div>`;
+  } else {
+    bannerInner = `<div class="livro-banner-placeholder"><span class="icon">⛰</span><span>Sem Banner</span></div>`;
+  }
 
-      <!-- BANNER -->
-      <div class="livro-banner">
-        ${wp ? `<div class="livro-banner-bg" style="background-image:url('${wp.url}')"></div>` : ''}
-        ${p.gifPoder ? `<div class="livro-banner-gif"><img src="${p.gifPoder}" alt="" onerror="this.style.display='none'"></div>` : ''}
+  // ── FOTO PRINCIPAL ──
+  const avatarHtml = f.foto
+    ? `<img class="livro-avatar" src="${f.foto}" alt="${f.nome}" onclick="abrirLightbox('${(f.foto).replace(/'/g,"\\'")}')" onerror="this.outerHTML='<div class=\\'livro-avatar-placeholder\\' onclick=\\'abrirLightbox()\\'>⚔</div>'">`
+    : `<div class="livro-avatar-placeholder" ${ehDono ? `onclick="abrirSeletorFotoPrincipal()"` : ''}>⚔</div>`;
+
+  const avatarActionsHtml = ehDono ? `
+    <div class="livro-avatar-actions">
+      <button class="livro-avatar-btn" title="Trocar foto principal" onclick="event.stopPropagation();abrirSeletorFotoPrincipal()">🔄</button>
+      ${f.foto ? `<button class="livro-avatar-btn" title="Remover foto principal" onclick="event.stopPropagation();removerFotoPrincipal()">✕</button>` : ''}
+    </div>` : '';
+
+  // ── CARD DE PODER PRINCIPAL ──
+  const prismaSrc = 'assets/icons/prisma.svg';
+  const nomePoder = (f.poder && f.poder !== '—') ? f.poder : '';
+  const gifPoderHtml = p.gifPoder
+    ? `<div class="livro-poder-card-gif"><img src="${p.gifPoder}" alt="${nomePoder}" loading="lazy" onclick="abrirLightbox('${p.gifPoder.replace(/'/g,"\\'")}')" onerror="this.parentElement.outerHTML='<div class=\\'livro-poder-card-empty\\'><span class=\\'icon\\'>✨</span><span>Sem GIF do poder</span></div>'"></div>`
+    : `<div class="livro-poder-card-empty"><span class="icon">✨</span><span>Sem GIF do poder</span></div>`;
+
+  const poderCardHtml = (nomePoder || ehDono) ? `
+    <div class="livro-poder-card">
+      <div class="livro-poder-card-header">
+        <img class="livro-poder-prisma" src="${prismaSrc}" alt="Prisma" onerror="this.style.display='none'">
+        <div class="livro-poder-nome">${nomePoder || 'Poder Não Definido'}</div>
+      </div>
+      ${gifPoderHtml}
+    </div>` : '';
+
+  // ── GALERIA DO DESPERTO — populada de forma assíncrona após o render ──
+
+  overlay.innerHTML = `
+    <div class="livro-modal ${temaClass}">
+
+      <!-- 1/2. BANNER -->
+      <div class="livro-banner" id="livro-banner-el">
+        ${bannerInner}
+        ${p.gifPoder && !bannerCustom ? `<div class="livro-banner-gif"><img src="${p.gifPoder}" alt="" loading="lazy" onerror="this.style.display='none'"></div>` : ''}
         <div class="livro-banner-gradient"></div>
         <div class="livro-banner-runes">ᚱ ᚢ ᚾ ᚨ ᛊ ᛏ ᚢ ᛗ</div>
-        <div class="livro-avatar-wrap">${avatarHtml}</div>
+        ${ehDono ? `<button class="livro-banner-edit" onclick="abrirAcoesBanner()"><span class="ic">🖼</span><span class="lbl">${bannerCustom ? 'Trocar Banner' : 'Adicionar Banner'}</span></button>` : ''}
         <button class="livro-close" onclick="document.getElementById('livro-overlay').remove()">✕</button>
+      </div>
+
+      <!-- 3. FOTO PRINCIPAL — centralizada -->
+      <div class="livro-avatar-wrap" id="livro-avatar-wrap-el">
+        <div class="livro-avatar-frame">
+          ${avatarHtml}
+          ${avatarActionsHtml}
+        </div>
       </div>
 
       <!-- IDENTIDADE -->
       <div class="livro-identity">
         <div class="livro-nome">${f.nome}</div>
-        ${f.alcunha ? `<div class="livro-alcunha">"${f.alcunha}"</div>` : ''}
-        ${f.poder && f.poder !== '—' ? `
-        <div class="livro-poder-badge">
-          ${p.gifPoder ? `<img class="livro-poder-gif" src="${p.gifPoder}" alt="" onerror="this.style.display='none'">` : '🔷'}
-          ${f.poder}
-        </div>` : ''}
+        <div class="livro-alcunha">${f.alcunha ? `"${f.alcunha}"` : (ehDono ? '<span style="opacity:.4">Sem alcunha</span>' : '')}</div>
         <div class="livro-tags">${tags.join('')}</div>
-        ${f.frase ? `<div class="livro-frase">"${f.frase}"</div>` : ''}
+        ${f.frase ? `<div class="livro-frase">"${f.frase}"</div>` : (ehDono ? `<div class="livro-frase" style="color:#555">Nenhuma frase marcante definida.</div>` : '')}
+
+        <!-- 7/8. CARD DE PODER -->
+        ${poderCardHtml}
+
+        ${ehDono ? `<button class="livro-edit-link" style="margin-top:1.1rem;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid var(--livro-border,rgba(193,63,63,.35));color:var(--livro-accent,#c13f3f);padding:.4rem 1rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--livro-accent,var(--accent))';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='var(--livro-accent,#c13f3f)'" onclick="abrirEditorPerfilPublico()">✎ Editar Perfil Público</button>` : ''}
       </div>
 
       <!-- CORPO -->
       <div class="livro-body">
 
-        ${f.descricaoPublica ? `
+        ${f.descricaoPublica || ehDono ? `
         <div class="livro-section">
-          <div class="livro-section-title">◈ Descrição</div>
-          <div class="livro-descricao">${f.descricaoPublica.replace(/\n/g,'<br>')}</div>
+          <div class="livro-section-title">◈ Perfil Público</div>
+          <div class="livro-descricao">${f.descricaoPublica ? f.descricaoPublica.replace(/\n/g,'<br>') : ''}</div>
         </div>` : ''}
 
         ${gifsHtml}
 
         <div class="livro-section">
-          <div class="livro-section-title">👑 Títulos</div>
+          <div class="livro-section-title">👑 Títulos Ostentados</div>
           <div class="livro-badges">${titulosHtml}</div>
         </div>
 
         ${f.socHistoria ? `
         <div class="livro-section">
           <div class="livro-section-title">📜 História</div>
-          <div class="livro-descricao">${f.socHistoria.replace(/\n/g,'<br>')}</div>
+          <div class="livro-descricao" style="white-space:pre-wrap">${f.socHistoria.replace(/\n/g,'<br>')}</div>
         </div>` : ''}
 
         <div class="livro-section">
@@ -3787,14 +4630,14 @@ function abrirPerfilPublico(f) {
               ${listaHTML(linhas(f.socFeitos), 'Nenhum feito registrado.')}
             </div>
             <div class="livro-area-card">
-              <div class="livro-area-title">🌑 Conquistas do Abismo</div>
+              <div class="livro-area-title">🌑 Conquistas das Torres</div>
               ${conquistasHtml}
             </div>
           </div>
         </div>
 
         <div class="livro-section">
-          <div class="livro-section-title">⚔️ Aliados &amp; Rivais</div>
+          <div class="livro-section-title">🤝 Aliados &amp; Rivais</div>
           <div class="livro-2col">
             <div class="livro-area-card">
               <div class="livro-area-title">🤝 Aliados</div>
@@ -3812,37 +4655,353 @@ function abrirPerfilPublico(f) {
           <div class="livro-timeline">${timelineHtml}</div>
         </div>
 
-        <div class="livro-section" id="livro-galeria-section" style="display:none">
-          <div class="livro-section-title">📷 Galeria</div>
-          <div class="livro-galeria" id="livro-galeria-fotos"></div>
+        <!-- 5. GALERIA DO DESPERTO -->
+        <div class="livro-section" id="livro-galeria-section">
+          <div class="livro-section-title with-edit">📷 Galeria do Desperto${ehDono ? `<span class="livro-edit-link" style="flex:none;cursor:default">✎ Gerenciar (clique nas imagens)</span>` : ''}<span style="flex:1;height:1px;background:linear-gradient(to right, var(--livro-section-line, rgba(193,63,63,.4)), transparent);margin-left:.5rem"></span></div>
+          <div class="livro-galeria" id="livro-galeria-fotos"><div class="livro-area-empty" style="grid-column:1/-1">Carregando...</div></div>
         </div>
 
         <div class="livro-footer">
-          ${temaInfo.icon} LIVRO DAS LENDAS • Crônicas do Abismo ${temaInfo.icon}
+          ${temaInfo.icon} LIVRO DOS DESPERTOS • Crônicas das Torres ${temaInfo.icon}
         </div>
       </div>
     </div>`;
 
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-  document.body.appendChild(overlay);
-  _carregarGaleriaLivro(f.user, f.nomePersonagem || f.nome);
+  // overlay já foi appendado no início — apenas carrega galeria
+  _carregarGaleriaLivro(userPerfil, personagemPerfil, ehDono);
+
+  // Guarda contexto do perfil aberto, usado pelos editores/ações
+  window._livroContexto = { user: userPerfil, personagem: personagemPerfil, ehDono, pid, ficha: f };
 }
 
-function _carregarGaleriaLivro(user, personagem) {
+// ─── GALERIA DO DESPERTO — render com slots editáveis para o dono ───
+function _renderGaleriaDesperto(container, fotos, ehDono) {
+  const slots = [];
+  for (let i = 0; i < 5; i++) {
+    const src = fotos[i] || null;
+    if (src) {
+      slots.push(`
+        <div class="livro-galeria-item" data-slot="${i}" onclick="${ehDono ? `abrirAcoesGaleriaDesperto(${i},'${src.replace(/'/g,"\\'")}')` : `abrirLightbox('${src.replace(/'/g,"\\'")}')`}">
+          <img src="${src}" alt="Foto ${i+1}" loading="lazy">
+        </div>`);
+    } else if (ehDono) {
+      slots.push(`<div class="livro-galeria-item livro-galeria-empty" data-slot="${i}" onclick="adicionarFotoGaleriaDesperto(${i})" title="Adicionar imagem">+</div>`);
+    }
+  }
+  if (!slots.length) {
+    container.innerHTML = `<div class="livro-area-empty" style="grid-column:1/-1">Nenhuma imagem na galeria.</div>`;
+    return;
+  }
+  container.innerHTML = slots.join('');
+}
+
+function _carregarGaleriaLivro(user, personagem, ehDono) {
   const container = document.getElementById('livro-galeria-fotos');
-  const section = document.getElementById('livro-galeria-section');
-  if (!container || !section || !window.db || !window.doc || !window.getDoc) return;
+  if (!container) return;
+  if (!window.db || !window.doc || !window.getDoc) {
+    _renderGaleriaDesperto(container, [], ehDono);
+    return;
+  }
   window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(user, personagem))).then(snap => {
-    if (!snap.exists()) return;
-    const gal = (snap.data().galeria || []).filter(Boolean);
-    if (!gal.length) return;
-    section.style.display = '';
-    container.innerHTML = gal.map(src =>
-      `<img src="${src}" alt="foto" onclick="abrirLightbox('${src.replace(/'/g,"\'")}')">`
-    ).join('');
-  }).catch(()=>{});
+    const gal = snap.exists() ? (snap.data().galeria || []) : [];
+    _renderGaleriaDesperto(container, gal, ehDono);
+  }).catch(() => _renderGaleriaDesperto(container, [], ehDono));
 }
 
+// ─── Ações sobre a Galeria do Desperto (dono) ───
+async function adicionarFotoGaleriaDesperto(slot) {
+  const ctx = window._livroContexto;
+  if (!ctx || !ctx.ehDono) return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  input.onchange = async () => {
+    if (!input.files[0]) { input.remove(); return; }
+    const b64 = await imageToBase64(input.files[0]);
+    const dados = await carregarFotosPerfil(ctx.user, ctx.personagem) || {};
+    const galeria = (dados.galeria || []).slice(0, 5);
+    while (galeria.length < 5) galeria.push(null);
+    galeria[slot] = b64;
+    const principal = dados.principal !== undefined ? dados.principal : null;
+    await salvarFotosPerfil(ctx.user, ctx.personagem, principal, galeria);
+    // Sincroniza estado global se for o personagem ativo
+    if (usuarioAtual === ctx.user && personagemAtual === ctx.personagem) {
+      _galeriaFotos = galeria;
+      renderFotoPersonagem();
+    }
+    const container = document.getElementById('livro-galeria-fotos');
+    if (container) _renderGaleriaDesperto(container, galeria, true);
+    input.remove();
+  };
+  document.body.appendChild(input);
+  input.click();
+}
+
+async function removerFotoGaleriaDesperto(slot) {
+  const ctx = window._livroContexto;
+  if (!ctx || !ctx.ehDono) return;
+  const dados = await carregarFotosPerfil(ctx.user, ctx.personagem) || {};
+  const galeria = (dados.galeria || []).slice(0, 5);
+  while (galeria.length < 5) galeria.push(null);
+  galeria[slot] = null;
+  const principal = dados.principal !== undefined ? dados.principal : null;
+  await salvarFotosPerfil(ctx.user, ctx.personagem, principal, galeria);
+  if (usuarioAtual === ctx.user && personagemAtual === ctx.personagem) {
+    _galeriaFotos = galeria;
+    renderFotoPersonagem();
+  }
+  const container = document.getElementById('livro-galeria-fotos');
+  if (container) _renderGaleriaDesperto(container, galeria, true);
+}
+
+function abrirAcoesGaleriaDesperto(slot, src) {
+  const ctx = window._livroContexto;
+  document.getElementById('livro-img-actions')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'livro-img-actions';
+  ov.className = 'livro-img-actions-overlay';
+  ov.innerHTML = `
+    <div class="livro-img-actions-modal">
+      <div class="livro-img-actions-title">Imagem ${slot+1} — Galeria do Desperto</div>
+      <img class="livro-img-actions-preview" src="${src}" alt="">
+      <div class="livro-img-actions-list">
+        <button class="primary" onclick="document.getElementById('livro-img-actions').remove();adicionarFotoGaleriaDesperto(${slot})">🔄 Trocar Imagem</button>
+        <button class="secondary" onclick="abrirLightbox('${src.replace(/'/g,"\\'")}')">⤢ Ampliar</button>
+        <button class="danger" onclick="document.getElementById('livro-img-actions').remove();removerFotoGaleriaDesperto(${slot})">✕ Remover Imagem</button>
+        <button class="cancel" onclick="document.getElementById('livro-img-actions').remove()">Cancelar</button>
+      </div>
+    </div>`;
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
+// ─── BANNER PERSONALIZADO — Adicionar / Trocar / Remover ───
+async function abrirAcoesBanner() {
+  const ctx = window._livroContexto;
+  if (!ctx || !ctx.ehDono) return;
+  const pid = ctx.pid;
+  const p = _personalizacoes[pid] || {};
+  const bannerAtual = p.bannerUrl || '';
+
+  document.getElementById('livro-img-actions')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'livro-img-actions';
+  ov.className = 'livro-img-actions-overlay';
+  ov.innerHTML = `
+    <div class="livro-img-actions-modal">
+      <div class="livro-img-actions-title">Banner do Perfil</div>
+      ${bannerAtual ? `<img class="livro-img-actions-preview" src="${bannerAtual}" alt="">` : ''}
+      <div class="livro-img-actions-list">
+        <button class="primary" onclick="document.getElementById('livro-img-actions').remove();selecionarArquivoBanner()">🖼 ${bannerAtual ? 'Trocar Banner' : 'Adicionar Banner'}</button>
+        ${bannerAtual ? `<button class="danger" onclick="document.getElementById('livro-img-actions').remove();removerBanner()">✕ Remover Banner</button>` : ''}
+        <button class="cancel" onclick="document.getElementById('livro-img-actions').remove()">Cancelar</button>
+      </div>
+    </div>`;
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
+function selecionarArquivoBanner() {
+  const ctx = window._livroContexto;
+  if (!ctx || !ctx.ehDono) return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  input.onchange = async () => {
+    if (!input.files[0]) { input.remove(); return; }
+    const b64 = await imageToBase64Banner(input.files[0]);
+    await salvarBannerPerfil(ctx.user, ctx.personagem, b64);
+    input.remove();
+    if (document.getElementById('livro-overlay')) {
+      const f = window._livroContexto.ficha;
+      abrirPerfilPublico(f);
+    }
+  };
+  document.body.appendChild(input);
+  input.click();
+}
+
+async function removerBanner() {
+  const ctx = window._livroContexto;
+  if (!ctx || !ctx.ehDono) return;
+  await salvarBannerPerfil(ctx.user, ctx.personagem, '');
+  if (document.getElementById('livro-overlay')) {
+    const f = window._livroContexto.ficha;
+    abrirPerfilPublico(f);
+  }
+}
+
+// Banner permite imagens maiores (até 1600px no lado maior)
+function imageToBase64Banner(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => resolve(reader.result);
+      img.onload = () => {
+        const MAX = 1600;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          if (width >= height) { height = Math.round(height * (MAX / width)); width = MAX; }
+          else { width = Math.round(width * (MAX / height)); height = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        try { resolve(canvas.toDataURL('image/jpeg', 0.82)); }
+        catch (e) { resolve(reader.result); }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function salvarBannerPerfil(user, personagem, bannerUrl) {
+  const pid = _fsDocId(user, personagem);
+  const old = _personalizacoes[pid] || {};
+  const dados = { ...old, bannerUrl: bannerUrl || '', user, personagem, ts: Date.now() };
+  if (!dados.tema) dados.tema = 'sangue';
+  _personalizacoes[pid] = dados;
+  if (window.db && window.doc && window.setDoc) {
+    try {
+      await window.setDoc(window.doc(window.db, 'personalizacoes', pid), dados);
+      console.log('[Banner] Salvo:', pid);
+    } catch(e) { console.warn('[Banner] Erro ao salvar:', e); }
+  }
+  if (_lendasFichas.length) renderizarCartoes(_lendasFichas, _abaAtual);
+}
+
+// ─── EDITOR DO PERFIL PÚBLICO ───
+// Edita: GIF do Poder, Nome do Poder, Alcunha, Descrição Pública, Frase Marcante
+function abrirEditorPerfilPublico() {
+  const ctx = window._livroContexto;
+  if (!ctx || !ctx.ehDono) return;
+  const pid = ctx.pid;
+  const p = _personalizacoes[pid] || {};
+  const f = ctx.ficha;
+
+  document.getElementById('livro-edit-overlay')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'livro-edit-overlay';
+  ov.className = 'livro-edit-overlay';
+  ov.innerHTML = `
+    <div class="livro-edit-modal">
+      <div class="livro-edit-header">✎ Editar Perfil Público</div>
+      <div class="livro-edit-body">
+        <div class="livro-edit-field">
+          <label>Alcunha</label>
+          <input type="text" id="lep-alcunha" value="${(f.alcunha||'').replace(/"/g,'&quot;')}" placeholder="Ex: O Devorador de Estrelas">
+        </div>
+        <div class="livro-edit-field">
+          <label>Nome do Poder Principal</label>
+          <input type="text" id="lep-poder-nome" value="${(f.poder && f.poder !== '—' ? f.poder : '').replace(/"/g,'&quot;')}" placeholder="Ex: Susanoo">
+        </div>
+        <div class="livro-edit-field">
+          <label>GIF do Poder Principal (URL)</label>
+          <input type="text" id="lep-gif-poder" value="${(p.gifPoder||'').replace(/"/g,'&quot;')}" placeholder="https://...">
+        </div>
+        <div class="livro-edit-field">
+          <label>Frase Marcante</label>
+          <textarea id="lep-frase" rows="2" placeholder="Uma frase que define seu personagem...">${f.frase||''}</textarea>
+        </div>
+        <div class="livro-edit-field">
+          <label>Descrição Pública</label>
+          <textarea id="lep-descricao" rows="4" placeholder="Conte a história do seu personagem...">${f.descricaoPublica||''}</textarea>
+        </div>
+        <div class="livro-edit-actions">
+          <button class="livro-edit-btn-cancel" onclick="document.getElementById('livro-edit-overlay').remove()">Cancelar</button>
+          <button class="livro-edit-btn-save" onclick="salvarEditorPerfilPublico()">✓ Salvar</button>
+        </div>
+      </div>
+    </div>`;
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
+async function salvarEditorPerfilPublico() {
+  const ctx = window._livroContexto;
+  if (!ctx || !ctx.ehDono) return;
+
+  const alcunha   = document.getElementById('lep-alcunha')?.value?.trim() || '';
+  const poderNome = document.getElementById('lep-poder-nome')?.value?.trim() || '';
+  const gifPoder  = document.getElementById('lep-gif-poder')?.value?.trim() || '';
+  const frase     = document.getElementById('lep-frase')?.value?.trim() || '';
+  const descricao = document.getElementById('lep-descricao')?.value?.trim() || '';
+
+  // Atualiza personalização (GIF do poder)
+  const pid = ctx.pid;
+  const oldP = _personalizacoes[pid] || {};
+  const novaPersonalizacao = { ...oldP, gifPoder, user: ctx.user, personagem: ctx.personagem, ts: Date.now() };
+  if (!novaPersonalizacao.tema) novaPersonalizacao.tema = 'sangue';
+  _personalizacoes[pid] = novaPersonalizacao;
+
+  // Atualiza ficha local (campos refletidos na ficha do personagem)
+  if (usuarioAtual === ctx.user && personagemAtual === ctx.personagem) {
+    const elAlcunha = document.getElementById('f-alcunha');
+    if (elAlcunha) elAlcunha.value = alcunha;
+    const elPoderNome = document.getElementById('f-poder-nome');
+    if (elPoderNome) elPoderNome.value = poderNome;
+    const elPPrincipal = document.getElementById('p-principal');
+    if (elPPrincipal) elPPrincipal.value = poderNome;
+    const elFrase = document.getElementById('f-frase');
+    if (elFrase) elFrase.value = frase;
+    const elDescricao = document.getElementById('f-descricao-publica');
+    if (elDescricao) elDescricao.value = descricao;
+    salvarLocal();
+    if (typeof salvarFichaFirestore === 'function') await salvarFichaFirestore();
+  }
+
+  // Salva personalização (GIF do poder) na nuvem
+  if (window.db && window.doc && window.setDoc) {
+    try { await window.setDoc(window.doc(window.db, 'personalizacoes', pid), novaPersonalizacao); }
+    catch(e) { console.warn('[Editor Perfil] Erro ao salvar personalização:', e); }
+
+    // Garante atualização do grimorioPublico mesmo se a ficha não estiver carregada localmente
+    try {
+      const docId = pid;
+      const snap = await window.getDoc(window.doc(window.db, 'grimorioPublico', docId));
+      const atual = snap.exists() ? snap.data() : {};
+      await window.setDoc(window.doc(window.db, 'grimorioPublico', docId), {
+        ...atual,
+        user: ctx.user, personagem: ctx.personagem,
+        frase, descricaoPublica: descricao, ts: Date.now(),
+      });
+      // Também reflete alcunha/poder no rankingGlobal (campos leves)
+      const snapR = await window.getDoc(window.doc(window.db, 'rankingGlobal', docId));
+      if (snapR.exists()) {
+        const atualR = snapR.data();
+        await window.setDoc(window.doc(window.db, 'rankingGlobal', docId), {
+          ...atualR, alcunha, poder: poderNome || '—',
+        });
+      }
+    } catch(e) { console.warn('[Editor Perfil] Erro ao sincronizar grimório:', e); }
+  }
+
+  // Atualiza objeto da ficha exibida e re-renderiza o perfil
+  ctx.ficha = { ...ctx.ficha, alcunha, poder: poderNome || '—', frase, descricaoPublica: descricao };
+  document.getElementById('livro-edit-overlay')?.remove();
+  invalidarCacheRanking();
+  abrirPerfilPublico(ctx.ficha);
+}
+
+// ─── LIGHTBOX — ampliação de imagens (avatar, banner, galeria, GIFs) ───
+function abrirLightbox(src) {
+  if (!src) return;
+  document.getElementById('foto-lightbox')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'foto-lightbox';
+  ov.className = 'foto-lightbox-overlay';
+  ov.onclick = () => ov.remove();
+  ov.innerHTML = `
+    <button class="foto-lightbox-close" onclick="event.stopPropagation();document.getElementById('foto-lightbox').remove()">✕</button>
+    <img src="${src}" alt="Imagem ampliada">`;
+  document.body.appendChild(ov);
+}
 // ═══ PERSONALIZAÇÃO DO PERFIL ═══
 function abrirPersonalizacao() {
   if (!usuarioAtual || !personagemAtual) {
@@ -4133,17 +5292,24 @@ async function abrirSeletorFotoPrincipal() {
   input.type = 'file';
   input.accept = 'image/*';
   input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  // Captura user e personagem AGORA — evita race condition se o usuário
+  // trocar de personagem enquanto o seletor de arquivo está aberto.
+  const userSnap = usuarioAtual;
+  const personagemSnap = personagemAtual;
   input.onchange = async () => {
     if (!input.files[0]) { input.remove(); return; }
-    if (!usuarioAtual || !personagemAtual) { alert('Nenhum personagem ativo. Ative um personagem antes de salvar a foto.'); input.remove(); return; }
+    if (!userSnap || !personagemSnap) { alert('Nenhum personagem ativo. Ative um personagem antes de salvar a foto.'); input.remove(); return; }
     const b64 = await imageToBase64(input.files[0]);
-    _fotoPrincipal = b64;
-    renderFotoPersonagem();
-    atualizarFichaHero();
-    await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
+    // Só atualiza o estado global se ainda estamos no mesmo personagem
+    if (usuarioAtual === userSnap && personagemAtual === personagemSnap) {
+      _fotoPrincipal = b64;
+      renderFotoPersonagem();
+      atualizarFichaHero();
+    }
+    await salvarFotosPerfil(userSnap, personagemSnap, b64, _galeriaFotos);
     // Atualiza cache da sidebar
-    const fotoKey = '_sbfoto_' + usuarioAtual + '_' + personagemAtual;
-    sessionStorage.setItem(fotoKey, _fotoPrincipal);
+    const fotoKey = '_sbfoto_' + userSnap + '_' + personagemSnap;
+    sessionStorage.setItem(fotoKey, b64);
     renderizarPersonagensNaSidebar();
     input.remove();
   };
@@ -4156,13 +5322,25 @@ async function adicionarFotoGaleria(slot) {
   input.type = 'file';
   input.accept = 'image/*';
   input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  // Captura user e personagem AGORA
+  const userSnap = usuarioAtual;
+  const personagemSnap = personagemAtual;
   input.onchange = async () => {
     if (!input.files[0]) { input.remove(); return; }
     const b64 = await imageToBase64(input.files[0]);
-    _galeriaFotos[slot] = b64;
-    renderFotoPersonagem();
-    atualizarFichaHero();
-    await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
+    // Só atualiza o estado global se ainda estamos no mesmo personagem
+    if (usuarioAtual === userSnap && personagemAtual === personagemSnap) {
+      _galeriaFotos[slot] = b64;
+      renderFotoPersonagem();
+      atualizarFichaHero();
+      await salvarFotosPerfil(userSnap, personagemSnap, _fotoPrincipal, _galeriaFotos);
+    } else {
+      // Personagem trocado: salva apenas a galeria do personagem correto
+      // sem alterar o estado global atual
+      const galeriaCorreta = [..._galeriaFotos];
+      galeriaCorreta[slot] = b64;
+      await salvarFotosPerfil(userSnap, personagemSnap, null, galeriaCorreta);
+    }
     input.remove();
   };
   document.body.appendChild(input);
@@ -4176,13 +5354,8 @@ async function removerFotoGaleria(slot) {
   await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
 }
 
-function abrirLightbox(src) {
-  const ov = document.createElement('div');
-  ov.className = 'foto-lightbox-overlay';
-  ov.onclick = () => ov.remove();
-  ov.innerHTML = `<img src="${src}" alt="Foto ampliada">`;
-  document.body.appendChild(ov);
-}
+// abrirLightbox — definido junto ao novo Perfil Público (Livro dos Despertos)
+
 
 // Abre painel de ações ao clicar em uma miniatura com foto
 function abrirAcoesMiniatura(slot, src) {
@@ -4329,9 +5502,12 @@ async function inicializarFotos() {
   }
 }
 
-// ─── SEÇÕES EXPANSÍVEIS (Poder / Lore) ───
-// Mesma lógica para ambas as seções: clique alterna abrir/fechar, sem modal/popup.
-let _fichaExpandidos = { poder: false, lore: false };
+// ─── SEÇÕES EXPANSÍVEIS (todas as seções da ficha) ───
+// Clique alterna abrir/fechar. Seções listadas abaixo são controláveis.
+const _SECOES_EXPAND = ['poder','lore','grimorio','aparencia','recursos','armas','inventario','pets','pericias'];
+let _fichaExpandidos = {};
+// Inicializa todas como fechadas (exceto poder/lore que mantêm comportamento original)
+_SECOES_EXPAND.forEach(s => _fichaExpandidos[s] = false);
 
 function toggleFichaExpand(secao) {
   _fichaExpandidos[secao] = !_fichaExpandidos[secao];
@@ -4339,7 +5515,7 @@ function toggleFichaExpand(secao) {
 }
 
 function _aplicarEstadoFichaExpand() {
-  ['poder','lore'].forEach(secao => {
+  _SECOES_EXPAND.forEach(secao => {
     const area = document.getElementById(`area-${secao}`);
     const seta = document.getElementById(`seta-${secao}`);
     if (!area || !seta) return;
@@ -4351,7 +5527,7 @@ function _aplicarEstadoFichaExpand() {
   _atualizarResumosFichaExpand();
 }
 
-// Atualiza os resumos exibidos ao lado de "Poder" e "Lore" quando fechados
+// Atualiza resumos nas barras recolhidas
 function _atualizarResumosFichaExpand() {
   const resumoPoder = document.getElementById('resumo-poder');
   if (resumoPoder) {
@@ -4363,6 +5539,43 @@ function _atualizarResumosFichaExpand() {
     const historia = document.getElementById('r-historia')?.value || '';
     const resumo = historia.replace(/\s+/g,' ').trim();
     resumoLore.textContent = resumo ? (resumo.length > 60 ? resumo.slice(0,60) + '…' : resumo) : '—';
+  }
+  const resumoGrimorio = document.getElementById('resumo-grimorio');
+  if (resumoGrimorio) {
+    const feitos = document.getElementById('soc-feitos')?.value || '';
+    const titulos = document.getElementById('soc-titulos')?.value || '';
+    resumoGrimorio.textContent = titulos || feitos.split('\n')[0] || '—';
+  }
+  const resumoAparencia = document.getElementById('resumo-aparencia');
+  if (resumoAparencia) {
+    const ap = document.getElementById('f-aparencia')?.value || '';
+    resumoAparencia.textContent = ap ? (ap.length > 50 ? ap.slice(0,50)+'…' : ap) : '—';
+  }
+  const resumoRecursos = document.getElementById('resumo-recursos');
+  if (resumoRecursos) {
+    const pv = document.getElementById('r-pv')?.textContent || '0';
+    const pvA = document.getElementById('pv-atual-display')?.textContent || pv;
+    resumoRecursos.textContent = `PV ${pvA}/${pv}`;
+  }
+  const resumoArmas = document.getElementById('resumo-armas');
+  if (resumoArmas) {
+    const primeiraArma = document.getElementById('arm1-nome')?.value || '';
+    resumoArmas.textContent = primeiraArma || '—';
+  }
+  const resumoInventario = document.getElementById('resumo-inventario');
+  if (resumoInventario) {
+    const esps = document.getElementById('inv-espiritos')?.value || '';
+    resumoInventario.textContent = esps ? `${esps} espíritos` : '—';
+  }
+  const resumoPets = document.getElementById('resumo-pets');
+  if (resumoPets) {
+    const petNome = document.getElementById('pet-nome')?.value || '';
+    resumoPets.textContent = petNome || '—';
+  }
+  const resumoPericias = document.getElementById('resumo-pericias');
+  if (resumoPericias) {
+    const mt = document.getElementById('f-mt')?.value || '0';
+    resumoPericias.textContent = `${mt} maestrias`;
   }
 }
 
@@ -5012,15 +6225,24 @@ function getFormulas() {
   const merged = { ...def, ...saved };
 
   // ─── Auto-correção: fórmula de PE corrompida ───
-  // A fórmula de PE NUNCA deve depender de pvBase/staBase — esse padrão
-  // (ex: "floor((pvBase/2)/staBase) + bonusPE") pertence ao cálculo do
-  // CUSTO de cada Ponto de Energia, e foi salva por engano no campo de PE
-  // através do editor de fórmulas. Como pvBase ≈ staBase, essa expressão
-  // resulta em floor(0.5) = 0, fazendo PE Máx = 0 + bonusPE sempre.
-  if (typeof merged.pe === 'string' && /\bpvBase\b|\bstaBase\b/.test(merged.pe)) {
-    console.warn('[Fórmulas] PE inválido detectado (depende de pvBase/staBase), restaurando padrão. Valor anterior:', merged.pe);
+  // Detecta fórmulas claramente erradas:
+  // 1. Dependem de pvBase/staBase (pertencem ao custo, não ao PE máx)
+  // 2. Produzem resultado ≤ 0 com atributos padrão (Alma=10, Int=10, Nível=1)
+  const peCorrupto = (() => {
+    if (typeof merged.pe !== 'string') return true;
+    if (/\bpvBase\b|\bstaBase\b/.test(merged.pe)) return true;
+    // Testa com valores mínimos realistas
+    try {
+      const testCtx = { nivel:1, modAlma:0, modIntelecto:0, floor:Math.floor, ceil:Math.ceil, round:Math.round, bonusPE:0 };
+      const resultado = avaliarFormula(merged.pe, testCtx);
+      if (typeof resultado !== 'number' || isNaN(resultado) || resultado < 0) return true;
+    } catch(e) { return true; }
+    return false;
+  })();
+  if (peCorrupto) {
+    console.warn('[Fórmulas] PE inválido detectado, restaurando padrão. Valor anterior:', merged.pe);
     merged.pe = def.pe;
-    salvarFormulas(merged); // persiste a correção localmente e na nuvem (config/formulas)
+    salvarFormulas(merged);
   }
 
   return merged;
@@ -5062,8 +6284,16 @@ async function carregarFormulasDaNuvem() {
     const snap = await window.getDoc(window.doc(window.db, 'config', 'formulas'));
     if (snap.exists()) {
       const f = JSON.parse(snap.data().dados);
+      // Protege PE: se a fórmula na nuvem depende de pvBase/staBase ou está corrompida, restaura o padrão
+      const peDefault = '(floor(nivel / 2) + 2) * (modAlma + modIntelecto)';
+      if (typeof f.pe === 'string' && (/\bpvBase\b|\bstaBase\b/.test(f.pe))) {
+        console.warn('[Firestore] Fórmula de PE corrompida na nuvem, usando padrão. Nuvem tinha:', f.pe);
+        f.pe = peDefault;
+      }
       localStorage.setItem('tp_formulas', JSON.stringify(f));
       console.log('[Firestore] Fórmulas carregadas da nuvem.');
+      // Recalcula se a ficha estiver aberta
+      if (document.getElementById('a-for')) calcTudo();
     }
   } catch(e) { console.warn('[Firestore] Erro ao carregar fórmulas:', e); }
 }
@@ -5230,10 +6460,12 @@ function calcTudo() {
   set('r-init',    fmtMod(Math.round(avaliarFormula(f['init'], ctx))));
   set('r-maestria', '+' + Math.round(maestria));
 
-  // ── Custo de cada Ponto de Energia: INT((STA máx ÷ 2) ÷ PE máx) ──
+  // ── Custo de cada Ponto de Energia: INT(STA máx ÷ PE máx) ──
+  // Fórmula correta: Custo = ARRED.PARA.BAIXO(STA_Max ÷ PE_Max)
+  // Exemplo: 60 STA, 10 PE → Custo = floor(60 / 10) = 6 STA por PE
   const staMaxTotal = staBase + bonusSTA;
   const peMaxTotal  = parseInt(document.getElementById('r-pe')?.textContent) || 0;
-  const peCusto = peMaxTotal > 0 ? Math.floor((staMaxTotal / 2) / peMaxTotal) : 0;
+  const peCusto = peMaxTotal > 0 ? Math.floor(staMaxTotal / peMaxTotal) : 0;
   const peCustoEl = document.getElementById('pe-custo');
   if (peCustoEl) peCustoEl.value = peCusto;
 
@@ -5430,7 +6662,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
     <div class="table-wrapper"><table>
       <thead><tr><th style="min-width:160px">Nome da Passiva</th><th>Descrição / Efeito</th></tr></thead>
       <tbody id="passivas-tbody">
-        ${[1,2,3,4].map(n=>`<tr>
+        ${[1].map(n=>`<tr>
           <td data-label="Nome da Passiva"><input type="text" id="pass${n}-nome" style="min-width:140px" placeholder="Nome..." oninput="salvarLocal()"></td>
           <td data-label="Descrição / Efeito"><textarea id="pass${n}-desc" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
         </tr>`).join('')}
@@ -5448,7 +6680,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
     <div class="table-wrapper"><table>
       <thead><tr><th style="min-width:160px">Nome do Despertar</th><th>Condição / Gatilho</th><th>Efeito</th></tr></thead>
       <tbody id="despertares-tbody">
-        ${[1,2,3].map(n=>`<tr>
+        ${[1].map(n=>`<tr>
           <td data-label="Nome do Despertar"><input type="text" id="desp${n}-nome" placeholder="Nome..." oninput="salvarLocal()"></td>
           <td data-label="Condição / Gatilho"><input type="text" id="desp${n}-cond" placeholder="Gatilho..." oninput="salvarLocal()"></td>
           <td data-label="Efeito"><textarea id="desp${n}-efei" style="min-height:44px" placeholder="Efeito..." oninput="salvarLocal()"></textarea></td>
@@ -5513,9 +6745,11 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
 
 <!-- GRIMÓRIO DOS DESPERTOS — SISTEMA SOCIAL (PERFIL PÚBLICO) -->
 <div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem;border-top:3px solid rgba(100,60,150,.6)!important">
-  <div class="ficha-panel-title" style="color:#b090e0;border-bottom-color:rgba(100,60,150,.2)">
-    📖 Grimório dos Despertos — Perfil Público
+  <div class="ficha-panel-title ficha-expand-toggle" onclick="toggleFichaExpand('grimorio')" id="toggle-grimorio" style="color:#b090e0;border-bottom-color:rgba(100,60,150,.2)">
+    <span class="ficha-expand-seta" id="seta-grimorio">▶</span> 📖 Grimório dos Despertos — Perfil Público
+    <span class="ficha-expand-resumo" id="resumo-grimorio"></span>
   </div>
+  <div class="ficha-expand-area" id="area-grimorio">
   <div class="ficha-panel-body">
     <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem">Estas informações ficam visíveis a todos no Ranking. Preencha para enriquecer seu perfil público.</p>
 
@@ -5566,11 +6800,16 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       ${fieldGroup('Eventos da Linha do Tempo','soc-timeline','textarea')}
     </div>
   </div>
+  </div>
 </div>
 
 <!-- APARÊNCIA — após Lore, acima dos recursos -->
 <div class="ficha-panel ficha-full-row" style="margin-bottom:.75rem">
-  <div class="ficha-panel-title">◆ Aparência</div>
+  <div class="ficha-panel-title ficha-expand-toggle" onclick="toggleFichaExpand('aparencia')" id="toggle-aparencia">
+    <span class="ficha-expand-seta" id="seta-aparencia">▶</span> ◆ Aparência
+    <span class="ficha-expand-resumo" id="resumo-aparencia"></span>
+  </div>
+  <div class="ficha-expand-area" id="area-aparencia">
   <div class="ficha-panel-body">
     <div class="field-row cols-4" style="margin-bottom:.75rem">
       ${fieldGroup('Cabelos','f-cabelos')}
@@ -5579,6 +6818,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       ${fieldGroup('Roupas & Acessórios','f-roupas')}
     </div>
     ${fieldGroup('Aparência','f-aparencia','textarea')}
+  </div>
   </div>
 </div>
 
@@ -5590,7 +6830,11 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
 
     <!-- RECURSOS DE COMBATE — compactos -->
     <div class="ficha-panel">
-      <div class="ficha-panel-title">◆ Recursos de Combate</div>
+      <div class="ficha-panel-title ficha-expand-toggle" onclick="toggleFichaExpand('recursos')" id="toggle-recursos">
+        <span class="ficha-expand-seta" id="seta-recursos">▶</span> ◆ Recursos de Combate
+        <span class="ficha-expand-resumo" id="resumo-recursos"></span>
+      </div>
+      <div class="ficha-expand-area" id="area-recursos">
       <div class="ficha-panel-body" style="padding:1rem 1.2rem">
 
         <!-- PV / STA / PE — três colunas compactas -->
@@ -5653,7 +6897,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           <!-- PE -->
           <div style="background:linear-gradient(160deg,#161220,#0e0c14);border:1px solid rgba(50,40,65,.5);border-top:2px solid rgba(180,140,30,.7);padding:.75rem .6rem">
             <div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem">
-              PE <span class="info-btn" style="font-size:.65rem">ⓘ<span class="tooltip">Máx = (⌊nível÷2⌋ + 2) × (modAlma + modIntelecto). Custo de cada PE = INT((STA máx ÷ 2) ÷ PE máx). Atual = Máx − (Gasto × Custo)</span></span>
+              PE <span class="info-btn" style="font-size:.65rem">ⓘ<span class="tooltip">Máx = (⌊nível÷2⌋ + 2) × (modAlma + modIntelecto). Custo de cada PE = ⌊STA máx ÷ PE máx⌋. Atual = Máx − (Gasto × Custo)</span></span>
             </div>
             <div style="text-align:center;font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold-light);line-height:1;margin-bottom:.3rem" id="r-pe">0</div>
             <div style="font-size:.58rem;color:#555;text-align:center;margin-bottom:.5rem">máximo</div>
@@ -5667,8 +6911,8 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
                 <input type="number" id="pe-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pe');salvarLocal()">
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
-                <span style="font-size:.6rem;color:var(--gold);white-space:nowrap" title="INT((STA máx ÷ 2) ÷ PE máx)">Custo</span>
-                <input type="number" id="pe-custo" value="0" readonly style="width:44px;background:var(--bg-input);border:1px solid rgba(180,140,30,.3);color:var(--gold);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" title="Custo de cada Ponto de Energia = INT((STA máx ÷ 2) ÷ PE máx) — calculado automaticamente">
+                <span style="font-size:.6rem;color:var(--gold);white-space:nowrap" title="⌊STA máx ÷ PE máx⌋">Custo</span>
+                <input type="number" id="pe-custo" value="0" readonly style="width:44px;background:var(--bg-input);border:1px solid rgba(180,140,30,.3);color:var(--gold);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" title="Custo de cada Ponto de Energia = ⌊STA máx ÷ PE máx⌋ — calculado automaticamente">
               </div>
               <div style="border-top:1px solid var(--border);padding-top:.3rem;text-align:center">
                 <div style="font-size:.55rem;color:var(--gold-light);letter-spacing:1px;margin-bottom:.1rem">ATUAL</div>
@@ -5721,6 +6965,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           </div>
         </div>
       </div>
+      </div>
     </div>
 
   </div><!-- /ficha-col-left -->
@@ -5730,20 +6975,25 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
 
     <!-- ARMAS -->
     <div class="ficha-panel">
-      <div class="ficha-panel-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>◆ Armas</span>
-        <div style="display:flex;gap:.4rem">
+      <div class="ficha-panel-title ficha-expand-toggle" onclick="toggleFichaExpand('armas')" id="toggle-armas" style="display:flex;align-items:center;justify-content:space-between">
+        <span style="display:flex;align-items:center;gap:.6rem;flex:1">
+          <span class="ficha-expand-seta" id="seta-armas">▶</span> ◆ Armas
+          <span class="ficha-expand-resumo" id="resumo-armas"></span>
+        </span>
+        <div style="display:flex;gap:.4rem" onclick="event.stopPropagation()">
           <button onclick="addArmaRow()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.2rem .65rem;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:.5px" onmouseover="this.style.borderColor='var(--accent-light)';this.style.color='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">+ Slot</button>
           <button onclick="removeArmaRow()" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.2rem .65rem;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
         </div>
       </div>
+      <div class="ficha-expand-area" id="area-armas">
       <div class="ficha-panel-body">
         <div class="table-wrapper"><table>
           <thead><tr><th style="min-width:120px">Nome</th><th>Bônus Atq.</th><th>Dano</th><th>Crítico</th><th>Tipo</th><th>Alcance</th><th>Notas</th><th style="width:28px"></th></tr></thead>
           <tbody id="armas-tbody">
-            ${[1,2,3].map(n=>`<tr id="arma-row-${n}"><td data-label="Nome"><input type="text" id="arm${n}-nome" style="min-width:110px" oninput="salvarLocal()"></td><td data-label="Bônus Atq."><input type="text" id="arm${n}-bat" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Dano"><input type="text" id="arm${n}-dano" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Crítico"><input type="text" id="arm${n}-crit" style="min-width:50px" oninput="salvarLocal()"></td><td data-label="Tipo"><input type="text" id="arm${n}-tipo" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Alcance"><input type="text" id="arm${n}-alc" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Notas"><input type="text" id="arm${n}-obs" oninput="salvarLocal()"></td><td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td></tr>`).join('')}
+            ${[1].map(n=>`<tr id="arma-row-${n}"><td data-label="Nome"><input type="text" id="arm${n}-nome" style="min-width:110px" oninput="salvarLocal()"></td><td data-label="Bônus Atq."><input type="text" id="arm${n}-bat" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Dano"><input type="text" id="arm${n}-dano" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Crítico"><input type="text" id="arm${n}-crit" style="min-width:50px" oninput="salvarLocal()"></td><td data-label="Tipo"><input type="text" id="arm${n}-tipo" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Alcance"><input type="text" id="arm${n}-alc" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Notas"><input type="text" id="arm${n}-obs" oninput="salvarLocal()"></td><td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td></tr>`).join('')}
           </tbody>
         </table></div>
+      </div>
       </div>
     </div>
 
@@ -5753,15 +7003,24 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
 
   <!-- PERÍCIAS — abaixo dos recursos e armas, largura total -->
   <div class="ficha-panel ficha-full-row" style="margin-bottom:1rem">
-    <div class="ficha-panel-title">◆ Perícias</div>
+    <div class="ficha-panel-title ficha-expand-toggle" onclick="toggleFichaExpand('pericias')" id="toggle-pericias">
+      <span class="ficha-expand-seta" id="seta-pericias">▶</span> ◆ Perícias
+      <span class="ficha-expand-resumo" id="resumo-pericias"></span>
+    </div>
+    <div class="ficha-expand-area" id="area-pericias">
     <div class="ficha-panel-body" id="pericias-panel-body">
       <!-- gerado por buildPericias() -->
+    </div>
     </div>
   </div>
 
   <!-- INVENTÁRIO -->
   <div class="ficha-panel ficha-full-row">
-    <div class="ficha-panel-title">◆ Inventário</div>
+    <div class="ficha-panel-title ficha-expand-toggle" onclick="toggleFichaExpand('inventario')" id="toggle-inventario">
+      <span class="ficha-expand-seta" id="seta-inventario">▶</span> ◆ Inventário
+      <span class="ficha-expand-resumo" id="resumo-inventario"></span>
+    </div>
+    <div class="ficha-expand-area" id="area-inventario">
     <div class="ficha-panel-body">
       <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap">
         <span style="font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-light)">Espíritos:</span>
@@ -5779,7 +7038,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       <div class="table-wrapper"><table>
         <thead><tr><th style="min-width:200px">Nome do Item</th><th>Qtd.</th><th>Espaços</th><th>Descrição / Efeito</th><th style="width:30px"></th></tr></thead>
         <tbody id="inv-itens-tbody">
-          ${Array.from({length:12},(_,i)=>i+1).map(n=>`<tr id="inv-item-row-${n}">
+          ${[1].map(n=>`<tr id="inv-item-row-${n}">
             <td data-label="Nome do Item"><input type="text" id="item${n}-nome" oninput="salvarLocal()"></td>
             <td data-label="Qtd."><input type="number" id="item${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
             <td data-label="Espaços"><input type="number" id="item${n}-esp" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
@@ -5800,7 +7059,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       <div class="table-wrapper"><table>
         <thead><tr><th style="min-width:180px">Nome</th><th>Qtd.</th><th>Efeito</th><th style="width:30px"></th></tr></thead>
         <tbody id="inv-cons-tbody">
-          ${Array.from({length:6},(_,i)=>i+1).map(n=>`<tr id="inv-cons-row-${n}">
+          ${[1].map(n=>`<tr id="inv-cons-row-${n}">
             <td data-label="Nome"><input type="text" id="cons${n}-nome" oninput="salvarLocal()"></td>
             <td data-label="Qtd."><input type="number" id="cons${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
             <td data-label="Efeito"><input type="text" id="cons${n}-efei" oninput="salvarLocal()"></td>
@@ -5822,7 +7081,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           <div class="table-wrapper"><table>
             <thead><tr><th>Material</th><th>Qtd.</th><th style="width:30px"></th></tr></thead>
             <tbody id="inv-mat-tbody">
-              ${Array.from({length:6},(_,i)=>i+1).map(n=>`<tr>
+              ${[1].map(n=>`<tr>
                 <td data-label="Material"><input type="text" id="mat${n}-nome" oninput="salvarLocal()"></td>
                 <td data-label="Qtd."><input type="number" id="mat${n}-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
                 <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.8rem;padding:.1rem .25rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
@@ -5842,7 +7101,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           <div class="table-wrapper"><table>
             <thead><tr><th>Nome</th><th>Tipo</th><th>Efeito</th><th style="width:30px"></th></tr></thead>
             <tbody id="inv-nuc-tbody">
-              ${Array.from({length:4},(_,i)=>i+1).map(n=>`<tr>
+              ${[1].map(n=>`<tr>
                 <td data-label="Nome"><input type="text" id="nuc${n}-nome" oninput="salvarLocal()"></td>
                 <td data-label="Tipo"><input type="text" id="nuc${n}-tipo" style="width:70px" oninput="salvarLocal()"></td>
                 <td data-label="Efeito"><input type="text" id="nuc${n}-efei" oninput="salvarLocal()"></td>
@@ -5853,11 +7112,16 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         </div>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- PETS -->
   <div class="ficha-panel ficha-full-row">
-    <div class="ficha-panel-title">◆ Pets & Montarias</div>
+    <div class="ficha-panel-title ficha-expand-toggle" onclick="toggleFichaExpand('pets')" id="toggle-pets">
+      <span class="ficha-expand-seta" id="seta-pets">▶</span> ◆ Pets & Montarias
+      <span class="ficha-expand-resumo" id="resumo-pets"></span>
+    </div>
+    <div class="ficha-expand-area" id="area-pets">
     <div class="ficha-panel-body">
       <div id="pets-lista">
         <div class="pet-entry" id="pet-entry-1">
@@ -5881,7 +7145,8 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       </div>
       <button onclick="addPet()" style="margin-top:.75rem;width:100%;padding:.6rem;background:none;border:1px dashed var(--border);color:var(--text-muted);font-family:inherit;font-size:.85rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)';this.style.color='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">+ Adicionar Companheiro</button>
     </div>
-  </div>
+    </div>
+    </div>
 
   <!-- SAVE BAR -->
   <div class="save-bar">
@@ -6092,6 +7357,49 @@ function removerTecnicaEl(btn) {
   if (div) { div.remove(); salvarLocal(); }
 }
 
+// Coleta dinamicamente os IDs de todos os campos de um tbody de inventário
+function _coletarInvFields(tbodyId, prefix, fields) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) {
+    return Array.from({length:20},(_,i)=>i+1).flatMap(n=>fields.map(f=>`${prefix}${n}-${f}`));
+  }
+  const rows = tbody.querySelectorAll('tr');
+  const result = [];
+  rows.forEach(tr => {
+    const firstInput = tr.querySelector('input');
+    if (firstInput) {
+      const match = firstInput.id.match(new RegExp(`^${prefix}(\\d+)-`));
+      if (match) {
+        const n = match[1];
+        fields.forEach(f => result.push(`${prefix}${n}-${f}`));
+      }
+    }
+  });
+  return result;
+}
+
+function _coletarPassivaFields() {
+  const tbody = document.getElementById('passivas-tbody');
+  if (!tbody) return Array.from({length:numPassivas},(_,i)=>i+1).flatMap(n=>['nome','desc'].map(f=>`pass${n}-${f}`));
+  const result = [];
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const inp = tr.querySelector('input[id^="pass"]');
+    if (inp) { const m = inp.id.match(/^pass(\d+)-/); if(m) ['nome','desc'].forEach(f=>result.push(`pass${m[1]}-${f}`)); }
+  });
+  return result;
+}
+
+function _coletarDespFields() {
+  const tbody = document.getElementById('despertares-tbody');
+  if (!tbody) return Array.from({length:numDespertares},(_,i)=>i+1).flatMap(n=>['nome','cond','efei'].map(f=>`desp${n}-${f}`));
+  const result = [];
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const inp = tr.querySelector('input[id^="desp"]');
+    if (inp) { const m = inp.id.match(/^desp(\d+)-/); if(m) ['nome','cond','efei'].forEach(f=>result.push(`desp${m[1]}-${f}`)); }
+  });
+  return result;
+}
+
 // ─── SAVE / LOAD ───
 function getChave(user) {
   return 'ficha_' + (user || usuarioAtual) + '_' + personagemAtual;
@@ -6144,12 +7452,12 @@ function coletarDados() {
   } else {
     [1,2,3,4,5,6].flatMap(n=>['nome','bat','dano','crit','tipo','alc','obs'].map(f=>`arm${n}-${f}`)).forEach(f => armaFields.push(f));
   }
-  const passFields  = Array.from({length:numPassivas},(_,i)=>i+1).flatMap(n=>['nome','desc'].map(f=>`pass${n}-${f}`));
-  const despFields  = Array.from({length:numDespertares},(_,i)=>i+1).flatMap(n=>['nome','cond','efei'].map(f=>`desp${n}-${f}`));
-  const itemFields  = [1,2,3,4,5,6,7,8,9,10,11,12].flatMap(n=>['nome','qtd','esp','desc'].map(f=>`item${n}-${f}`));
-  const consFields  = [1,2,3,4,5,6].flatMap(n=>['nome','qtd','efei'].map(f=>`cons${n}-${f}`));
-  const matFields   = [1,2,3,4,5,6].flatMap(n=>['nome','qtd'].map(f=>`mat${n}-${f}`));
-  const nucFields   = [1,2,3,4].flatMap(n=>['nome','tipo','efei'].map(f=>`nuc${n}-${f}`));
+  const passFields  = _coletarPassivaFields();
+  const despFields  = _coletarDespFields();
+  const itemFields  = _coletarInvFields('inv-itens-tbody','item',['nome','qtd','esp','desc']);
+  const consFields  = _coletarInvFields('inv-cons-tbody','cons',['nome','qtd','efei']);
+  const matFields   = _coletarInvFields('inv-mat-tbody','mat',['nome','qtd']);
+  const nucFields   = _coletarInvFields('inv-nuc-tbody','nuc',['nome','tipo','efei']);
 
   const todos = [...campos,...armaFields,...passFields,...despFields,...itemFields,...consFields,...matFields,...nucFields,...petFields];
   const d = {};
@@ -6203,49 +7511,70 @@ async function salvarFichaFirestore(user, dados) {
     console.log('[Firestore] Ficha salva:', docId);
     // Atualiza coleção rankingGlobal para evitar N×M leituras no ranking
     await updateRankingEntry(user || usuarioAtual, persoNome, dados, _fotoPrincipal || null);
+    invalidarCacheRanking(); // força releitura na próxima abertura do ranking
   } catch(e) {
     console.error('[Firestore] Erro ao salvar ficha:', e);
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// updateRankingEntry — salva APENAS campos do ranking (leve)
+// Chamado sempre que uma ficha é salva.
+// Campos de grimório social vão para grimorioPublico (Camada 3).
+// ═══════════════════════════════════════════════════════════════
 async function updateRankingEntry(user, personagem, dados, foto) {
   if (!window.db || !window.doc || !window.setDoc) return;
+  const docId = _fsDocId(user, personagem);
+
+  const nucleoRaw = dados['f-nucleo'] || '0';
+  const nucleos   = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
+  const nivel     = parseInt(dados['f-nivel'] || '1') || 1;
+
+  // ── Documento leve — apenas campos exibidos no card de ranking ──
+  const rankingDoc = {
+    user,
+    personagem,
+    nome:     dados['f-nome']      || personagem,
+    nivel,
+    poder:    dados['p-principal'] || dados['f-poder-nome'] || '—',
+    nucleos,
+    foto:     foto || null,
+    despertar: dados['f-despertar'] || 'Desperto',
+    score:    nivel * 10 + nucleos,
+    vitorias: parseInt(dados['f-vitorias'] || '0') || 0,
+    status:   'ativo',
+    ts:       Date.now(),
+    alcunha:  dados['f-alcunha']  || '',
+    rank:     dados['f-rank']     || '',
+    faccao:   dados['f-faccao']   || '',
+    cidade:   dados['f-cidade']   || '',
+  };
+
+  // ── Documento de grimório — campos usados apenas no perfil público ──
+  const grimorioDoc = {
+    user,
+    personagem,
+    ts:               Date.now(),
+    frase:            dados['f-frase']             || '',
+    descricaoPublica: dados['f-descricao-publica'] || '',
+    genero:           dados['f-genero']            || '',
+    classe:           dados['f-classe']            || '',
+    socHistoria:      dados['soc-historia']        || '',
+    socFeitos:        dados['soc-feitos']          || '',
+    socConquistas:    dados['soc-conquistas']      || '',
+    socTitulos:       dados['soc-titulos']         || '',
+    socAliados:       dados['soc-aliados']         || '',
+    socRivais:        dados['soc-rivais']          || '',
+    socTimeline:      dados['soc-timeline']        || '',
+  };
+
   try {
-    const docId = _fsDocId(user, personagem);
-    const nucleoRaw = dados['f-nucleo'] || '0';
-    const nucleos = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
-    await window.setDoc(window.doc(window.db, 'rankingGlobal', docId), {
-      user,
-      personagem,
-      nome: dados['f-nome'] || personagem,
-      nivel: parseInt(dados['f-nivel'] || '1') || 1,
-      poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
-      nucleos,
-      foto: foto || null,
-      despertar: dados['f-despertar'] || 'Desperto',
-      score: (parseInt(dados['f-nivel'] || '1') || 1) * 10 + nucleos,
-      vitorias: parseInt(dados['f-vitorias'] || '0') || 0,
-      status: 'ativo',
-      ts: Date.now(),
-      // novos campos de perfil público
-      alcunha: dados['f-alcunha'] || '',
-      classe: dados['f-classe'] || '',
-      rank: dados['f-rank'] || '',
-      faccao: dados['f-faccao'] || '',
-      cidade: dados['f-cidade'] || '',
-      genero: dados['f-genero'] || '',
-      frase: dados['f-frase'] || '',
-      descricaoPublica: dados['f-descricao-publica'] || '',
-      socHistoria: dados['soc-historia'] || '',
-      socFeitos: dados['soc-feitos'] || '',
-      socConquistas: dados['soc-conquistas'] || '',
-      socTitulos: dados['soc-titulos'] || '',
-      socAliados: dados['soc-aliados'] || '',
-      socRivais: dados['soc-rivais'] || '',
-      socTimeline: dados['soc-timeline'] || '',
-    });
+    await Promise.all([
+      window.setDoc(window.doc(window.db, 'rankingGlobal',  docId), rankingDoc),
+      window.setDoc(window.doc(window.db, 'grimorioPublico', docId), grimorioDoc),
+    ]);
   } catch(e) {
-    console.warn('[Ranking] Erro ao atualizar rankingGlobal:', e);
+    console.warn('[Ranking] Erro ao atualizar rankingGlobal/grimorioPublico:', e);
   }
 }
 
@@ -6513,17 +7842,6 @@ function preencherCampos(d) {
     _slotsPericia = { maestrias: [], especializacoes: [] };
   }
 
-  // Restaura passivas extras
-  if(d.numPassivas && d.numPassivas > numPassivas) {
-    const extra = d.numPassivas - numPassivas;
-    for(let i=0;i<extra;i++) addPassiva();
-  }
-  // Restaura despertares extras
-  if(d.numDespertares && d.numDespertares > numDespertares) {
-    const extra = d.numDespertares - numDespertares;
-    for(let i=0;i<extra;i++) addDespertar();
-  }
-
   // Restaura pets extras
   if(d.numPets && d.numPets > numPets) {
     const extra = d.numPets - numPets;
@@ -6558,6 +7876,44 @@ function preencherCampos(d) {
         armasTbody2.appendChild(tr);
       }
     });
+  }
+
+  // Restaura linhas extras de inventário (itens, consumíveis, materiais, núcleos)
+  function _restaurarLinhasInv(tbodyId, prefix, fields, labels) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+    const keyBase = `${prefix}1-${fields[0]}`;
+    // Determina o máximo de linhas salvas
+    const maxN = Object.keys(d).reduce((max, k) => {
+      const m = k.match(new RegExp(`^${prefix}(\\d+)-`));
+      return m ? Math.max(max, parseInt(m[1])) : max;
+    }, 1);
+    const currentRows = tbody.querySelectorAll('tr').length;
+    for (let n = currentRows + 1; n <= maxN; n++) {
+      addInvRow(tbodyId, prefix, fields, labels);
+    }
+  }
+  _restaurarLinhasInv('inv-itens-tbody','item',['nome','qtd','esp','desc'],['Nome do Item','Qtd','Esp','Descrição']);
+  _restaurarLinhasInv('inv-cons-tbody','cons',['nome','qtd','efei'],['Nome','Qtd','Efeito']);
+  _restaurarLinhasInv('inv-mat-tbody','mat',['nome','qtd'],['Material','Qtd']);
+  _restaurarLinhasInv('inv-nuc-tbody','nuc',['nome','tipo','efei'],['Nome','Tipo','Efeito']);
+
+  // Restaura passivas extras se necessário (base inicial agora é 1)
+  const maxPass = Object.keys(d).reduce((max, k) => {
+    const m = k.match(/^pass(\d+)-/); return m ? Math.max(max, parseInt(m[1])) : max;
+  }, 1);
+  if (maxPass > numPassivas) {
+    const extra = maxPass - numPassivas;
+    for (let i = 0; i < extra; i++) addPassiva();
+  }
+
+  // Restaura despertares extras se necessário (base inicial agora é 1)
+  const maxDesp = Object.keys(d).reduce((max, k) => {
+    const m = k.match(/^desp(\d+)-/); return m ? Math.max(max, parseInt(m[1])) : max;
+  }, 1);
+  if (maxDesp > numDespertares) {
+    const extra = maxDesp - numDespertares;
+    for (let i = 0; i < extra; i++) addDespertar();
   }
 
   // Recalcula os displays de "Atual" após preencher todos os campos
@@ -6852,7 +8208,7 @@ function entrarObservador() {
 }
 
 function logout() {
-  if (_rankingInterval) { clearInterval(_rankingInterval); _rankingInterval = null; }
+  destruirListenerRanking(); // cancela onSnapshot e setInterval
   if (_inputListener) { document.removeEventListener('input', _inputListener); _inputListener = null; }
   usuarioAtual=null; roleAtual=null; numTecnicas=0;
   document.getElementById('app').style.display='none';
@@ -7157,10 +8513,49 @@ function filtrarSidebar(termoRaw) {
     setDoc,
     deleteDoc,
     collection,
-    getDocs
+    getDocs,
+    onSnapshot,
+    enableIndexedDbPersistence,
+    query,
+    orderBy,
+    limit
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   console.log("[Firebase] Módulo carregado.");
+
+  /*
+  ═══════════════════════════════════════════════════════════════
+  ESTRUTURA FIRESTORE — LIVRO DAS LENDAS v3 (arquitetura 3 camadas)
+  ═══════════════════════════════════════════════════════════════
+
+  CAMADA 1 — rankingGlobal/{user}_{personagem}  (campos mínimos, leitura única)
+  ├── user, personagem, nome, foto, alcunha
+  ├── nivel, rank, poderPrincipal, faccao, cidade
+  ├── nucleos, score, ts, vitorias, despertar, status
+
+  CAMADA 2 — personalizacoes/{user}_{personagem}  (cache local + nuvem)
+  ├── tema, wallpaper, wallpaperUrl
+  ├── gifPoder, gifTransformacao, gifSuprema
+  ├── ts, user, personagem
+
+  CAMADA 3 — grimorioPublico/{user}_{personagem}  (perfil completo, lazy)
+  ├── user, personagem, frase, descricaoPublica, genero, classe
+  ├── socHistoria, socFeitos, socConquistas, socTitulos
+  ├── socAliados, socRivais, socTimeline
+  └── ts
+
+  COLEÇÃO: fotos/{user}_{personagem}
+  ├── principal: string       — foto principal (base64 comprimido, max 900px)
+  ├── galeria: string[]       — array de até 5 fotos (base64 comprimido)
+  └── ts: number
+
+  FIREBASE STORAGE — Estrutura recomendada para GIFs:
+  gifs/{user}/{personagem}/poder.gif | transformacao.gif | suprema.gif
+
+  NOTA: Nunca salvar GIFs em base64 no Firestore.
+  Usar Firebase Storage e salvar apenas a URL pública.
+  ═══════════════════════════════════════════════════════════════
+  */
 
   const firebaseConfig = {
     apiKey: "AIzaSyARdbLlGtRJkicEGo4R-s2UnXMU-E2UVOQ",
@@ -7172,20 +8567,38 @@ function filtrarSidebar(termoRaw) {
   };
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  const db  = getFirestore(app);
+
+  // ── CACHE OFFLINE (IndexedDB) ──────────────────────────────────────
+  // Habilita persistência local. Ao reabrir o app sem internet,
+  // o Firestore serve os dados do cache. Com internet, sincroniza
+  // apenas o que mudou (delta), reduzindo leituras drasticamente.
+  enableIndexedDbPersistence(db).catch(err => {
+    if (err.code === 'failed-precondition') {
+      // Múltiplas abas abertas — persistência só funciona numa aba por vez.
+      console.warn('[Firestore] Persistência indisponível (múltiplas abas).');
+    } else if (err.code === 'unimplemented') {
+      // Navegador não suporta (raro em 2025).
+      console.warn('[Firestore] Persistência não suportada neste navegador.');
+    }
+  });
 
   // Expõe globalmente para uso no script principal
-  window.db       = db;
-  window.doc      = doc;
-  window.getDoc   = getDoc;
-  window.setDoc   = setDoc;
-  window.deleteDoc = deleteDoc;
-  window.collection = collection;
-  window.getDocs     = getDocs;
+  window.db              = db;
+  window.doc             = doc;
+  window.getDoc          = getDoc;
+  window.setDoc          = setDoc;
+  window.deleteDoc       = deleteDoc;
+  window.collection      = collection;
+  window.getDocs         = getDocs;
+  window.onSnapshot      = onSnapshot;
+  window.query           = query;
+  window.orderBy         = orderBy;
+  window.limit           = limit;
   // AVISO DE SEGURANÇA (P17): estas globais existem por compatibilidade com o código principal.
   // TODO: migrar para Firebase Auth + Security Rules para eliminar a necessidade disso.
 
-  console.log("[Firebase] SDK pronto. db, doc, getDoc, setDoc, deleteDoc, collection, getDocs disponíveis globalmente.");
+  console.log("[Firebase] SDK pronto com cache offline e onSnapshot.");
 </script>
 
 </body></html>
