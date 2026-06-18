@@ -799,6 +799,31 @@ section { padding-top:1rem; }
 .gm-header { background:linear-gradient(135deg,#1a1200,#0c0c0f); border:1px solid var(--gold); padding:1.5rem 2rem; margin-bottom:2rem; position:relative; }
 .gm-header::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(to right,transparent,var(--gold-light),transparent); }
 .gm-title { font-family:'Playfair Display',serif; font-size:1.8rem; color:var(--gold-light); margin-bottom:.3rem; }
+
+/* ── Painel de Visibilidade do Ranking ── */
+.gm-ranking-row {
+  display:flex; align-items:center; justify-content:space-between; gap:1rem;
+  background:var(--bg-surface); border:1px solid var(--border);
+  border-left:3px solid rgba(110,147,232,.4);
+  padding:.75rem 1rem; border-radius:var(--r-sm);
+  transition:background var(--dur), border-color var(--dur);
+}
+.gm-ranking-row:hover { background:var(--bg-elevated); }
+.gm-ranking-row.oculto-row { border-left-color:rgba(193,63,63,.5); opacity:.75; }
+.gm-ranking-row-info { display:flex; flex-direction:column; gap:.15rem; min-width:0; }
+.gm-ranking-row-nome { font-family:'Playfair Display',serif; font-size:1rem; color:var(--silver); font-weight:600; }
+.gm-ranking-row-meta { font-size:.76rem; color:var(--text-muted); }
+.oculto-badge { display:inline-block; font-size:.62rem; letter-spacing:.8px; text-transform:uppercase;
+  color:var(--accent-light); border:1px solid rgba(193,63,63,.35); padding:.1rem .45rem; margin-top:.15rem; background:rgba(156,42,42,.1); border-radius:var(--r-sm); }
+.gm-vis-btn {
+  flex-shrink:0; background:none; border:1px solid var(--border-strong);
+  color:var(--text-muted); padding:.35rem .9rem; cursor:pointer; font-family:inherit; font-size:.8rem;
+  border-radius:var(--r-pill); transition:all var(--dur); display:inline-flex; align-items:center; gap:.3rem;
+  white-space:nowrap;
+}
+.gm-vis-btn:hover { border-color:var(--arcane-light); color:var(--arcane-light); }
+.gm-vis-btn.oculto-ativo { border-color:rgba(193,63,63,.5); color:var(--accent-light); background:rgba(156,42,42,.08); }
+.gm-vis-btn.oculto-ativo:hover { background:rgba(156,42,42,.18); }
 .gm-subtitle { font-size:.8rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
 
 /* tabs GM */
@@ -884,7 +909,44 @@ section { padding-top:1rem; }
   .atributos-grid { grid-template-columns:repeat(2,1fr); }
 }
 
-/* INPUTS NAS TABELAS DE FICHA — bordas visíveis por coluna */
+/* ═══ MODO OBSERVADOR — Ficha em somente leitura ═══ */
+/* Desabilita TODA interação com inputs, textareas, selects e botões de ação */
+#ficha.modo-observador input,
+#ficha.modo-observador textarea,
+#ficha.modo-observador select {
+  pointer-events: none !important;
+  cursor: default !important;
+  user-select: text; /* ainda permite copiar texto */
+}
+#ficha.modo-observador input[type="number"] { -moz-appearance: textfield; }
+#ficha.modo-observador input:focus,
+#ficha.modo-observador textarea:focus,
+#ficha.modo-observador select:focus { outline: none !important; box-shadow: none !important; }
+/* Oculta todos os botões de ação (preserva os toggles expansíveis) */
+#ficha.modo-observador button:not(.ficha-expand-toggle):not(.ficha-panel-title) {
+  display: none !important;
+}
+/* Oculta botões inline de slot/add/remove */
+#ficha.modo-observador [onclick*="addArmaRow"],
+#ficha.modo-observador [onclick*="removeArmaRow"],
+#ficha.modo-observador [onclick*="addInvRow"],
+#ficha.modo-observador [onclick*="salvarLocal"],
+#ficha.modo-observador .ficha-hero-foto-placeholder { display: none !important; }
+/* Oculta a barra de salvar no modo observador */
+#ficha.modo-observador .save-bar { display: none !important; }
+/* Checkboxes: visíveis mas não clicáveis */
+#ficha.modo-observador input[type="checkbox"] { pointer-events: none; opacity: .75; cursor: default !important; }
+/* Tom levemente diferente para indicar readonly */
+#ficha.modo-observador input,
+#ficha.modo-observador textarea { border-color: rgba(255,255,255,.06) !important; background: rgba(255,255,255,.015) !important; }
+/* Banner de modo observador no topo da ficha */
+.obs-banner {
+  display: flex; align-items: center; gap: .7rem;
+  background: rgba(110,147,232,.07); border: 1px solid rgba(110,147,232,.25);
+  border-radius: var(--r-md); padding: .65rem 1.1rem; margin-bottom: 1.5rem;
+  font-size: .83rem; color: var(--arcane-light); line-height: 1.5;
+}
+.obs-banner svg { flex-shrink: 0; opacity: .85; font-size: 1.3rem; }
 .table-wrapper td { border-right: 1px solid var(--border); position: relative; }
 .table-wrapper td:last-child { border-right: none; }
 .table-wrapper td input[type="text"],
@@ -3326,15 +3388,32 @@ main { margin-left: 0 !important; }
       </div>
 
       <div class="gm-tabs">
-        <button class="gm-tab active" id="tab-fichas" onclick="mostrarTab(&#39;tab-fichas&#39;)">Fichas dos Players</button>
-        <button class="gm-tab" id="tab-formulas" onclick="mostrarTab(&#39;tab-formulas&#39;)">Editor de Fórmulas</button>
-        <button class="gm-tab" id="tab-ranking-audit" onclick="mostrarTab(&#39;tab-ranking-audit&#39;)">🔄 Ranking Global</button>
+        <button class="gm-tab active" id="tab-fichas" onclick="mostrarTab('tab-fichas')">Fichas dos Players</button>
+        <button class="gm-tab" id="tab-formulas" onclick="mostrarTab('tab-formulas')">Editor de Fórmulas</button>
+        <button class="gm-tab" id="tab-ranking-audit" onclick="mostrarTab('tab-ranking-audit')">
+          <svg class="ic ic-sm"><use href="#ic-refresh"/></svg> Ranking Global
+        </button>
+        <button class="gm-tab" id="tab-visibilidade" onclick="mostrarTab('tab-visibilidade');renderGMRankingVisibilidade()">
+          <svg class="ic ic-sm"><use href="#ic-eye"/></svg> Visibilidade
+        </button>
       </div>
 
       <!-- TAB: FICHAS -->
       <div class="gm-tab-content active" id="content-tab-fichas">
         <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:1.5rem">Clique em um jogador para ver e editar a ficha completa.</p>
         <div id="gm-players-list"></div>
+      </div>
+
+      <!-- TAB: VISIBILIDADE DO RANKING -->
+      <div class="gm-tab-content" id="content-tab-visibilidade">
+        <div class="lore-box" style="margin-bottom:1.5rem;border-color:rgba(110,147,232,.35)">
+          <strong style="color:var(--arcane-light)"><svg class="ic ic-sm"><use href="#ic-eye"/></svg> Controle de Visibilidade do Ranking</strong><br>
+          Escolha quais personagens aparecem publicamente no <strong>Livro das Lendas</strong>.
+          Personagens ocultos <strong>continuam normais</strong> no login e na ficha do jogador — apenas não aparecem no ranking público.
+        </div>
+        <div id="gm-ranking-visibilidade" style="display:flex;flex-direction:column;gap:.5rem">
+          <p style="color:var(--text-muted);font-size:.85rem">Clique na aba para carregar a lista.</p>
+        </div>
       </div>
 
       <!-- TAB: RANKING GLOBAL AUDITORIA -->
@@ -4349,14 +4428,116 @@ async function carregarRanking() {
     } catch(e) {}
   }
 
-  _lendasFichas = fichas;
-  renderizarCartoes(_lendasFichas, _abaAtual);
+  // ── Filtra personagens ocultos pelo GM antes de renderizar ──
+  const visiveis = fichas.filter(f => {
+    const docId = _fsDocId(f.user, f.nomePersonagem);
+    return !_rankingOcultos.has(docId);
+  });
+
+  _lendasFichas = visiveis;
+  renderizarCartoes(visiveis, _abaAtual);
 
   if (!_rankingInterval) {
     _rankingInterval = setInterval(() => {
       if (document.getElementById('ranking-grid')) carregarRanking();
     }, 30000);
   }
+}
+
+// ─── SISTEMA DE VISIBILIDADE DO RANKING (GM/ADM) ──────────────────────────
+// _rankingOcultos: Set de docIds que o GM marcou como ocultos.
+// Persistido em Firestore: rankingConfig/ocultos.{ ids: [...] }
+let _rankingOcultos = new Set();
+let _todasFichasParaGM = []; // cache completo para o painel de visibilidade
+
+async function carregarRankingOcultos() {
+  if (!window.db || !window.doc || !window.getDoc) return;
+  try {
+    const snap = await window.getDoc(window.doc(window.db, 'rankingConfig', 'ocultos'));
+    if (snap.exists()) {
+      _rankingOcultos = new Set(snap.data().ids || []);
+    }
+  } catch(e) { console.warn('[Ranking] Erro ao carregar ocultos:', e); }
+}
+
+async function salvarRankingOcultos() {
+  if (!window.db || !window.doc || !window.setDoc) return;
+  try {
+    await window.setDoc(
+      window.doc(window.db, 'rankingConfig', 'ocultos'),
+      { ids: [..._rankingOcultos], atualizadoEm: Date.now() }
+    );
+  } catch(e) { console.warn('[Ranking] Erro ao salvar ocultos:', e); }
+}
+
+async function toggleOcultarPersonagem(docId, btn) {
+  if (_rankingOcultos.has(docId)) {
+    _rankingOcultos.delete(docId);
+    if (btn) { btn.textContent = 'Ocultar'; btn.classList.remove('oculto-ativo'); }
+  } else {
+    _rankingOcultos.add(docId);
+    if (btn) { btn.textContent = 'Mostrar'; btn.classList.add('oculto-ativo'); }
+  }
+  await salvarRankingOcultos();
+  // Atualiza o ranking público imediatamente (sem recarregar do Firestore)
+  const visiveis = _todasFichasParaGM.length
+    ? _todasFichasParaGM.filter(f => !_rankingOcultos.has(_fsDocId(f.user, f.nomePersonagem)))
+    : _lendasFichas;
+  renderizarCartoes(visiveis, _abaAtual);
+}
+
+async function renderGMRankingVisibilidade() {
+  const container = document.getElementById('gm-ranking-visibilidade');
+  if (!container) return;
+  container.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">Carregando personagens...</p>';
+
+  // Carrega todos os registros do rankingGlobal (sem filtro de ocultos)
+  const fichas = [];
+  try {
+    const snap = await window.getDocs(window.collection(window.db, 'rankingGlobal'));
+    snap.forEach(docSnap => {
+      const d = docSnap.data() || {};
+      if (d.status === 'arquivado') return;
+      fichas.push({ ...d, _docId: docSnap.id });
+    });
+  } catch(e) {
+    container.innerHTML = '<p style="color:var(--accent-light)">Erro ao carregar personagens.</p>';
+    return;
+  }
+
+  _todasFichasParaGM = fichas.map(d => _fichaFromRankingGlobal(d._docId, d));
+
+  if (!fichas.length) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">Nenhum personagem no ranking ainda.</p>';
+    return;
+  }
+
+  // Ordena: ocultos por último
+  fichas.sort((a, b) => {
+    const aOc = _rankingOcultos.has(a._docId) ? 1 : 0;
+    const bOc = _rankingOcultos.has(b._docId) ? 1 : 0;
+    return aOc - bOc || (a.nome || '').localeCompare(b.nome || '');
+  });
+
+  container.innerHTML = fichas.map(f => {
+    const docId = f._docId;
+    const oculto = _rankingOcultos.has(docId);
+    const nome = f.nome || f.nomePersonagem || docId;
+    const jogador = USUARIOS[f.user]?.nome || f.user || '—';
+    const nivel = f['f-nivel'] || f.nivel || '?';
+    return `
+    <div class="gm-ranking-row ${oculto ? 'oculto-row' : ''}" id="row-${docId}">
+      <div class="gm-ranking-row-info">
+        <div class="gm-ranking-row-nome">${nome}</div>
+        <div class="gm-ranking-row-meta">Jogador: <strong>${jogador}</strong> · Nível ${nivel}</div>
+        ${oculto ? '<span class="oculto-badge">Oculto do ranking</span>' : ''}
+      </div>
+      <button class="gm-vis-btn ${oculto ? 'oculto-ativo' : ''}"
+        onclick="toggleOcultarPersonagem('${docId}', this)">
+        ${oculto ? '<svg class="ic ic-sm"><use href="#ic-eye"/></svg> Mostrar' : '<svg class="ic ic-sm"><use href="#ic-moon"/></svg> Ocultar'}
+      </button>
+    </div>`;
+  }).join('');
 }
 
 function abrirPerfilPublico(f) {
@@ -6152,20 +6333,22 @@ function calcRecursoAtual(tipo) {
 
 // ─── GERAR FICHA HTML ───
 function gerarFichaHTML(targetUser, modoVisualizacao) {
-  // modoVisualizacao: 'player'(própria) | 'gm'(acesso total) | 'adm'(só mecânico)
+  // modoVisualizacao: 'player'(própria) | 'gm'(acesso total) | 'adm'(só mecânico) | 'observador'(leitura total)
   const isOwner = (targetUser === usuarioAtual && roleAtual === 'player') || roleAtual === 'gm';
   const isAdm = roleAtual === 'adm';
+  const isObs = modoVisualizacao === 'observador';
 
   function fieldGroup(label, id, type='text', opts={}) {
     const isNarr = CAMPOS_NARRATIVOS.includes(id);
-    const locked = isAdm && isNarr;
+    const locked = (isAdm && isNarr) || isObs;
     const readonlyAttr = locked ? 'readonly' : '';
-    const lockedTag = locked ? '<span class="field-locked-tag">'+icone('lock','ic-sm')+' só player</span>' : '';
+    const lockedTag = (isAdm && isNarr) ? '<span class="field-locked-tag">'+icone('lock','ic-sm')+' só player</span>' : '';
     const borderClass = (isAdm && !isNarr) ? 'style="border-color:rgba(180,140,30,.3)"' : '';
+    const obsStyle = isObs ? 'style="cursor:default;opacity:.85"' : borderClass;
     if(type==='textarea') {
-      return `<div class="field-group"><label>${label}${lockedTag}</label><textarea id="${id}" ${readonlyAttr} ${borderClass} oninput="salvarLocal()">${opts.val||''}</textarea></div>`;
+      return `<div class="field-group"><label>${label}${lockedTag}</label><textarea id="${id}" ${readonlyAttr} ${obsStyle} oninput="salvarLocal()">${opts.val||''}</textarea></div>`;
     }
-    return `<div class="field-group"><label>${label}${lockedTag}</label><input type="${type}" id="${id}" value="${opts.val||opts.default||''}" ${opts.min?`min="${opts.min}"`:''}${opts.max?` max="${opts.max}"`:''}${readonlyAttr} ${borderClass} oninput="${type==='number'?'calcTudoDebounced()':'salvarLocal()'}"></div>`;
+    return `<div class="field-group"><label>${label}${lockedTag}</label><input type="${type}" id="${id}" value="${opts.val||opts.default||''}" ${opts.min?`min="${opts.min}"`:''}${opts.max?` max="${opts.max}"`:''}${readonlyAttr} ${obsStyle} oninput="${type==='number'?'calcTudoDebounced()':'salvarLocal()'}"></div>`;
   }
 
   return `
@@ -6712,7 +6895,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
     ${fieldGroup('Antecedentes','r-antecedentes','textarea')}
     <div class="field-group" style="margin-bottom:.75rem">
       <label>História <span style="font-size:.65rem;color:#555">(espaço livre — use para sua narrativa completa)</span></label>
-      <textarea id="r-historia" ${isAdm&&CAMPOS_NARRATIVOS.includes('r-historia')?'readonly':''} oninput="salvarLocal()" style="min-height:260px;resize:vertical"></textarea>
+      <textarea id="r-historia" ${(isAdm&&CAMPOS_NARRATIVOS.includes('r-historia'))||isObs?'readonly':''} oninput="salvarLocal()" style="min-height:260px;resize:vertical"></textarea>
     </div>
     ${fieldGroup('Eventos & Marcos Narrativos','r-eventos','textarea')}
     ${fieldGroup('NPCs Relevantes & Relações','r-npcs','textarea')}
@@ -8031,12 +8214,65 @@ async function carregarUsuariosExtras() {
 carregarUsuariosExtras();
 
 // ─── INICIAR ───
-function iniciarObservador() {
-  document.getElementById('sb-ficha-section').style.display='none';
-  document.getElementById('hero-cta-btn').style.display='none';
-  document.getElementById('ficha').style.display='none';
+async function iniciarObservador() {
+  // O observador vê a mesma página que um player comum.
+  // Diferença: todos os campos são readonly, botões de edição ocultos,
+  // sem painel GM/ADM, sem seção de personagens próprios.
+
+  // ── Sidebar: nome e info de observador ──
   document.getElementById('sb-player-name').textContent = 'Observador';
-  document.getElementById('sb-player-info').textContent = 'Acesso somente leitura';
+  document.getElementById('sb-player-info').textContent = 'Somente leitura';
+
+  // ── Oculta controles exclusivos de jogador na sidebar ──
+  const sbFicha = document.getElementById('sb-ficha-section');
+  if (sbFicha) sbFicha.style.display = 'none';
+
+  // ── Garante que painéis GM/ADM ficam ocultos ──
+  document.getElementById('sb-gm-section')?.style.setProperty('display','none','important');
+  document.getElementById('sb-adm-section')?.style.setProperty('display','none','important');
+  document.getElementById('painel-gm')?.style.setProperty('display','none','important');
+  document.getElementById('painel-adm')?.style.setProperty('display','none','important');
+
+  // ── Ficha: gera exatamente como para um player, no modo observador ──
+  const fichaSection = document.getElementById('ficha');
+  const fichaContent = document.getElementById('ficha-content');
+  const fichaLabel  = document.getElementById('ficha-viewer-label');
+
+  if (fichaSection) fichaSection.classList.add('modo-observador');
+  if (fichaLabel)   fichaLabel.textContent = 'Modo somente leitura — observador';
+
+  if (fichaContent) {
+    // Gera a ficha com modo 'observador' (todos os campos readonly)
+    fichaContent.innerHTML = gerarFichaHTML('__observador__', 'observador');
+    buildPericias();
+    resetarContadoresFicha();
+
+    // Banner informativo no topo da ficha
+    const banner = document.createElement('div');
+    banner.className = 'obs-banner';
+    banner.innerHTML = `<svg class="ic ic-lg"><use href="#ic-eye"/></svg>
+      <span>Você está em <strong>modo observador</strong>. A ficha está visível mas não pode ser editada.
+      Para criar seu personagem, solicite acesso ao Game Master.</span>`;
+    fichaContent.insertBefore(banner, fichaContent.firstChild);
+
+    // Oculta o painel de personagens (o observador não tem personagem)
+    const painelPersonagens = document.getElementById('painel-personagens');
+    if (painelPersonagens) painelPersonagens.style.display = 'none';
+  }
+
+  // ── Hero: botão de ficha redireciona para ranking ──
+  const ctaBtn = document.getElementById('hero-cta-btn');
+  if (ctaBtn) {
+    ctaBtn.innerHTML = `<svg class="ic"><use href="#ic-lendas"/></svg> Ver Ranking`;
+    ctaBtn.onclick = () => navTo('secao-ranking');
+  }
+
+  // ── Aguarda Firebase e carrega ranking (com ocultos) ──
+  await aguardarFirebase();
+  await carregarRankingOcultos();
+  carregarCapitulosExtras();
+  carregarUsuariosExtras().then(() => carregarRanking());
+  carregarRanking();
 }
 
 // Aguarda o Firebase SDK ficar disponível (máx 5s)
@@ -8123,6 +8359,7 @@ async function iniciar() {
   // CRÍTICO: aguarda carregarUsuariosExtras antes de carregar o ranking,
   // para que usuários criados dinamicamente apareçam no fallback do ranking.
   await carregarUsuariosExtras();
+  await carregarRankingOcultos(); // carrega lista de ocultos antes do ranking
   carregarCapitulosExtras();
   carregarRanking();
   if (personagemAtual) await inicializarFotos();
