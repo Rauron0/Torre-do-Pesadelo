@@ -4207,24 +4207,12 @@ main { margin-left: 0 !important; }
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// USUÁRIOS — edite aqui para adicionar/remover jogadores
-// Roles: "gm" | "adm" | "player"
+// USUÁRIOS — gerenciados pelo Firebase Authentication + Firestore
+// NÃO há mais senhas hardcodadas aqui. O objeto abaixo é apenas
+// um cache local preenchido após login via Firebase Auth.
+// Para adicionar jogadores: use o painel ADM ou o Firebase Console.
 // ═══════════════════════════════════════════════════════════
-const USUARIOS = {
-  "rauron":    { senha: "happy14768",      role: "gm",     nome: "Rauron"   },
-  "pratesz":   { senha: "Breno123",        role: "gm",     nome: "Pratesz"  },
-  "tortuga":   { senha: "tortuga547",      role: "adm",    nome: "Tortuga"  },
-  "herick":    { senha: "herick118",       role: "adm",    nome: "Herick"   },
-  "seki":      { senha: "seki092",         role: "adm",    nome: "Seki"     },
-  "melp":      { senha: "melp705",         role: "adm",    nome: "Melp"     },
-  "gabriel":   { senha: "biel381",         role: "player", nome: "Gabriel" },
-  "joaofelipe":{ senha: "joao814",         role: "player", nome: "João Felipe" },
-  "thiago":    { senha: "thiago263",       role: "player", nome: "Thiago" },
-  "jozzu":     { senha: "jozzu490",        role: "player", nome: "Jozzu" },
-  "ness":      { senha: "ness672",         role: "player", nome: "Ness" },
-  // Adicione mais players aqui no mesmo formato
-  "hauron":    { senha: "hauron001",       role: "player", nome: "Hauron" },
-};
+const USUARIOS = {}; // preenchido dinamicamente via Firestore após login
 
 const PERICIAS_DEF = [
   {nome:'Atletismo',attr:'FOR'},{nome:'Luta',attr:'DES'},{nome:'Acrobacia',attr:'DES'},
@@ -8530,21 +8518,59 @@ function mostrarTab(tabId) {
 }
 
 // ─── LOGIN / LOGOUT ───
-function tentarLogin() {
+async function tentarLogin() {
   const user = document.getElementById('login-user').value.trim().toLowerCase();
   const pass = document.getElementById('login-pass').value;
-  const err = document.getElementById('login-error');
-  if(USUARIOS[user] && USUARIOS[user].senha === pass) {
-    usuarioAtual = user; roleAtual = USUARIOS[user].role;
-    err.style.display='none';
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('app').style.display='block';
+  const err  = document.getElementById('login-error');
+  err.style.display = 'none';
+
+  if (!user || !pass) { err.textContent = 'Preencha usuário e senha.'; err.style.display='block'; return; }
+
+  // Converte username → email interno (ex: pratesz → pratesz@torredopesadelo.app)
+  const email = user + '@torredopesadelo.app';
+
+  try {
+    await aguardarFirebase();
+    const cred = await window._fbSignIn(email, pass);
+    const uid = cred.user.uid;
+
+    // Carrega perfil do Firestore (role, nome etc.)
+    const snap = await window.getDoc(window.doc(window.db, 'usuarios_extras', user));
+    if (!snap.exists()) {
+      err.textContent = 'Perfil não encontrado. Contate o GM.';
+      err.style.display='block';
+      await window._fbSignOut();
+      return;
+    }
+    const perfil = snap.data();
+    USUARIOS[user] = perfil;
+    usuarioAtual = user;
+    roleAtual    = perfil.role || 'player';
+
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
     _toggleTabbar(true);
     iniciar();
-  } else { err.style.display='block'; }
+  } catch(e) {
+    console.warn('[Auth] Erro no login:', e.code, e.message);
+    if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
+      err.textContent = 'Usuário ou senha incorretos.';
+    } else {
+      err.textContent = 'Erro ao conectar. Tente novamente.';
+    }
+    err.style.display = 'block';
+  }
 }
 
-function entrarObservador() {
+async function entrarObservador() {
+  try {
+    await aguardarFirebase();
+    if (window._fbSignAnon) await window._fbSignAnon();
+    console.log('[Auth] Login anônimo realizado para observador.');
+  } catch(e) {
+    console.warn('[Auth] Erro no login anônimo:', e.code, e.message);
+    // Continua mesmo sem auth anônima (fallback gracioso)
+  }
   usuarioAtual = '__observador__'; roleAtual = 'observador';
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
@@ -8552,7 +8578,7 @@ function entrarObservador() {
   iniciarObservador();
 }
 
-function logout() {
+async function logout() {
   if (_rankingInterval) { clearInterval(_rankingInterval); _rankingInterval = null; }
   if (_inputListener) { document.removeEventListener('input', _inputListener); _inputListener = null; }
   usuarioAtual=null; roleAtual=null; numTecnicas=0;
@@ -8563,6 +8589,7 @@ function logout() {
   document.getElementById('login-pass').value='';
   const err = document.getElementById('login-error');
   if (err) err.style.display = 'none';
+  try { if (window._fbSignOut) await window._fbSignOut(); } catch(e) {}
 }
 
 document.getElementById('login-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') tentarLogin(); });
@@ -8606,14 +8633,10 @@ async function criarConta() {
     err.textContent = 'As senhas não coincidem.';
     err.style.display='block'; return;
   }
-  if(USUARIOS[user]) {
-    err.textContent = 'Esse usuário já existe. Escolha outro.';
-    err.style.display='block'; return;
-  }
 
   await aguardarFirebase();
 
-  // Confere se já existe na nuvem (evita corrida entre dispositivos)
+  // Verifica se username já existe no Firestore
   if (window.db && window.doc && window.getDoc) {
     try {
       const snap = await window.getDoc(window.doc(window.db, 'usuarios_extras', user));
@@ -8624,55 +8647,57 @@ async function criarConta() {
     } catch(e) { console.warn('[Firestore] Erro ao verificar usuário:', e); }
   }
 
-  const novoUsuario = { senha: pass, role: 'player', nome: nome };
+  const email = user + '@torredopesadelo.app';
+  const novoUsuario = { role: 'player', nome: nome };
 
-  // Salva localmente para uso imediato
-  USUARIOS[user] = novoUsuario;
-  let extras = JSON.parse(localStorage.getItem('tp_usuarios_extras') || '{}');
-  extras[user] = novoUsuario;
-  localStorage.setItem('tp_usuarios_extras', JSON.stringify(extras));
+  try {
+    // Cria conta no Firebase Auth (senha armazenada com segurança pelo Firebase)
+    await window._fbSignUp(email, pass);
 
-  // Salva na nuvem para todos os dispositivos
-  if (window.db && window.doc && window.setDoc) {
-    try {
-      await window.setDoc(window.doc(window.db, 'usuarios_extras', user), novoUsuario);
-      console.log('[Firestore] Novo usuário salvo:', user);
-    } catch(e) {
-      console.warn('[Firestore] Erro ao salvar novo usuário:', e);
-      err.textContent = 'Conta criada localmente, mas houve um erro ao sincronizar com a nuvem.';
-      err.style.display='block';
+    // Salva perfil (sem senha!) no Firestore
+    await window.setDoc(window.doc(window.db, 'usuarios_extras', user), novoUsuario);
+    USUARIOS[user] = novoUsuario;
+    console.log('[Auth+Firestore] Novo usuário criado:', user);
+
+    ok.textContent = '✓ Conta criada com sucesso! Você já pode entrar.';
+    ok.style.display='block';
+
+    // Faz logout imediato do Firebase Auth (o usuário vai logar manualmente)
+    await window._fbSignOut();
+
+    setTimeout(() => {
+      fecharTelaCadastro();
+      document.getElementById('login-user').value = user;
+      document.getElementById('login-pass').value = '';
+      document.getElementById('login-pass').focus();
+    }, 1200);
+
+  } catch(e) {
+    console.warn('[Auth] Erro ao criar conta:', e.code, e.message);
+    if (e.code === 'auth/email-already-in-use') {
+      err.textContent = 'Esse usuário já existe. Escolha outro.';
+    } else if (e.code === 'auth/weak-password') {
+      err.textContent = 'Senha muito fraca. Use pelo menos 6 caracteres.';
+    } else {
+      err.textContent = 'Erro ao criar conta: ' + (e.message || e.code);
     }
+    err.style.display='block';
   }
-
-  ok.textContent = '✓ Conta criada com sucesso! Você já pode entrar.';
-  ok.style.display='block';
-
-  setTimeout(() => {
-    fecharTelaCadastro();
-    document.getElementById('login-user').value = user;
-    document.getElementById('login-pass').value = '';
-    document.getElementById('login-pass').focus();
-  }, 1200);
 }
 
-// Carrega usuários extras (criados via cadastro) salvos local e na nuvem
+// Carrega perfil dos usuários extras do Firestore (sem senhas — gerenciadas pelo Firebase Auth)
 async function carregarUsuariosExtras() {
-  // Local primeiro (funciona offline)
-  try {
-    const extrasLocal = JSON.parse(localStorage.getItem('tp_usuarios_extras') || '{}');
-    Object.entries(extrasLocal).forEach(([u,d]) => { if(!USUARIOS[u]) USUARIOS[u] = d; });
-  } catch(e) {}
-
   await aguardarFirebase();
   if (!window.db || !window.collection || !window.getDocs) return;
   try {
     const snap = await window.getDocs(window.collection(window.db, 'usuarios_extras'));
-    const extras = {};
-    snap.forEach(docSnap => { extras[docSnap.id] = docSnap.data(); });
-    Object.entries(extras).forEach(([u,d]) => { USUARIOS[u] = d; });
-    localStorage.setItem('tp_usuarios_extras', JSON.stringify(extras));
-    console.log('[Firestore] Usuários extras carregados:', Object.keys(extras).length);
-  } catch(e) { console.warn('[Firestore] Erro ao carregar usuários extras:', e); }
+    snap.forEach(docSnap => {
+      const d = docSnap.data();
+      // Armazena apenas role e nome — NUNCA senha
+      USUARIOS[docSnap.id] = { role: d.role || 'player', nome: d.nome || docSnap.id };
+    });
+    console.log('[Firestore] Perfis carregados:', Object.keys(USUARIOS).length);
+  } catch(e) { console.warn('[Firestore] Erro ao carregar perfis:', e); }
 }
 carregarUsuariosExtras();
 
@@ -9297,6 +9322,14 @@ document.addEventListener('DOMContentLoaded', () => {
     collection,
     getDocs
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signInAnonymously,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   console.log("[Firebase] Módulo carregado.");
 
@@ -9310,21 +9343,27 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  const db  = getFirestore(app);
+  const auth = getAuth(app);
 
-  // Expõe globalmente para uso no script principal
-  window.db       = db;
-  window.doc      = doc;
-  window.getDoc   = getDoc;
-  window.setDoc   = setDoc;
-  window.deleteDoc = deleteDoc;
-  window.collection = collection;
+  // ── Expõe globalmente ──
+  window.db          = db;
+  window.auth        = auth;
+  window.doc         = doc;
+  window.getDoc      = getDoc;
+  window.setDoc      = setDoc;
+  window.deleteDoc   = deleteDoc;
+  window.collection  = collection;
   window.getDocs     = getDocs;
-  // AVISO DE SEGURANÇA (P17): estas globais existem por compatibilidade com o código principal.
-  // TODO: migrar para Firebase Auth + Security Rules para eliminar a necessidade disso.
 
-  console.log("[Firebase] SDK pronto. db, doc, getDoc, setDoc, deleteDoc, collection, getDocs disponíveis globalmente.");
+  // ── Firebase Auth helpers expostos para o script principal ──
+  window._fbSignIn   = (email, pass) => signInWithEmailAndPassword(auth, email, pass);
+  window._fbSignUp   = (email, pass) => createUserWithEmailAndPassword(auth, email, pass);
+  window._fbSignOut  = ()            => signOut(auth);
+  window._fbSignAnon = ()            => signInAnonymously(auth);
+  window._fbOnAuth   = (cb)          => onAuthStateChanged(auth, cb);
 
+  console.log("[Firebase] SDK + Auth prontos.");
 </script>
 
 
