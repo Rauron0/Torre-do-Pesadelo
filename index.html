@@ -1714,13 +1714,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   );
 }
 .livro-banner-runes {
-  position: absolute; top: .8rem; left: 50%;
-  transform: translateX(-50%);
-  font-size: 1rem; letter-spacing: 16px;
-  color: rgba(193,63,63,.12);
-  font-family: 'Playfair Display', serif;
-  white-space: nowrap; pointer-events: none;
-  z-index: 3;
+  display: none;
 }
 /* Selo de rank absoluto no banner */
 .livro-banner-rank-seal {
@@ -2861,18 +2855,10 @@ main { position: relative; z-index: 1; }
   text-shadow: 0 0 10px rgba(193,63,63,.3);
 }
 .ficha-panel-title::after {
-  content: ' ᚱ';
-  opacity: .18;
-  font-size: .7em;
-  letter-spacing: 3px;
+  content: none;
 }
 
-/* Runa na section label */
-.sidebar-section-label::before {
-  content: '᛭ ';
-  opacity: .35;
-  font-size: .8em;
-}
+/* Runa na section label - removida */
 
 /* --- Olhos na névoa: criaturas ocultas --- */
 .tp-eye {
@@ -4890,7 +4876,12 @@ async function carregarRanking() {
 
   if (!_rankingInterval) {
     _rankingInterval = setInterval(() => {
-      if (document.getElementById('ranking-grid')) carregarRanking();
+      // Só recarrega se o painel de ranking estiver visível
+      const grid = document.getElementById('ranking-grid');
+      const lendas = document.getElementById('lendas');
+      if (grid && lendas && lendas.style.display !== 'none' && lendas.offsetParent !== null) {
+        carregarRanking();
+      }
     }, 30000);
   }
 }
@@ -5119,7 +5110,6 @@ function abrirPerfilPublico(f) {
         ${wallpaperUrl ? `<div class="livro-banner-bg" style="background-image:url('${wallpaperUrl}')"></div>` : ''}
         ${(p.gifPoder || p.gifTransformacao) ? `<div class="livro-banner-gif"><img src="${p.gifTransformacao || p.gifPoder}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
         <div class="livro-banner-gradient"></div>
-        <div class="livro-banner-runes">ᚱ ᚢ ᚾ ᚨ ᛊ ᛏ ᚢ ᛗ</div>
         ${f.rank ? `<div class="livro-banner-rank-seal">${icone('crown','ic-sm')} ${f.rank}</div>` : ''}
         <button class="livro-close" onclick="document.getElementById('livro-overlay').remove()" title="Fechar">${icone('close')}</button>
       </div>
@@ -5224,6 +5214,16 @@ function abrirPerfilPublico(f) {
         <div class="livro-footer">
           ${icone(temaInfo.ic||'moon','ic-sm')} GRIMÓRIO DOS DESPERTOS • Crônicas das Torres ${icone(temaInfo.ic||'moon','ic-sm')}
         </div>
+
+        <!-- Botão de personalizar — visível apenas para o dono do personagem -->
+        ${(f.user === usuarioAtual && f.nomePersonagem === personagemAtual) ? `
+        <div style="padding:1rem 1.75rem 2rem;display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap">
+          <button onclick="document.getElementById('livro-overlay').remove();abrirPersonalizacao()"
+            style="background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.6rem 1.3rem;font-family:inherit;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:.45rem;transition:all .2s"
+            onmouseover="this.style.background='rgba(156,42,42,.25)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
+            <svg class="ic"><use href="#ic-gear"/></svg> Personalizar Perfil
+          </button>
+        </div>` : ''}
       </div>
     </div>`;
 
@@ -5290,12 +5290,21 @@ function abrirPersonalizacao() {
         <div class="personalizar-section-title">Tema Visual</div>
         <div class="temas-grid">${temasBtns}</div>
 
-        <div class="personalizar-section-title">Wallpaper do Perfil</div>
-        <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.6rem">Aparece no banner e no cartão do ranking. Selecione ou cole uma URL personalizada.</p>
+        <div class="personalizar-section-title">Foto de Capa do Perfil</div>
+        <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.6rem">Aparece como banner no topo do Grimório. Envie uma imagem da galeria ou cole uma URL.</p>
+        <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem">
+          <button onclick="abrirSeletorCapaPersonalizacao()" style="width:100%;padding:.65rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);font-family:inherit;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s" onmouseover="this.style.background='rgba(156,42,42,.22)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
+            <svg class="ic"><use href="#ic-camera"/></svg> Enviar Foto de Capa da Galeria
+          </button>
+          ${p.wallpaperUrl && p.wallpaperUrl.startsWith('data:') ? `<img src="${p.wallpaperUrl}" style="width:100%;max-height:80px;object-fit:cover;border:1px solid rgba(60,40,60,.5);border-radius:2px;display:block;" onerror="this.style.display='none'">` : ''}
+        </div>
+
+        <div class="personalizar-section-title">Wallpaper do Perfil (URL)</div>
+        <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.6rem">Selecione um preset ou cole uma URL. Sobrescreve a foto enviada acima.</p>
         <div class="wallpapers-grid">${wpsBtns}</div>
         <div style="margin-top:.6rem;display:flex;gap:.5rem;align-items:center">
-          <input type="text" id="wp-custom-url" placeholder="Ou cole URL de imagem personalizada (https://...)"
-            value="${p.wallpaperUrl||''}"
+          <input type="text" id="wp-custom-url" placeholder="Cole URL de imagem (https://...)"
+            value="${(!p.wallpaperUrl || p.wallpaperUrl.startsWith('data:')) ? '' : (p.wallpaperUrl||'')}"
             style="flex:1;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.45rem .65rem;font-family:inherit;font-size:.82rem;outline:none">
           <button onclick="usarWallpaperCustom()" style="background:none;border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.45rem .85rem;font-family:inherit;font-size:.8rem;cursor:pointer">Usar</button>
         </div>
@@ -5346,8 +5355,69 @@ function abrirPersonalizacao() {
   document.body.appendChild(overlay);
 }
 
-let _temaSeleccionado = null;
-let _wallpaperSelecionado = null;
+function abrirSeletorCapaPersonalizacao() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  input.onchange = async () => {
+    if (!input.files[0]) { input.remove(); return; }
+    // Comprime a imagem para caber em base64 (máx 1200px larg)
+    const b64 = await imageToBase64Capa(input.files[0]);
+    // Armazena no campo oculto e pré-visualiza
+    document.getElementById('wp-custom-url').value = '';
+    document.querySelectorAll('.wp-btn').forEach(b => b.classList.remove('selecionado'));
+    _wallpaperSelecionado = null;
+    _capaBase64Temp = b64;
+    // Pré-visualização no modal
+    const existing = document.getElementById('capa-preview-img');
+    if (existing) { existing.src = b64; existing.style.display = 'block'; }
+    else {
+      const btn = document.querySelector('[onclick="abrirSeletorCapaPersonalizacao()"]');
+      if (btn) {
+        const img = document.createElement('img');
+        img.id = 'capa-preview-img';
+        img.src = b64;
+        img.style.cssText = 'width:100%;max-height:80px;object-fit:cover;border:1px solid rgba(60,40,60,.5);border-radius:2px;display:block;margin-top:.35rem';
+        img.onerror = () => img.style.display = 'none';
+        btn.insertAdjacentElement('afterend', img);
+      }
+    }
+    input.remove();
+  };
+  document.body.appendChild(input);
+  input.click();
+}
+
+// Redimensiona capa para 1400×400px landscape para economizar espaço
+function imageToBase64Capa(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => resolve(reader.result);
+      img.onload = () => {
+        const MAX_W = 1400, MAX_H = 500;
+        let { width: w, height: h } = img;
+        const ratio = w / h;
+        if (w > MAX_W) { w = MAX_W; h = Math.round(w / ratio); }
+        if (h > MAX_H) { h = MAX_H; w = Math.round(h * ratio); }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        try { resolve(canvas.toDataURL('image/jpeg', 0.78)); }
+        catch(e) { resolve(reader.result); }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+let _capaBase64Temp = null;
+
+
 
 function selecionarTema(id, btn) {
   _temaSeleccionado = id;
@@ -5381,10 +5451,21 @@ async function salvarPersonalizacao() {
   const old = _personalizacoes[pid] || {};
 
   const tema = _temaSeleccionado || old.tema || 'sangue';
-
   const wallpaper = _wallpaperSelecionado || old.wallpaper || '';
 
-  const wallpaperUrl = document.getElementById('wp-custom-url')?.value?.trim() || '';
+  const wpCustomInput = document.getElementById('wp-custom-url')?.value?.trim() || '';
+  // Se há foto base64 de capa enviada, usa ela. Se há URL nova, usa a URL. Se não, mantém a anterior.
+  let wallpaperUrl;
+  if (_capaBase64Temp) {
+    wallpaperUrl = _capaBase64Temp;
+  } else if (wpCustomInput) {
+    wallpaperUrl = wpCustomInput;
+  } else if (_wallpaperSelecionado) {
+    wallpaperUrl = ''; // preset foi escolhido, wallpaperUrl fica vazio
+  } else {
+    wallpaperUrl = old.wallpaperUrl || '';
+  }
+
   const gifPoder = document.getElementById('gif-poder')?.value?.trim() || '';
   const gifTransformacao = document.getElementById('gif-transformacao')?.value?.trim() || '';
   const gifSuprema = document.getElementById('gif-suprema')?.value?.trim() || '';
@@ -5392,7 +5473,7 @@ async function salvarPersonalizacao() {
   const dados = {
     tema: tema,
     wallpaper: wallpaper || old.wallpaper || '',
-    wallpaperUrl: wallpaperUrl || old.wallpaperUrl || '',
+    wallpaperUrl: wallpaperUrl,
     gifPoder, gifTransformacao, gifSuprema,
     ts: Date.now(),
     user: usuarioAtual,
@@ -5400,13 +5481,22 @@ async function salvarPersonalizacao() {
   };
 
   _personalizacoes[pid] = dados;
+  _capaBase64Temp = null; // limpa temporário
 
-  // Salva no Firestore — apenas a URL, nunca base64
+  // Salva no Firestore — base64 de capa pode ser grande, tenta salvar
   if (window.db && window.doc && window.setDoc) {
     try {
       await window.setDoc(window.doc(window.db, 'personalizacoes', pid), dados);
       console.log('[Personalizacao] Salvo:', pid);
-    } catch(e) { console.warn('[Personalizacao] Erro ao salvar:', e); }
+    } catch(e) {
+      console.warn('[Personalizacao] Erro ao salvar (possível tamanho base64):', e);
+      // Fallback: salva sem a URL base64 da capa, só com preset
+      const dadosSemCapa = { ...dados, wallpaperUrl: old.wallpaperUrl || '' };
+      try {
+        await window.setDoc(window.doc(window.db, 'personalizacoes', pid), dadosSemCapa);
+        _personalizacoes[pid] = dadosSemCapa;
+      } catch(e2) { console.warn('[Personalizacao] Erro no fallback:', e2); }
+    }
   }
 
   document.getElementById('personalizar-overlay')?.remove();
@@ -8997,6 +9087,10 @@ function navTo(id) {
   if (backdrop) backdrop.classList.remove('show');
   setTimeout(()=>{ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth'}); },100);
   _syncTabbar(id);
+  // Recarrega ranking ao navegar para ele (dados sempre frescos)
+  if (id === 'secao-ranking' && typeof carregarRanking === 'function') {
+    setTimeout(() => carregarRanking(), 200);
+  }
 }
 
 // ─── BOTTOM TAB BAR ─────────────────────────────────────────────────
@@ -9012,6 +9106,10 @@ function tabNav(id, btn) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior:'smooth' });
   _setTabAtiva(btn);
+  // Recarrega ranking ao clicar na aba
+  if (id === 'secao-ranking' && typeof carregarRanking === 'function') {
+    setTimeout(() => carregarRanking(), 200);
+  }
 }
 
 function _setTabAtiva(btn) {
