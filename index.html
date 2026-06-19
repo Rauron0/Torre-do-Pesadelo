@@ -724,6 +724,7 @@ tr:hover td { background:rgba(156,42,42,.05); }
 .save-btn:hover { background:var(--accent-light); }
 .save-status { font-size:.8rem; color:var(--text-muted); }
 .save-status.saved { color:#5cad7a; }
+.save-status.erro { color:#e08080; font-weight:600; }
 
 /* TOOLTIP */
 .info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:rgba(156,42,42,.2); border:1px solid var(--accent); color:var(--accent-light); font-size:.62rem; cursor:pointer; vertical-align:middle; margin-left:4px; font-style:normal; font-family:serif; position:relative; }
@@ -4200,6 +4201,65 @@ main { margin-left: 0 !important; }
 // ═══════════════════════════════════════════════════════════
 const USUARIOS = {}; // preenchido dinamicamente via Firestore após login
 
+// ═══════════════════════════════════════════════════════════════════════
+// DIAGNÓSTICO DE ERROS DO FIRESTORE — torna erros antes silenciosos visíveis
+// ═══════════════════════════════════════════════════════════════════════
+// Problema histórico: dezenas de chamadas ao Firestore tinham catch(e){}
+// totalmente silencioso. Se as regras de segurança bloqueassem uma leitura
+// (ex: "permission-denied" após a migração para Firebase Auth) ou a sessão
+// ainda não estivesse autenticada ("unauthenticated"/"failed-precondition"),
+// o app simplesmente não mostrava nada — sem erro, sem aviso — dando a
+// falsa impressão de "personagem não existe" ou "foto não salvou".
+//
+// _diag() registra essas falhas num painel acessível e também na barra de
+// status, para que GM e devs vejam IMEDIATAMENTE o motivo real (em vez de
+// adivinhar). Não altera o comportamento funcional — é só visibilidade.
+const _diagLog = [];
+function _diag(origem, err) {
+  const code = err && err.code ? err.code : 'erro-desconhecido';
+  const msg  = err && err.message ? err.message : String(err);
+  const entry = { origem, code, msg, ts: Date.now() };
+  _diagLog.push(entry);
+  if (_diagLog.length > 50) _diagLog.shift();
+
+  const grave = code === 'permission-denied' || code === 'unauthenticated' || code === 'failed-precondition';
+  if (grave) {
+    console.error(`[DIAGNÓSTICO] ${origem} → ${code}: ${msg}`);
+    _mostrarAvisoDiagnostico(origem, code);
+  } else {
+    console.warn(`[Firestore] ${origem}:`, code, msg);
+  }
+}
+
+// Mostra um aviso discreto (não bloqueante) quando uma operação crítica
+// falha por permissão/autenticação — a causa nº1 de "sumiu sem explicação".
+let _avisoDiagnosticoMostrado = false;
+function _mostrarAvisoDiagnostico(origem, code) {
+  if (_avisoDiagnosticoMostrado) return; // evita espalhar vários avisos iguais
+  _avisoDiagnosticoMostrado = true;
+  const el = document.createElement('div');
+  el.id = 'diag-aviso';
+  el.style.cssText = `
+    position:fixed;bottom:14px;right:14px;z-index:9999;max-width:340px;
+    background:#1a0a0a;border:1px solid rgba(193,63,63,.55);border-radius:8px;
+    padding:.85rem 1rem;color:#f0d0d0;font-family:'Source Sans 3',sans-serif;
+    font-size:.78rem;line-height:1.5;box-shadow:0 8px 30px rgba(0,0,0,.6);
+  `;
+  const explicacao = code === 'permission-denied'
+    ? 'As regras de segurança do Firestore estão bloqueando esta operação para o usuário atual.'
+    : code === 'unauthenticated'
+    ? 'A sessão não está autenticada no Firebase neste momento.'
+    : 'Falha de pré-condição na consulta ao Firestore.';
+  el.innerHTML = `
+    <strong style="color:#e08080">⚠ Falha de acesso ao banco de dados</strong><br>
+    <span style="opacity:.85">${explicacao}</span><br>
+    <span style="opacity:.6;font-size:.7rem">Origem: ${origem} · Código: ${code}</span>
+    <div style="margin-top:.5rem;text-align:right">
+      <button onclick="document.getElementById('diag-aviso').remove()" style="background:none;border:1px solid rgba(193,63,63,.4);color:#f0d0d0;padding:.2rem .6rem;font-size:.72rem;cursor:pointer;border-radius:4px">Fechar</button>
+    </div>`;
+  document.body.appendChild(el);
+}
+
 const PERICIAS_DEF = [
   {nome:'Atletismo',attr:'FOR'},{nome:'Luta',attr:'DES'},{nome:'Acrobacia',attr:'DES'},
   {nome:'Furtividade',attr:'DES'},{nome:'Pontaria',attr:'DES'},{nome:'Prestidigitação',attr:'DES'},
@@ -4459,7 +4519,7 @@ async function sincronizarRankingCompleto() {
   const todosUsers = Object.entries(USUARIOS);
   for (const [user] of todosUsers) {
     try {
-      const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
+      const listaSnap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(user)));
       if (!listaSnap.exists()) continue;
       const lista = JSON.parse(listaSnap.data().lista || '[]');
       for (const nome of lista) {
@@ -4760,9 +4820,9 @@ async function _indexarPersonagensUsuarioAtual() {
     const listaLocal = JSON.parse(localStorage.getItem(`chars_${usuarioAtual}`) || '[]');
     let listaNuvem = [];
     try {
-      const charsSnap = await window.getDoc(window.doc(window.db, 'chars', usuarioAtual));
+      const charsSnap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(usuarioAtual)));
       if (charsSnap.exists()) listaNuvem = JSON.parse(charsSnap.data().lista || '[]');
-    } catch(e) {}
+    } catch(e) { _diag('_indexarPersonagensUsuarioAtual → leitura de chars/' + usuarioAtual, e); }
     // Merge sem duplicatas
     const lista = [...new Set([...listaNuvem, ...listaLocal])];
     if (!lista.length) return;
@@ -4782,7 +4842,7 @@ async function _indexarPersonagensUsuarioAtual() {
             const raw = fichaSnap.data().dados;
             dados = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
           }
-        } catch(e) {}
+        } catch(e) { _diag('_indexarPersonagensUsuarioAtual → leitura de fichas/' + docId, e); }
 
         // Se não existe no rankingGlobal, ou se existe mas está desatualizado, indexa
         if (!jaExiste) {
@@ -4791,15 +4851,17 @@ async function _indexarPersonagensUsuarioAtual() {
           try {
             const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(usuarioAtual, nome)));
             if (fotoSnap.exists()) foto = fotoSnap.data().principal || null;
-          } catch(e) {}
+          } catch(e) { _diag('_indexarPersonagensUsuarioAtual → leitura de fotos/' + _fotoDocId(usuarioAtual, nome), e); }
           await updateRankingEntry(usuarioAtual, nome, dados, foto);
           console.log('[Ranking] Personagem indexado no login:', docId);
         }
       } catch(e) {
+        _diag('_indexarPersonagensUsuarioAtual → personagem ' + nome, e);
         console.warn('[Ranking] Erro ao indexar personagem:', nome, e);
       }
     }
   } catch(e) {
+    _diag('_indexarPersonagensUsuarioAtual', e);
     console.warn('[Ranking] Erro em _indexarPersonagensUsuarioAtual:', e);
   }
 }
@@ -4831,6 +4893,7 @@ async function carregarRanking() {
         idsConhecidos.add(docSnap.id);
       });
     } catch(e) {
+      _diag('carregarRanking → leitura de rankingGlobal', e);
       console.warn('[Ranking] Erro ao ler rankingGlobal, usando apenas fallback por ficha:', e);
     }
   } else {
@@ -4844,7 +4907,7 @@ async function carregarRanking() {
   const todos = Object.entries(USUARIOS);
   for (const [user, info] of todos) {
     try {
-      const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
+      const listaSnap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(user)));
       let listaPersonagens = [];
       if (listaSnap.exists()) listaPersonagens = JSON.parse(listaSnap.data().lista || '[]');
       if (!listaPersonagens.length) continue;
@@ -5573,7 +5636,7 @@ async function carregarGaleriaPublicaGrimorio(user, personagem) {
     container.innerHTML = fotos.map(src =>
       `<img src="${src}" alt="foto" onclick="abrirLightbox('${src.replace(/'/g,"\\'")}'">`
     ).join('');
-  } catch(e) {}
+  } catch(e) { _diag('carregarGaleriaPublicaGrimorio(' + user + ',' + personagem + ')', e); }
 }
 
 async function carregarGaleriaPublica(user, personagem) {
@@ -5596,7 +5659,7 @@ async function carregarGaleriaPublica(user, personagem) {
         container.appendChild(img);
       });
     }
-  } catch(e) {}
+  } catch(e) { _diag('carregarGaleriaPublica(' + user + ',' + personagem + ')', e); }
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -5609,7 +5672,8 @@ async function carregarGaleriaPublica(user, personagem) {
 // Cada personagem tem seu próprio doc, nunca compartilham referência.
 
 function _fotoDocId(user, personagem) {
-  return _sanitizeDocPart(user || usuarioAtual) + '_' + _sanitizeDocPart(personagem || personagemAtual || '_default');
+  // user normalizado para minúsculas — mesma razão de _fsDocId (ver _normUser).
+  return _sanitizeDocPart(_normUser(user || usuarioAtual)) + '_' + _sanitizeDocPart(personagem || personagemAtual || '_default');
 }
 
 async function salvarFotosPerfil(user, personagem, principal, galeria) {
@@ -5622,7 +5686,7 @@ async function salvarFotosPerfil(user, personagem, principal, galeria) {
       ts: Date.now()
     });
     console.log('[Fotos] salvo:', docId);
-  } catch(e) { console.warn('[Fotos] erro ao salvar:', e); }
+  } catch(e) { _diag('salvarFotosPerfil(' + docId + ')', e); }
 }
 
 async function carregarFotosPerfil(user, personagem) {
@@ -5634,7 +5698,7 @@ async function carregarFotosPerfil(user, personagem) {
       console.log('[Fotos] carregado:', docId);
       return snap.data();
     }
-  } catch(e) {}
+  } catch(e) { _diag('carregarFotosPerfil(' + docId + ')', e); }
   return null;
 }
 
@@ -7881,15 +7945,41 @@ function _sanitizeDocPart(s) {
   return String(s ?? '').trim().replace(/[\/\\#\?\[\]\.]/g, '-');
 }
 
+// Normaliza o USERNAME (nunca o nome do personagem) para minúsculas.
+// CAUSA RAIZ HISTÓRICA: o login (tentarLogin) e o cadastro (criarConta) sempre
+// normalizaram o username para lowercase antes de autenticar — mas funções de
+// indexação/auditoria do ranking (ex: sincronizarRankingCompleto) liam o campo
+// "user" gravado DENTRO do próprio documento da ficha, que podia ter sido
+// salvo com capitalização diferente (ex: "Joao") por versões antigas do app,
+// antes dessa normalização existir. Resultado: o personagem ficava indexado
+// sob o docId "Joao_Arthur", enquanto o jogador logado como "joao" (minúsculo)
+// sempre operava sobre "joao_Arthur" — dois documentos DIFERENTES no Firestore.
+// Da perspectiva do jogador: "o personagem não aparece" e "a foto não salva",
+// sem nenhum erro visível, porque cada operação criava/lia um doc novo e vazio
+// em vez de tocar no doc antigo com os dados reais.
+// Normalizar aqui, no ponto único onde todo ID é montado, garante que
+// QUALQUER variação de capitalização do username sempre resolve para o
+// mesmo documento.
+function _normUser(u) {
+  return String(u ?? '').trim().toLowerCase();
+}
+
+// ID do documento da lista de personagens de um usuário (coleção 'chars').
+// Centraliza a normalização — mesma razão de _fsDocId/_fotoDocId.
+function _charsDocId(user) {
+  return _sanitizeDocPart(_normUser(user || usuarioAtual));
+}
+
 function _fsDocId(user, personagem) {
   // Documento Firestore: coleção "fichas", id = "user_personagem"
-  return _sanitizeDocPart(user || usuarioAtual) + '_' + _sanitizeDocPart(personagem || personagemAtual || '_default');
+  // user é sempre normalizado para minúsculas — ver comentário em _normUser.
+  return _sanitizeDocPart(_normUser(user || usuarioAtual)) + '_' + _sanitizeDocPart(personagem || personagemAtual || '_default');
 }
 
 async function salvarFichaFirestore(user, dados) {
   if (!window.db || !window.doc || !window.setDoc) {
     console.warn('[Firestore] SDK não disponível ainda, pulando salvamento na nuvem.');
-    return;
+    return false;
   }
   const persoNome = personagemAtual || '_default';
   const docId = _fsDocId(user, persoNome);
@@ -7903,15 +7993,18 @@ async function salvarFichaFirestore(user, dados) {
     console.log('[Firestore] Ficha salva:', docId);
     // Atualiza coleção rankingGlobal para evitar N×M leituras no ranking
     await updateRankingEntry(user || usuarioAtual, persoNome, dados, _fotoPrincipal || null);
+    return true;
   } catch(e) {
+    _diag('salvarFichaFirestore(' + docId + ')', e);
     console.error('[Firestore] Erro ao salvar ficha:', e);
+    return false;
   }
 }
 
 async function updateRankingEntry(user, personagem, dados, foto) {
   if (!window.db || !window.doc || !window.setDoc) return;
+  const docId = _fsDocId(user, personagem); // fora do try: precisa estar visível no catch
   try {
-    const docId = _fsDocId(user, personagem);
     const nucleoRaw = dados['f-nucleo'] || '0';
     const nucleos = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
     const nivel = parseInt(dados['f-nivel'] || '1') || 1;
@@ -7952,6 +8045,7 @@ async function updateRankingEntry(user, personagem, dados, foto) {
       socTimeline:    dados['soc-timeline']    || '',
     });
   } catch(e) {
+    _diag('updateRankingEntry(' + docId + ')', e);
     console.warn('[Ranking] Erro ao atualizar rankingGlobal:', e);
   }
 }
@@ -7980,7 +8074,7 @@ async function salvarListaNuvem(lista, user) {
   if (!window.db || !window.doc || !window.setDoc) return;
   const u = user || usuarioAtual;
   try {
-    await window.setDoc(window.doc(window.db, 'chars', u), {
+    await window.setDoc(window.doc(window.db, 'chars', _charsDocId(u)), {
       lista: JSON.stringify(lista),
       ts: Date.now()
     });
@@ -7994,7 +8088,7 @@ async function carregarListaNuvem(user) {
   if (!window.db || !window.doc || !window.getDoc) return null;
   const u = user || usuarioAtual;
   try {
-    const snap = await window.getDoc(window.doc(window.db, 'chars', u));
+    const snap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(u)));
     if (snap.exists()) {
       console.log('[Firestore] Lista de personagens carregada:', u);
       return JSON.parse(snap.data().lista);
@@ -8159,8 +8253,11 @@ function salvarLocal(targetUser) {
   // Debounce: salva na nuvem 1.5s após última edição
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async () => {
-    await salvarFichaFirestore(u, dados);
-    if (el) { el.innerHTML = icone('cloud','ic-sm')+' Salvo na nuvem'; el.className = 'save-status saved'; }
+    const ok = await salvarFichaFirestore(u, dados);
+    if (el) {
+      if (ok) { el.innerHTML = icone('cloud','ic-sm')+' Salvo na nuvem'; el.className = 'save-status saved'; }
+      else { el.innerHTML = icone('close','ic-sm')+' Falha ao salvar na nuvem (só local)'; el.className = 'save-status erro'; }
+    }
   }, 1500);
 }
 
@@ -8170,8 +8267,11 @@ function salvarFicha() {
   localStorage.setItem('ficha_' + usuarioAtual + '_' + personagemAtual, JSON.stringify(dados));
   const el = document.getElementById('save-status');
   if (el) { el.textContent = '⏳ Salvando…'; el.className = 'save-status'; }
-  salvarFichaFirestore(usuarioAtual, dados).then(() => {
-    if (el) { el.innerHTML = icone('check','ic-sm')+' Ficha salva!'; el.className = 'save-status saved'; }
+  salvarFichaFirestore(usuarioAtual, dados).then(ok => {
+    if (el) {
+      if (ok) { el.innerHTML = icone('check','ic-sm')+' Ficha salva!'; el.className = 'save-status saved'; }
+      else { el.innerHTML = icone('close','ic-sm')+' Falha ao salvar na nuvem (só local)'; el.className = 'save-status erro'; }
+    }
   });
 }
 
@@ -8327,7 +8427,7 @@ async function renderGMPlayers() {
 
     try {
       if (window.db && window.doc && window.getDoc) {
-        const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
+        const listaSnap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(user)));
         if (listaSnap.exists()) {
           personagens = JSON.parse(listaSnap.data().lista || '[]');
         }
@@ -8482,7 +8582,7 @@ async function carregarDadosInline(user, container) {
   if (!window.db || !window.doc || !window.getDoc) return;
   try {
     // Carrega lista de personagens do usuário
-    const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
+    const listaSnap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(user)));
     const lista = listaSnap.exists() ? JSON.parse(listaSnap.data().lista || '[]') : [];
     if (!lista.length) return;
 
@@ -8571,7 +8671,7 @@ async function renderADMPlayers() {
     let dados = {};
     try {
       if (window.db && window.doc && window.getDoc) {
-        const listaSnap = await window.getDoc(window.doc(window.db, 'chars', user));
+        const listaSnap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(user)));
         let primeiroPerso = null;
         if (listaSnap.exists()) primeiroPerso = JSON.parse(listaSnap.data().lista || '[]')[0] || null;
         if (primeiroPerso) {
@@ -8661,9 +8761,88 @@ function mostrarTab(tabId) {
   document.getElementById('content-' + tabId)?.classList.add('active');
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// MIGRAÇÃO RETROATIVA DE CAPITALIZAÇÃO DE USERNAME
+// ═══════════════════════════════════════════════════════════════════════
+// Contexto: antes de _normUser existir, o docId de cada coleção (chars,
+// fichas, fotos, rankingGlobal) usava o username exatamente como foi
+// digitado/cadastrado (ex: "Joao", "JOAO", "joao" geravam 3 documentos
+// diferentes). A correção em _fsDocId/_fotoDocId/_charsDocId resolve
+// o problema para todo dado NOVO, mas não resolve por si só o dado
+// ANTIGO já gravado com a grafia "errada" — ele continua existindo sob
+// o ID antigo e fica invisível para o código novo (que só lê o ID
+// normalizado em minúsculas).
+//
+// Esta função roda uma vez por login: tenta localizar documentos do
+// usuário sob a grafia exata como está cadastrado em usuarios_extras
+// (campo 'nome' não serve, mas o id do doc malformado pode ter sobrado
+// em chars/<grafia antiga>). Como não sabemos de antemão qual era a
+// grafia antiga, tentamos as variações mais comuns: tal como digitada
+// no login (antes do toLowerCase) e capitalizada (Maiúscula inicial).
+async function _migrarCapitalizacaoAntiga(userDigitadoOriginal, userNormalizado) {
+  if (!window.db || !window.doc || !window.getDoc || !window.setDoc) return;
+  if (userDigitadoOriginal === userNormalizado) return; // nada para migrar
+
+  const candidatos = [...new Set([
+    userDigitadoOriginal,
+    userDigitadoOriginal.charAt(0).toUpperCase() + userDigitadoOriginal.slice(1),
+    userNormalizado.charAt(0).toUpperCase() + userNormalizado.slice(1),
+    userNormalizado.toUpperCase(),
+  ])].filter(c => c !== userNormalizado);
+
+  for (const candidato of candidatos) {
+    try {
+      // 1. Lista de personagens (coleção chars) sob a grafia antiga
+      const charsAntigoRef = window.doc(window.db, 'chars', _sanitizeDocPart(candidato));
+      const charsAntigoSnap = await window.getDoc(charsAntigoRef);
+      if (!charsAntigoSnap.exists()) continue; // esse candidato não tem dados antigos
+
+      console.log('[Migração] Encontrados dados antigos sob a grafia:', candidato);
+      const listaAntiga = JSON.parse(charsAntigoSnap.data().lista || '[]');
+
+      // 2. Mescla com a lista já normalizada (se existir)
+      const charsNovoRef = window.doc(window.db, 'chars', _sanitizeDocPart(userNormalizado));
+      const charsNovoSnap = await window.getDoc(charsNovoRef);
+      const listaNova = charsNovoSnap.exists() ? JSON.parse(charsNovoSnap.data().lista || '[]') : [];
+      const listaMerge = [...new Set([...listaNova, ...listaAntiga])];
+      await window.setDoc(charsNovoRef, { lista: JSON.stringify(listaMerge) });
+
+      // 3. Para cada personagem, migra fichas/fotos/rankingGlobal do ID antigo para o novo
+      for (const nomePersonagem of listaAntiga) {
+        const idAntigo = _sanitizeDocPart(candidato) + '_' + _sanitizeDocPart(nomePersonagem);
+        const idNovo   = _fsDocId(userNormalizado, nomePersonagem);
+        if (idAntigo === idNovo) continue;
+
+        for (const colecao of ['fichas', 'fotos', 'rankingGlobal', 'personalizacoes']) {
+          try {
+            const refAntigo = window.doc(window.db, colecao, idAntigo);
+            const snapAntigo = await window.getDoc(refAntigo);
+            if (!snapAntigo.exists()) continue;
+            const refNovo = window.doc(window.db, colecao, idNovo);
+            const snapNovo = await window.getDoc(refNovo);
+            if (snapNovo.exists()) continue; // já migrado anteriormente — não sobrescreve dado novo
+            const dadosAntigos = snapAntigo.data();
+            await window.setDoc(refNovo, { ...dadosAntigos, user: userNormalizado, personagem: nomePersonagem });
+            console.log(`[Migração] ${colecao}/${idAntigo} → ${colecao}/${idNovo}`);
+          } catch(e) {
+            _diag(`_migrarCapitalizacaoAntiga → ${colecao}/${idAntigo}`, e);
+          }
+        }
+      }
+
+      // Não removemos os documentos antigos automaticamente (segurança:
+      // preferimos manter um backup acessível do que perder dado por engano).
+      console.log('[Migração] Concluída para a grafia antiga:', candidato);
+    } catch(e) {
+      _diag('_migrarCapitalizacaoAntiga → candidato ' + candidato, e);
+    }
+  }
+}
+
 // ─── LOGIN / LOGOUT ───
 async function tentarLogin() {
-  const user = document.getElementById('login-user').value.trim().toLowerCase();
+  const userOriginal = document.getElementById('login-user').value.trim();
+  const user = userOriginal.toLowerCase();
   const pass = document.getElementById('login-pass').value;
   const err  = document.getElementById('login-error');
   err.style.display = 'none';
@@ -8694,6 +8873,12 @@ async function tentarLogin() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     _toggleTabbar(true);
+
+    // Migração silenciosa de dados antigos com capitalização diferente,
+    // ANTES de iniciar() carregar a lista de personagens — assim, se
+    // houver dados órfãos, eles já aparecem na primeira renderização.
+    await _migrarCapitalizacaoAntiga(userOriginal, user);
+
     iniciar();
   } catch(e) {
     console.warn('[Auth] Erro no login:', e.code, e.message);
@@ -12423,4 +12608,4 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-</body></html>e
+</body></html>
