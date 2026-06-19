@@ -4750,6 +4750,60 @@ async function _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId) 
   };
 }
 
+// ─── INDEXAÇÃO AUTOMÁTICA DO USUÁRIO ATUAL ──────────────────────────────────
+// Garante que TODOS os personagens do usuário logado existam em rankingGlobal.
+// Roda uma vez no login. É idempotente — se já existe, apenas atualiza com dados frescos.
+async function _indexarPersonagensUsuarioAtual() {
+  if (!usuarioAtual || !window.db || !window.doc || !window.getDoc || !window.setDoc) return;
+  try {
+    // Obtém lista de personagens do usuário (nuvem + local)
+    const listaLocal = JSON.parse(localStorage.getItem(`chars_${usuarioAtual}`) || '[]');
+    let listaNuvem = [];
+    try {
+      const charsSnap = await window.getDoc(window.doc(window.db, 'chars', usuarioAtual));
+      if (charsSnap.exists()) listaNuvem = JSON.parse(charsSnap.data().lista || '[]');
+    } catch(e) {}
+    // Merge sem duplicatas
+    const lista = [...new Set([...listaNuvem, ...listaLocal])];
+    if (!lista.length) return;
+
+    for (const nome of lista) {
+      try {
+        const docId = _fsDocId(usuarioAtual, nome);
+        // Verifica se já existe no rankingGlobal
+        const rankSnap = await window.getDoc(window.doc(window.db, 'rankingGlobal', docId));
+        const jaExiste = rankSnap.exists();
+
+        // Carrega dados da ficha (nuvem tem prioridade)
+        let dados = {};
+        try {
+          const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', docId));
+          if (fichaSnap.exists()) {
+            const raw = fichaSnap.data().dados;
+            dados = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+          }
+        } catch(e) {}
+
+        // Se não existe no rankingGlobal, ou se existe mas está desatualizado, indexa
+        if (!jaExiste) {
+          // Busca foto salva
+          let foto = null;
+          try {
+            const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(usuarioAtual, nome)));
+            if (fotoSnap.exists()) foto = fotoSnap.data().principal || null;
+          } catch(e) {}
+          await updateRankingEntry(usuarioAtual, nome, dados, foto);
+          console.log('[Ranking] Personagem indexado no login:', docId);
+        }
+      } catch(e) {
+        console.warn('[Ranking] Erro ao indexar personagem:', nome, e);
+      }
+    }
+  } catch(e) {
+    console.warn('[Ranking] Erro em _indexarPersonagensUsuarioAtual:', e);
+  }
+}
+
 async function carregarRanking() {
   const grid = document.getElementById('ranking-grid');
   if (!grid) return;
@@ -8939,7 +8993,12 @@ async function iniciar() {
   await carregarUsuariosExtras();
   await carregarRankingOcultos(); // carrega lista de ocultos antes do ranking
   carregarCapitulosExtras();
-  carregarRanking();
+
+  // ── Garante que os personagens do usuário atual existam no rankingGlobal ──
+  // Isso resolve o caso de personagens criados antes do sistema de indexação
+  // ou que nunca foram salvos após a implementação do rankingGlobal.
+  _indexarPersonagensUsuarioAtual().then(() => carregarRanking());
+
   _carregarBlocosLivroNuvem(); // carrega blocos editados do livro (em background)
   if (personagemAtual) await inicializarFotos();
 
@@ -12364,4 +12423,4 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-</body></html>
+</body></html>e
