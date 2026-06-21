@@ -443,7 +443,15 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 }
 
 /* SIDEBAR */
-.sidebar { position:fixed; top:0; left:0; width:260px; height:100vh; background:var(--bg-surface); border-right:1px solid var(--border); padding:1.5rem 1.25rem; overflow-y:auto; z-index:200; display:flex; flex-direction:column; }
+.sidebar { position:fixed; top:0; left:0; width:260px; height:100vh; background:var(--bg-surface); border-right:1px solid var(--border); padding:1.5rem 1.25rem; overflow:hidden; z-index:200; display:flex; flex-direction:column; }
+/* Área rolável da sidebar (busca até Regras) — separada do rodapé do
+   jogador, que fica FORA daqui. Antes, tudo (inclusive o botão "Sair da
+   Torre") ficava dentro de uma única área rolável de 100vh — com vários
+   personagens + os 10 capítulos de Regras, o conteúdo passava da altura
+   da tela e o botão de sair ficava escondido no fim do scroll. min-height:0
+   é necessário aqui: sem isso, um filho flex não encolhe pra caber no
+   espaço disponível e a rolagem interna não funciona. */
+.sidebar-scroll { flex:1 1 auto; overflow-y:auto; min-height:0; }
 .sidebar-logo { font-family:'Playfair Display',serif; font-size:1.1rem; color:#f0f0f5; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border); line-height:1.3; }
 .sidebar-logo span { display:block; font-size:.65rem; letter-spacing:3px; color:var(--accent-light); text-transform:uppercase; }
 .sidebar-section-label { font-size:.65rem; text-transform:uppercase; letter-spacing:2px; color:var(--accent-light); margin:1.2rem 0 .4rem; border-left:3px solid var(--accent-light); padding-left:.5rem; display:flex; align-items:center; gap:.4rem; }
@@ -461,7 +469,7 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 .badge-player { background:rgba(100,100,120,.2); color:var(--silver); border:1px solid var(--border); }
 
 /* SIDEBAR PLAYER */
-.sidebar-player { position:sticky; bottom:0; margin-top:auto; padding-top:1rem; border-top:1px solid var(--border); background:var(--bg-surface); }
+.sidebar-player { flex-shrink:0; padding-top:1rem; border-top:1px solid var(--border); background:var(--bg-surface); }
 .sidebar-player-name { font-size:.78rem; color:var(--silver); font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:.3rem; }
 .sidebar-player-info { font-size:.78rem; color:var(--text-muted); }
 .logout-btn { background:none; border:1px solid var(--border); color:var(--text-muted); padding:.35rem .7rem; font-size:.78rem; cursor:pointer; margin-top:.6rem; font-family:inherit; transition:all .2s; width:100%; }
@@ -2071,6 +2079,14 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   padding: .65rem 1rem;
   border-left: 2px solid rgba(193,63,63,.4);
   background: rgba(255,255,255,.025);
+}
+
+#btn-curtir.curtido {
+  background: rgba(193,63,63,.22);
+  border-color: rgba(220,90,90,.6);
+}
+#btn-curtir:not([style*="cursor: default"]):hover {
+  background: rgba(156,42,42,.2);
 }
 
 /* ══════════════════════════════════════════════════════
@@ -4164,6 +4180,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
   </nav>
 
   <nav class="sidebar" id="sidebar">
+    <div class="sidebar-scroll">
     <div class="sb-search">
       <span class="sb-search-icon"><svg class="ic"><use href="#ic-search"></use></svg></span>
       <input type="text" id="sb-search-input" placeholder="Buscar capítulos, regras, personagens..." oninput="filtrarSidebar(this.value)">
@@ -4229,7 +4246,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
       <li><a data-nav="cap9" onclick="navTo(&#39;cap9&#39;)">Cap. 9 — Progressão</a></li>
       <li><a data-nav="cap10" onclick="navTo(&#39;cap10&#39;)">Cap. 10 — Perícias</a></li>
     </ul>
-
+    </div><!-- /sidebar-scroll -->
 
     <div class="sidebar-player">
       <div class="sidebar-player-name" id="sb-player-name">—</div>
@@ -5385,11 +5402,15 @@ function _fichaFromRankingGlobal(docId, d) {
     descricaoPublica: d.descricaoPublica || '',
     // ─ Grimório — Perfil Social ─
     socHistoria:   d.socHistoria   || '',
+    socObjetivos:  d.socObjetivos  || '',
+    socFilosofia:  d.socFilosofia  || '',
     socFeitos:     d.socFeitos     || '',
     socConquistas: d.socConquistas || '',
     socTitulos:    d.socTitulos    || '',
     socAliados:    d.socAliados    || '',
     socRivais:     d.socRivais     || '',
+    socPactos:     d.socPactos     || '',
+    socMentores:   d.socMentores   || '',
     socTimeline:   d.socTimeline   || '',
     // ─ Grimório — Aba Poder ─
     poderDescricao: d.poderDescricao || '',
@@ -5446,11 +5467,15 @@ async function _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId) 
     descricaoPublica: dados['f-descricao-publica'] || '',
     // ─ Grimório — Perfil Social ─
     socHistoria:   dados['soc-historia']    || '',
+    socObjetivos:  dados['soc-objetivos']   || '',
+    socFilosofia:  dados['soc-filosofia']   || '',
     socFeitos:     dados['soc-feitos']      || '',
     socConquistas: dados['soc-conquistas']  || '',
     socTitulos:    dados['soc-titulos']     || '',
     socAliados:    dados['soc-aliados']     || '',
     socRivais:     dados['soc-rivais']      || '',
+    socPactos:     dados['soc-pactos']      || '',
+    socMentores:   dados['soc-mentores']    || '',
     socTimeline:   dados['soc-timeline']    || '',
     // ─ Grimório — Aba Poder ─
     poderDescricao: dados['p-descricao'] || '',
@@ -5762,6 +5787,523 @@ async function renderGMRankingVisibilidade() {
   }).join('');
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// SISTEMA DE LIKES — cada personagem pode curtir outro personagem.
+// Coleção 'likes', um doc por par (target_source) — o próprio ID do
+// documento já impede curtida duplicada (criar de novo só sobrescreve
+// o mesmo doc; pra "descurtir" a gente exclui o doc).
+// ═══════════════════════════════════════════════════════════════════
+function _likeDocId(targetPid, sourcePid) {
+  return targetPid + '__' + sourcePid;
+}
+
+async function contarCurtidas(targetPid) {
+  if (!window.db || !window.collection || !window.query || !window.where || !window.getCountFromServer) return 0;
+  try {
+    const q = window.query(window.collection(window.db, 'likes'), window.where('target', '==', targetPid));
+    const snap = await window.getCountFromServer(q);
+    return snap.data().count;
+  } catch(e) { console.warn('[Likes] Erro ao contar curtidas:', e); return 0; }
+}
+
+async function jaCurtiu(targetPid, sourcePid) {
+  if (!window.db || !window.doc || !window.getDoc) return false;
+  try {
+    const snap = await window.getDoc(window.doc(window.db, 'likes', _likeDocId(targetPid, sourcePid)));
+    return snap.exists();
+  } catch(e) { return false; }
+}
+
+// Atualiza o botão de curtir na tela com a contagem e o estado atuais.
+// Roda toda vez que um perfil abre e depois de cada curtir/descurtir.
+async function _atualizarUiCurtidas(targetPid) {
+  if (!document.getElementById('btn-curtir')) return;
+  const sourcePid = (usuarioAtual && personagemAtual) ? _fsDocId(usuarioAtual, personagemAtual) : null;
+  const [total, curtiu] = await Promise.all([
+    contarCurtidas(targetPid),
+    (sourcePid && sourcePid !== targetPid) ? jaCurtiu(targetPid, sourcePid) : Promise.resolve(false)
+  ]);
+  // O perfil pode ter sido fechado enquanto isso carregava — confere de novo
+  const btn = document.getElementById('btn-curtir');
+  if (!btn) return;
+  btn.innerHTML = (curtiu ? '❤️' : '🤍') + ' ' + total + (total === 1 ? ' Curtida' : ' Curtidas');
+  btn.classList.toggle('curtido', curtiu);
+}
+
+// Curte ou descurte (toggle) o personagem cujo perfil está aberto, em
+// nome do personagem ATIVO de quem clicou — por isso o botão fica
+// desativado no próprio perfil (não dá pra curtir a si mesmo).
+async function alternarCurtida(targetPid, targetUser, targetNome) {
+  if (!usuarioAtual || !personagemAtual) { alert('Ative um personagem para curtir.'); return; }
+  const sourcePid = _fsDocId(usuarioAtual, personagemAtual);
+  if (sourcePid === targetPid) return;
+  if (!window.db || !window.doc || !window.getDoc || !window.setDoc || !window.deleteDoc) return;
+  const docId = _likeDocId(targetPid, sourcePid);
+  const btn = document.getElementById('btn-curtir');
+  if (btn) btn.style.opacity = '.6';
+  try {
+    const snap = await window.getDoc(window.doc(window.db, 'likes', docId));
+    if (snap.exists()) {
+      await window.deleteDoc(window.doc(window.db, 'likes', docId));
+    } else {
+      await window.setDoc(window.doc(window.db, 'likes', docId), {
+        target: targetPid,
+        targetUser: targetUser,
+        source: sourcePid,
+        sourceUser: usuarioAtual,
+        sourceNome: personagemAtual,
+        ts: Date.now()
+      });
+    }
+  } catch(e) {
+    console.warn('[Likes] Erro ao curtir/descurtir:', e);
+    _diag('alternarCurtida(' + docId + ')', e);
+  }
+  await _atualizarUiCurtidas(targetPid);
+  const btnFinal = document.getElementById('btn-curtir');
+  if (btnFinal) btnFinal.style.opacity = '';
+}
+
+// Mostra quem curtiu o personagem cujo perfil está aberto.
+async function abrirListaCurtidas(targetPid) {
+  document.getElementById('lista-curtidas-overlay')?.remove();
+  const ov = document.createElement('div');
+  ov.className = 'foto-lightbox-overlay';
+  ov.id = 'lista-curtidas-overlay';
+  ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
+  ov.innerHTML = `<div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;max-width:360px;width:90%;max-height:70vh;overflow-y:auto;padding:1.2rem" onclick="event.stopPropagation()">
+    <h3 style="margin:0 0 .8rem;font-family:'Playfair Display',serif;color:var(--gold-light);display:flex;align-items:center;gap:.4rem">❤️ Curtidas</h3>
+    <div id="lista-curtidas-conteudo" style="font-size:.85rem;color:var(--text-muted)">Carregando…</div>
+  </div>`;
+  document.body.appendChild(ov);
+  if (!window.db || !window.collection || !window.query || !window.where || !window.getDocs) return;
+  try {
+    const q = window.query(window.collection(window.db, 'likes'), window.where('target', '==', targetPid));
+    const snap = await window.getDocs(q);
+    const conteudo = document.getElementById('lista-curtidas-conteudo');
+    if (!conteudo) return;
+    if (snap.empty) { conteudo.innerHTML = 'Ninguém curtiu ainda. Seja o primeiro!'; return; }
+    const itens = [];
+    snap.forEach(d => itens.push(d.data()));
+    itens.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    conteudo.innerHTML = itens.map(it =>
+      `<div style="padding:.5rem 0;border-bottom:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:.4rem">
+        <span style="opacity:.7">❤️</span> ${it.sourceNome || it.source || 'Desconhecido'}
+      </div>`
+    ).join('');
+  } catch(e) {
+    console.warn('[Likes] Erro ao listar curtidas:', e);
+    const conteudo = document.getElementById('lista-curtidas-conteudo');
+    if (conteudo) conteudo.innerHTML = 'Não foi possível carregar as curtidas agora.';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SISTEMA DE PUBLICAÇÕES — feed de posts por personagem (registros de
+// aventuras, prints, acontecimentos do RPG). Coleção 'posts' (um doc por
+// publicação) + 'comentarios' (um doc por comentário, ligado por postId).
+// Likes em posts reaproveitam o mesmo sistema de curtidas dos perfis
+// (contarCurtidas/jaCurtiu/alternarCurtida/abrirListaCurtidas já são
+// genéricos por "targetPid" — aqui o targetPid é o ID do post).
+// ═══════════════════════════════════════════════════════════════════
+function _fmtDataPost(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  const dia = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+  const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  return `${dia} às ${hora}`;
+}
+
+let _anexoPostTemp = null;
+
+function abrirSeletorImagemPost() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  input.onchange = async () => {
+    if (!input.files[0]) { input.remove(); return; }
+    try {
+      _anexoPostTemp = await imageToBlob(input.files[0], 1200, 0.85);
+      const prev = document.getElementById('post-anexo-preview');
+      if (prev) {
+        prev.src = URL.createObjectURL(_anexoPostTemp);
+        prev.style.display = 'block';
+      }
+    } catch(e) { console.warn('[Publicacoes] Erro ao processar imagem:', e); }
+    input.remove();
+  };
+  document.body.appendChild(input);
+  input.click();
+}
+
+function removerAnexoPost() {
+  _anexoPostTemp = null;
+  const prev = document.getElementById('post-anexo-preview');
+  if (prev) { prev.style.display = 'none'; prev.src = ''; }
+}
+
+// Renderiza a caixa de "criar publicação" — só aparece pro dono do perfil
+// (ou GM/ADM), igual ao "Create Post" de uma Página do Facebook.
+function _renderComposerPost(pid, authorUser, authorPersonagem) {
+  const area = document.getElementById('publicacoes-composer-area');
+  if (!area) return;
+  const podePostar = (_normUser(authorUser) === _normUser(usuarioAtual) && authorPersonagem === personagemAtual) || roleAtual === 'gm' || roleAtual === 'adm';
+  if (!podePostar) { area.innerHTML = ''; return; }
+  _anexoPostTemp = null;
+  area.innerHTML = `
+    <div class="livro-section" style="margin-bottom:1rem">
+      <textarea id="post-conteudo-input" placeholder="Registre uma aventura, um acontecimento, um print..." style="width:100%;min-height:70px;background:rgba(0,0,0,.25);border:1px solid var(--border);color:var(--text);padding:.6rem;font-family:inherit;font-size:.85rem;resize:vertical"></textarea>
+      <img id="post-anexo-preview" style="display:none;max-width:100%;max-height:160px;object-fit:cover;margin-top:.5rem;border:1px solid var(--border)">
+      <div style="display:flex;gap:.5rem;margin-top:.6rem;align-items:center;flex-wrap:wrap">
+        <button type="button" onclick="abrirSeletorImagemPost()" title="Anexar imagem" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.6rem .8rem;font-family:inherit;font-size:.78rem;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;min-height:44px">
+          <svg class="ic ic-sm"><use href="#ic-camera"/></svg> Imagem
+        </button>
+        <button type="button" onclick="removerAnexoPost()" style="background:none;border:none;color:var(--text-muted);font-size:.78rem;cursor:pointer;text-decoration:underline;padding:.6rem;min-height:44px">remover anexo</button>
+      </div>
+      <button type="button" onclick="publicarPost('${pid}','${authorUser}','${authorPersonagem.replace(/'/g,"\\'")}')" style="width:100%;margin-top:.6rem;background:var(--accent);border:none;color:#fff;padding:.7rem 1.2rem;font-family:'Playfair Display',serif;font-size:.9rem;cursor:pointer;min-height:44px">Publicar</button>
+    </div>
+  `;
+}
+
+async function publicarPost(pid, authorUser, authorPersonagem) {
+  const ta = document.getElementById('post-conteudo-input');
+  const conteudo = ta ? ta.value.trim() : '';
+  if (!conteudo && !_anexoPostTemp) { alert('Escreva algo ou anexe uma imagem antes de publicar.'); return; }
+  if (!window.db || !window.collection || !window.addDoc) return;
+  const btn = document.querySelector(`[onclick^="publicarPost('${pid}'"]`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Publicando…'; }
+  try {
+    let imagemUrl = '';
+    if (_anexoPostTemp) {
+      imagemUrl = await _cloudinaryUpload(_anexoPostTemp, 'posts');
+    }
+    await window.addDoc(window.collection(window.db, 'posts'), {
+      authorPid: pid,
+      authorUser: _normUser(authorUser),
+      authorPersonagem: authorPersonagem,
+      authorFoto: _fotoPrincipal || null,
+      conteudo: conteudo,
+      imagem: imagemUrl || '',
+      ts: Date.now()
+    });
+    _anexoPostTemp = null;
+    _renderComposerPost(pid, authorUser, authorPersonagem);
+    _carregarFeedPosts(pid);
+  } catch(e) {
+    console.warn('[Publicacoes] Erro ao publicar:', e);
+    _diag('publicarPost(' + pid + ')', e);
+    if (btn) { btn.disabled = false; btn.textContent = 'Publicar'; }
+  }
+}
+
+async function excluirPost(postId, pid) {
+  if (!confirm('Excluir esta publicação? Os comentários e curtidas dela também serão perdidos.')) return;
+  if (!window.db || !window.doc || !window.deleteDoc) return;
+  try {
+    await window.deleteDoc(window.doc(window.db, 'posts', postId));
+    _carregarFeedPosts(pid);
+  } catch(e) {
+    console.warn('[Publicacoes] Erro ao excluir post:', e);
+    _diag('excluirPost(' + postId + ')', e);
+  }
+}
+
+function _renderPostItem(id, post, pid) {
+  const podeExcluir = (post.authorUser === _normUser(usuarioAtual) && post.authorPersonagem === personagemAtual) || roleAtual === 'gm' || roleAtual === 'adm';
+  return `
+  <div class="livro-area-card" style="margin-bottom:1rem" id="post-${id}">
+    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;min-height:44px">
+      ${post.authorFoto
+        ? `<img src="${post.authorFoto}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
+        : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg class="ic ic-sm"><use href="#ic-ficha"/></svg></div>`}
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:.9rem">${post.authorPersonagem}</div>
+        <div style="font-size:.72rem;color:var(--text-muted)">${_fmtDataPost(post.ts)}</div>
+      </div>
+      ${podeExcluir ? `<button onclick="excluirPost('${id}','${pid}')" title="Excluir publicação" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.95rem;min-width:44px;min-height:44px;flex-shrink:0">✕</button>` : ''}
+    </div>
+    ${post.conteudo ? `<div class="livro-descricao" style="margin-bottom:.5rem">${post.conteudo.replace(/\n/g,'<br>')}</div>` : ''}
+    ${post.imagem ? `<img src="${post.imagem}" onclick="abrirLightbox('${post.imagem.replace(/'/g,"\\'")}')" style="width:100%;max-height:320px;object-fit:cover;cursor:pointer;border:1px solid var(--border);margin-bottom:.5rem">` : ''}
+    <div style="display:flex;gap:.5rem;align-items:center;padding-top:.2rem;border-top:1px solid var(--border)">
+      <button id="btn-curtir-post-${id}" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">🤍 …</button>
+      <button onclick="alternarComentarios('${id}')" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">💬 Comentários</button>
+    </div>
+    <div id="comentarios-area-${id}" style="display:none;margin-top:.6rem"></div>
+  </div>`;
+}
+
+async function _carregarFeedPosts(pid) {
+  const feed = document.getElementById('publicacoes-feed');
+  if (!feed || !window.db || !window.collection || !window.query || !window.where || !window.getDocs) return;
+  try {
+    const q = window.query(window.collection(window.db, 'posts'), window.where('authorPid', '==', pid));
+    const snap = await window.getDocs(q);
+    if (snap.empty) { feed.innerHTML = `<span class="livro-area-empty">Nenhuma publicação ainda.</span>`; return; }
+    const itens = [];
+    snap.forEach(d => itens.push({ id: d.id, ...d.data() }));
+    itens.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    feed.innerHTML = itens.map(p => _renderPostItem(p.id, p, pid)).join('');
+    itens.forEach(p => _atualizarUiCurtidasPost(p.id));
+  } catch(e) {
+    console.warn('[Publicacoes] Erro ao carregar feed:', e);
+    feed.innerHTML = `<span class="livro-area-empty">Não foi possível carregar as publicações.</span>`;
+  }
+}
+
+async function _atualizarUiCurtidasPost(postId) {
+  const btn = document.getElementById('btn-curtir-post-' + postId);
+  if (!btn) return;
+  const sourcePid = (usuarioAtual && personagemAtual) ? _fsDocId(usuarioAtual, personagemAtual) : null;
+  const [total, curtiu] = await Promise.all([
+    contarCurtidas(postId),
+    sourcePid ? jaCurtiu(postId, sourcePid) : Promise.resolve(false)
+  ]);
+  const btnFinal = document.getElementById('btn-curtir-post-' + postId);
+  if (!btnFinal) return;
+  btnFinal.innerHTML = (curtiu ? '❤️' : '🤍') + ' ' + total;
+  btnFinal.onclick = () => alternarCurtidaPost(postId);
+}
+
+async function alternarCurtidaPost(postId) {
+  if (!usuarioAtual || !personagemAtual) { alert('Ative um personagem para curtir.'); return; }
+  const sourcePid = _fsDocId(usuarioAtual, personagemAtual);
+  const docId = _likeDocId(postId, sourcePid);
+  try {
+    const snap = await window.getDoc(window.doc(window.db, 'likes', docId));
+    if (snap.exists()) {
+      await window.deleteDoc(window.doc(window.db, 'likes', docId));
+    } else {
+      await window.setDoc(window.doc(window.db, 'likes', docId), {
+        target: postId, source: sourcePid, sourceUser: usuarioAtual, sourceNome: personagemAtual, ts: Date.now()
+      });
+    }
+  } catch(e) { console.warn('[Publicacoes] Erro ao curtir post:', e); }
+  _atualizarUiCurtidasPost(postId);
+}
+
+function alternarComentarios(postId) {
+  const area = document.getElementById('comentarios-area-' + postId);
+  if (!area) return;
+  if (area.style.display === 'none') {
+    area.style.display = 'block';
+    _carregarComentarios(postId);
+  } else {
+    area.style.display = 'none';
+  }
+}
+
+async function _carregarComentarios(postId) {
+  const area = document.getElementById('comentarios-area-' + postId);
+  if (!area || !window.db) return;
+  area.innerHTML = `<span class="livro-area-empty">Carregando comentários…</span>`;
+  let itensHtml = '';
+  try {
+    const q = window.query(window.collection(window.db, 'comentarios'), window.where('postId', '==', postId));
+    const snap = await window.getDocs(q);
+    const itens = [];
+    snap.forEach(d => itens.push(d.data()));
+    itens.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+    itensHtml = itens.map(c => `
+      <div style="display:flex;gap:.5rem;padding:.4rem 0;border-bottom:1px solid var(--border)">
+        ${c.authorFoto
+          ? `<img src="${c.authorFoto}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+          : `<div style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);flex-shrink:0"></div>`}
+        <div style="flex:1">
+          <span style="font-weight:600;color:var(--gold-light);font-size:.8rem">${c.authorPersonagem}</span>
+          <span style="font-size:.7rem;color:var(--text-muted);margin-left:.4rem">${_fmtDataPost(c.ts)}</span>
+          <div style="font-size:.82rem;color:var(--text)">${(c.conteudo||'').replace(/\n/g,'<br>')}</div>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    console.warn('[Publicacoes] Erro ao carregar comentários:', e);
+    itensHtml = `<span class="livro-area-empty">Não foi possível carregar os comentários.</span>`;
+  }
+  const podeComentar = usuarioAtual && personagemAtual;
+  area.innerHTML = `
+    ${itensHtml || '<span class="livro-area-empty">Nenhum comentário ainda.</span>'}
+    ${podeComentar ? `
+    <div style="display:flex;gap:.4rem;margin-top:.5rem">
+      <input type="text" id="comentario-input-${postId}" placeholder="Escreva um comentário..." style="flex:1;background:rgba(0,0,0,.25);border:1px solid var(--border);color:var(--text);padding:.6rem;font-family:inherit;font-size:.85rem;min-height:44px" onkeydown="if(event.key==='Enter'){enviarComentario('${postId}')}">
+      <button onclick="enviarComentario('${postId}')" style="background:var(--accent);border:none;color:#fff;padding:.6rem 1rem;font-family:inherit;font-size:.85rem;cursor:pointer;min-height:44px;flex-shrink:0">Enviar</button>
+    </div>` : ''}
+  `;
+}
+
+async function enviarComentario(postId) {
+  const input = document.getElementById('comentario-input-' + postId);
+  const conteudo = input ? input.value.trim() : '';
+  if (!conteudo || !usuarioAtual || !personagemAtual) return;
+  if (!window.db || !window.collection || !window.addDoc) return;
+  try {
+    await window.addDoc(window.collection(window.db, 'comentarios'), {
+      postId,
+      authorUser: _normUser(usuarioAtual),
+      authorPersonagem: personagemAtual,
+      authorFoto: _fotoPrincipal || null,
+      conteudo,
+      ts: Date.now()
+    });
+    if (input) input.value = '';
+    _carregarComentarios(postId);
+  } catch(e) {
+    console.warn('[Publicacoes] Erro ao comentar:', e);
+    _diag('enviarComentario(' + postId + ')', e);
+  }
+}
+
+function _carregarPublicacoes(pid, authorUser, authorPersonagem, ehDono) {
+  _renderComposerPost(pid, authorUser, authorPersonagem);
+  _carregarFeedPosts(pid);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ABA USUÁRIO — representa o JOGADOR real, não o personagem. Foto e bio
+// vivem em usuarios_extras/{username} (mesmo doc que já guarda o "role"),
+// usando merge:true pra nunca sobrescrever esse campo por engano.
+// ═══════════════════════════════════════════════════════════════════
+let _fotoUsuarioArquivoTemp = null;
+
+async function _carregarAbaUsuario(targetUser) {
+  await _renderPerfilUsuario(targetUser);
+  await _carregarPersonagensVinculados(targetUser);
+}
+
+async function _renderPerfilUsuario(targetUser) {
+  const area = document.getElementById('usuario-perfil-area');
+  if (!area || !window.db || !window.doc || !window.getDoc) return;
+  const ehProprioUsuario = _normUser(targetUser) === _normUser(usuarioAtual);
+  let dados = {};
+  try {
+    const snap = await window.getDoc(window.doc(window.db, 'usuarios_extras', _normUser(targetUser)));
+    if (snap.exists()) dados = snap.data();
+  } catch(e) { console.warn('[Usuario] Erro ao carregar perfil de usuário:', e); }
+  const nomeReal = dados.nome || targetUser;
+  area.innerHTML = `
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+      ${dados.foto
+        ? `<img src="${dados.foto}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
+        : `<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg class="ic ic-lg"><use href="#ic-ficha"/></svg></div>`}
+      <div style="flex:1;min-width:160px">
+        <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:1.1rem">${nomeReal}</div>
+        <div style="font-size:.75rem;color:var(--text-muted)">@${_normUser(targetUser)}</div>
+      </div>
+    </div>
+    <div style="margin-top:.75rem;font-size:.85rem;color:var(--text)">
+      ${dados.bio ? dados.bio.replace(/\n/g,'<br>') : `<span class="livro-area-empty">Este jogador ainda não escreveu uma descrição.</span>`}
+    </div>
+    ${ehProprioUsuario ? `
+    <button onclick="abrirEditarPerfilUsuario()" style="margin-top:.75rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.55rem 1rem;font-family:inherit;font-size:.8rem;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:.4rem">
+      <svg class="ic ic-sm"><use href="#ic-edit"/></svg> Editar Perfil de Usuário
+    </button>` : ''}
+  `;
+}
+
+function abrirEditarPerfilUsuario() {
+  document.getElementById('editar-usuario-overlay')?.remove();
+  _fotoUsuarioArquivoTemp = null;
+  const dadosAtuais = USUARIOS[usuarioAtual] || {};
+  const ov = document.createElement('div');
+  ov.id = 'editar-usuario-overlay';
+  ov.className = 'foto-lightbox-overlay';
+  ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
+  ov.innerHTML = `
+    <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;max-width:380px;width:90%;max-height:80vh;overflow-y:auto;padding:1.3rem" onclick="event.stopPropagation()">
+      <h3 style="margin:0 0 .9rem;font-family:'Playfair Display',serif;color:var(--gold-light)">Editar Perfil de Usuário</h3>
+      <div style="text-align:center;margin-bottom:.8rem">
+        <img id="editar-usuario-foto-preview" src="${dadosAtuais.foto || ''}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--border);display:${dadosAtuais.foto ? 'inline-block' : 'none'};margin-bottom:.5rem" onerror="this.style.display='none'">
+        <div>
+          <button type="button" onclick="abrirSeletorFotoUsuario()" style="background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.5rem .9rem;font-family:inherit;font-size:.78rem;cursor:pointer;min-height:44px">Trocar Foto</button>
+        </div>
+      </div>
+      <label style="font-size:.72rem;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase">Descrição</label>
+      <textarea id="editar-usuario-bio" style="width:100%;min-height:90px;background:rgba(0,0,0,.25);border:1px solid var(--border);color:var(--text);padding:.6rem;font-family:inherit;font-size:.85rem;margin-top:.3rem;resize:vertical">${dadosAtuais.bio || ''}</textarea>
+      <div style="display:flex;gap:.5rem;margin-top:1rem">
+        <button onclick="document.getElementById('editar-usuario-overlay').remove()" style="flex:1;padding:.6rem;background:none;border:1px solid var(--border);color:var(--text-muted);font-family:inherit;font-size:.85rem;cursor:pointer;min-height:44px">Cancelar</button>
+        <button onclick="salvarPerfilUsuario()" style="flex:1;padding:.6rem;background:var(--accent);border:none;color:#fff;font-family:'Playfair Display',serif;font-size:.85rem;cursor:pointer;min-height:44px">Salvar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+function abrirSeletorFotoUsuario() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  input.onchange = async () => {
+    if (!input.files[0]) { input.remove(); return; }
+    try {
+      _fotoUsuarioArquivoTemp = await imageToBlob(input.files[0], 400, 0.85);
+      const prev = document.getElementById('editar-usuario-foto-preview');
+      if (prev) { prev.src = URL.createObjectURL(_fotoUsuarioArquivoTemp); prev.style.display = 'inline-block'; }
+    } catch(e) { console.warn('[Usuario] Erro ao processar foto:', e); }
+    input.remove();
+  };
+  document.body.appendChild(input);
+  input.click();
+}
+
+async function salvarPerfilUsuario() {
+  if (!usuarioAtual) return;
+  const bio = document.getElementById('editar-usuario-bio')?.value?.trim() || '';
+  const btn = document.querySelector('[onclick="salvarPerfilUsuario()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+  try {
+    const dados = { bio };
+    if (_fotoUsuarioArquivoTemp) {
+      dados.foto = await _cloudinaryUpload(_fotoUsuarioArquivoTemp, 'users');
+    }
+    // merge:true — NUNCA sobrescrever o campo "role" que já vive neste doc
+    await window.setDoc(window.doc(window.db, 'usuarios_extras', usuarioAtual), dados, { merge: true });
+    if (USUARIOS[usuarioAtual]) Object.assign(USUARIOS[usuarioAtual], dados);
+    document.getElementById('editar-usuario-overlay')?.remove();
+    _renderPerfilUsuario(usuarioAtual);
+  } catch(e) {
+    console.warn('[Usuario] Erro ao salvar perfil de usuário:', e);
+    alert('Não foi possível salvar. Tente novamente.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Salvar'; }
+  }
+}
+
+async function _carregarPersonagensVinculados(targetUser) {
+  const container = document.getElementById('usuario-personagens-vinculados');
+  if (!container || !window.db || !window.doc || !window.getDoc) return;
+  try {
+    const snap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(targetUser)));
+    const lista = snap.exists() ? (JSON.parse(snap.data().lista || '[]')) : [];
+    if (!lista.length) { container.innerHTML = '<span class="livro-area-empty">Nenhum personagem vinculado.</span>'; return; }
+    container.innerHTML = lista.map(nome => `
+      <button onclick="_abrirPersonagemVinculado('${_normUser(targetUser)}','${nome.replace(/'/g,"\\'")}')"
+        style="display:flex;align-items:center;gap:.5rem;width:100%;text-align:left;cursor:pointer;background:rgba(255,255,255,.02);border:1px solid var(--border);padding:.7rem;margin-bottom:.5rem;min-height:44px;color:var(--text);font-family:inherit;font-size:.85rem">
+        <svg class="ic ic-sm"><use href="#ic-ficha"/></svg> ${nome}
+      </button>
+    `).join('');
+  } catch(e) {
+    console.warn('[Usuario] Erro ao carregar personagens vinculados:', e);
+    container.innerHTML = '<span class="livro-area-empty">Não foi possível carregar.</span>';
+  }
+}
+
+async function _abrirPersonagemVinculado(user, nome) {
+  const docId = _fsDocId(user, nome);
+  if (!window.db || !window.doc || !window.getDoc) return;
+  try {
+    const rankSnap = await window.getDoc(window.doc(window.db, 'rankingGlobal', docId));
+    if (rankSnap.exists()) {
+      abrirPerfilPublico(_fichaFromRankingGlobal(docId, rankSnap.data()));
+      return;
+    }
+    const info = USUARIOS[user] || { nome: user, role: 'player' };
+    const f = await _fichaFallbackIndividual(user, info, nome, docId);
+    if (f) abrirPerfilPublico(f);
+    else alert('Não foi possível abrir esse personagem.');
+  } catch(e) {
+    console.warn('[Usuario] Erro ao abrir personagem vinculado:', e);
+    alert('Não foi possível abrir esse personagem.');
+  }
+}
+
 function abrirPerfilPublico(f) {
   // Remove modal anterior (livro-overlay = novo sistema, grimorio-overlay = legado)
   document.getElementById('livro-overlay')?.remove();
@@ -5802,11 +6344,15 @@ function abrirPerfilPublico(f) {
           f.frase = d['f-frase'] || f.frase || '';
           f.descricaoPublica = d['f-descricao-publica'] || f.descricaoPublica || '';
           f.socHistoria = d['soc-historia'] || f.socHistoria || '';
+          f.socObjetivos = d['soc-objetivos'] || f.socObjetivos || '';
+          f.socFilosofia = d['soc-filosofia'] || f.socFilosofia || '';
           f.socFeitos = d['soc-feitos'] || f.socFeitos || '';
           f.socConquistas = d['soc-conquistas'] || f.socConquistas || '';
           f.socTitulos = d['soc-titulos'] || f.socTitulos || '';
           f.socAliados = d['soc-aliados'] || f.socAliados || '';
           f.socRivais = d['soc-rivais'] || f.socRivais || '';
+          f.socPactos = d['soc-pactos'] || f.socPactos || '';
+          f.socMentores = d['soc-mentores'] || f.socMentores || '';
           f.socTimeline = d['soc-timeline'] || f.socTimeline || '';
           f.poderDescricao = d['p-descricao'] || f.poderDescricao || '';
           f.poderSuprema = d['p-suprema'] || f.poderSuprema || '';
@@ -5836,6 +6382,8 @@ function abrirPerfilPublico(f) {
 
   // Títulos
   const titulosArr = (f.socTitulos||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const _perfilEhProprio = (f.user === usuarioAtual && (f.nomePersonagem||f.nome) === personagemAtual);
+  const _nomePersonagemEscapado = (f.nomePersonagem||f.nome||'').replace(/'/g,"\\'");
   const titulosHtml = titulosArr.length
     ? titulosArr.map(t=>`<span class="livro-badge">${t}</span>`).join('')
     : '<span style="color:#444;font-size:.8rem;font-style:italic">Nenhum título ostentado.</span>';
@@ -5928,11 +6476,27 @@ function abrirPerfilPublico(f) {
             <span>${f.poder}</span>
           </div>` : ''}
 
+          <!-- Título — só exibe se o personagem tiver pelo menos um -->
+          ${titulosArr.length ? `
+          <div class="livro-titulo-portador" style="margin-top:.35rem;font-size:.78rem;color:var(--text-muted);letter-spacing:.5px">
+            Portador do Título:
+            <strong style="color:var(--gold-light);font-family:'Playfair Display',serif;font-weight:600;display:block;font-size:.95rem;margin-top:.1rem">${titulosArr[0]}</strong>
+          </div>` : ''}
+
           <!-- Tags: despertar, rank, facção, cidade, gênero, nível, núcleos -->
           <div class="livro-tags">${tags.join('')}</div>
 
           <!-- Frase marcante -->
           ${f.frase ? `<div class="livro-frase">"${f.frase}"</div>` : ''}
+
+          <!-- Sistema de Likes -->
+          <div class="livro-likes-row" style="display:flex;flex-direction:column;align-items:center;gap:.2rem;margin-top:.85rem">
+            <button id="btn-curtir" ${_perfilEhProprio ? '' : `onclick="alternarCurtida('${pid}','${f.user}','${_nomePersonagemEscapado}')"`}
+              style="background:rgba(156,42,42,.1);border:1px solid rgba(193,63,63,.35);color:var(--text);padding:.5rem 1.2rem;border-radius:20px;font-family:inherit;font-size:.88rem;cursor:${_perfilEhProprio?'default':'pointer'};display:inline-flex;align-items:center;gap:.4rem;transition:all .2s;min-height:44px">
+              🤍 Carregando…
+            </button>
+            <a onclick="abrirListaCurtidas('${pid}')" style="font-size:.74rem;color:var(--text-muted);cursor:pointer;text-decoration:underline;padding:.5rem;min-height:44px;display:inline-flex;align-items:center">Ver quem curtiu</a>
+          </div>
         </div>
       </div>
 
@@ -5943,9 +6507,10 @@ function abrirPerfilPublico(f) {
       <div class="livro-tabs-nav" role="tablist">
         <button class="livro-tab-btn active" data-tab="perfil" onclick="_mudarAbaLivro('perfil',this)" role="tab" aria-selected="true">${icone('ficha','ic-sm')} Perfil</button>
         <button class="livro-tab-btn" data-tab="poder" onclick="_mudarAbaLivro('poder',this)" role="tab" aria-selected="false">${icone('bolt','ic-sm')} Poder</button>
-        <button class="livro-tab-btn" data-tab="historia" onclick="_mudarAbaLivro('historia',this)" role="tab" aria-selected="false">${icone('scroll','ic-sm')} História</button>
-        <button class="livro-tab-btn" data-tab="conquistas" onclick="_mudarAbaLivro('conquistas',this)" role="tab" aria-selected="false">${icone('moon','ic-sm')} Conquistas</button>
+        <button class="livro-tab-btn" data-tab="sobre" onclick="_mudarAbaLivro('sobre',this)" role="tab" aria-selected="false">${icone('scroll','ic-sm')} Sobre</button>
+        <button class="livro-tab-btn" data-tab="publicacoes" onclick="_mudarAbaLivro('publicacoes',this)" role="tab" aria-selected="false">${icone('banner','ic-sm')} Publicações</button>
         <button class="livro-tab-btn" data-tab="ranking" onclick="_mudarAbaLivro('ranking',this)" role="tab" aria-selected="false">${icone('lendas','ic-sm')} Ranking</button>
+        <button class="livro-tab-btn" data-tab="usuario" onclick="_mudarAbaLivro('usuario',this)" role="tab" aria-selected="false">${icone('ficha','ic-sm')} Usuário</button>
       </div>
 
       <div class="livro-body">
@@ -6015,8 +6580,8 @@ function abrirPerfilPublico(f) {
           </div>`}
         </div>
 
-        <!-- ═══ ABA: HISTÓRIA — História, Eventos (linha do tempo), NPCs (aliados/rivais) ═══ -->
-        <div class="livro-tab-pane" id="livro-pane-historia">
+        <!-- ═══ ABA: SOBRE — História, Objetivos, Filosofia, Feitos, Conquistas, Relações ═══ -->
+        <div class="livro-tab-pane" id="livro-pane-sobre">
           <div class="livro-section">
             <div class="livro-section-title">${icone('scroll','ic-sm')} História</div>
             ${f.socHistoria
@@ -6025,41 +6590,74 @@ function abrirPerfilPublico(f) {
           </div>
 
           <div class="livro-section">
-            <div class="livro-section-title">${icone('clock','ic-sm')} Linha do Tempo (Eventos)</div>
-            <div class="livro-timeline">${timelineHtml}</div>
-          </div>
-
-          <div class="livro-section">
-            <div class="livro-section-title">${icone('sword','ic-sm')} NPCs — Aliados & Rivais</div>
+            <div class="livro-section-title">${icone('eye','ic-sm')} Objetivos &amp; Filosofia de Vida</div>
             <div class="livro-2col">
               <div class="livro-area-card">
-                <div class="livro-area-title">${icone('shield','ic-sm')} Aliados & Pactos</div>
-                ${listaHTML(linhas(f.socAliados), 'Nenhum aliado registrado.')}
+                <div class="livro-area-title">${icone('moon','ic-sm')} Objetivos Atuais</div>
+                ${f.socObjetivos
+                  ? `<div class="livro-descricao">${f.socObjetivos.replace(/\n/g,'<br>')}</div>`
+                  : `<span class="livro-area-empty">Nenhum objetivo registrado.</span>`}
               </div>
               <div class="livro-area-card">
-                <div class="livro-area-title">${icone('skull','ic-sm')} Rivais & Inimigos</div>
-                ${listaHTML(linhas(f.socRivais), 'Nenhum rival registrado.')}
+                <div class="livro-area-title">${icone('prism','ic-sm')} Filosofia de Vida</div>
+                ${f.socFilosofia
+                  ? `<div class="livro-descricao">${f.socFilosofia.replace(/\n/g,'<br>')}</div>`
+                  : `<span class="livro-area-empty">Nenhuma filosofia registrada.</span>`}
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- ═══ ABA: CONQUISTAS — Conquistas, Torres concluídas, Chefes derrotados ═══ -->
-        <div class="livro-tab-pane" id="livro-pane-conquistas">
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('bolt','ic-sm')} Feitos em Batalha — Torres &amp; Chefes</div>
+            ${f.socFeitos
+              ? `<div class="livro-descricao">${f.socFeitos.replace(/\n/g,'<br>')}</div>`
+              : `<span class="livro-area-empty">Nenhum feito registrado.</span>`}
+          </div>
+
           <div class="livro-section">
             <div class="livro-section-title">${icone('moon','ic-sm')} Conquistas</div>
             ${conquistasHtml}
           </div>
 
           <div class="livro-section">
-            <div class="livro-section-title">${icone('bolt','ic-sm')} Feitos em Batalha — Torres & Chefes</div>
-            ${f.socFeitos
-              ? `<div class="livro-descricao">${f.socFeitos.replace(/\n/g,'<br>')}</div>`
-              : `<span class="livro-area-empty">Nenhum feito registrado.</span>`}
+            <div class="livro-section-title">${icone('clock','ic-sm')} Linha do Tempo (Eventos)</div>
+            <div class="livro-timeline">${timelineHtml}</div>
+          </div>
+
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('sword','ic-sm')} Relações</div>
+            <div class="livro-2col">
+              <div class="livro-area-card">
+                <div class="livro-area-title">${icone('shield','ic-sm')} Aliados</div>
+                ${listaHTML(linhas(f.socAliados), 'Nenhum aliado registrado.')}
+              </div>
+              <div class="livro-area-card">
+                <div class="livro-area-title">${icone('skull','ic-sm')} Rivais</div>
+                ${listaHTML(linhas(f.socRivais), 'Nenhum rival registrado.')}
+              </div>
+            </div>
+            <div class="livro-2col" style="margin-top:.75rem">
+              <div class="livro-area-card">
+                <div class="livro-area-title">${icone('handshake','ic-sm')} Pactos</div>
+                ${listaHTML(linhas(f.socPactos), 'Nenhum pacto registrado.')}
+              </div>
+              <div class="livro-area-card">
+                <div class="livro-area-title">${icone('crown','ic-sm')} Mentores</div>
+                ${listaHTML(linhas(f.socMentores), 'Nenhum mentor registrado.')}
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- ═══ ABA: RANKING — Integração com o Livro das Lendas ═══ -->
+        <!-- ═══ ABA: PUBLICAÇÕES — feed de posts do personagem, com likes e comentários ═══ -->
+        <div class="livro-tab-pane" id="livro-pane-publicacoes">
+          <div id="publicacoes-composer-area"></div>
+          <div id="publicacoes-feed" class="livro-section">
+            <span class="livro-area-empty">Carregando publicações…</span>
+          </div>
+        </div>
+
         <div class="livro-tab-pane" id="livro-pane-ranking">
           <div class="livro-section">
             <div class="livro-section-title">${icone('lendas','ic-sm')} Posição no Ranking</div>
@@ -6073,6 +6671,19 @@ function abrirPerfilPublico(f) {
               onmouseover="this.style.background='rgba(156,42,42,.25)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
               ${icone('lendas','ic-sm')} Ver Livro das Lendas completo
             </button>
+          </div>
+        </div>
+
+        <!-- ═══ ABA: USUÁRIO — o jogador real por trás do personagem, não o personagem ═══ -->
+        <div class="livro-tab-pane" id="livro-pane-usuario">
+          <div id="usuario-perfil-area" class="livro-section">
+            <span class="livro-area-empty">Carregando...</span>
+          </div>
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('banner','ic-sm')} Personagens Vinculados</div>
+            <div id="usuario-personagens-vinculados">
+              <span class="livro-area-empty">Carregando...</span>
+            </div>
           </div>
         </div>
 
@@ -6097,6 +6708,9 @@ function abrirPerfilPublico(f) {
   document.body.appendChild(overlay);
   _carregarGaleriaLivro(f.user, f.nomePersonagem || f.nome);
   _carregarResumoRankingLivro(f);
+  _atualizarUiCurtidas(pid);
+  _carregarPublicacoes(pid, f.user, f.nomePersonagem || f.nome, _perfilEhProprio);
+  _carregarAbaUsuario(f.user);
 }
 
 // ─── Sistema de abas do Grimório ───
@@ -6143,14 +6757,20 @@ function _carregarGaleriaLivro(user, personagem) {
   const container = document.getElementById('livro-galeria-fotos');
   const section = document.getElementById('livro-galeria-section');
   if (!container || !section || !window.db || !window.doc || !window.getDoc) return;
+  // Dono vê Ampliar/Trocar/Remover; qualquer outro visitante só vê Ampliar.
+  const ehDono = _normUser(user) === _normUser(usuarioAtual) && personagem === personagemAtual;
   window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(user, personagem))).then(snap => {
     if (!snap.exists()) return;
-    const gal = (snap.data().galeria || []).filter(Boolean);
-    if (!gal.length) return;
+    const gal = snap.data().galeria || [];
+    if (!gal.some(Boolean)) return;
     section.style.display = '';
-    container.innerHTML = gal.map(src =>
-      `<img src="${src}" alt="foto" onclick="abrirLightbox('${src.replace(/'/g,"\'")}')">`
-    ).join('');
+    container.innerHTML = gal.map((src, i) => {
+      if (!src) return '';
+      const srcEsc = src.replace(/'/g, "\\'");
+      return ehDono
+        ? `<img src="${src}" alt="foto" onclick="abrirAcoesMiniatura(${i},'${srcEsc}')" title="Clique para gerenciar foto">`
+        : `<img src="${src}" alt="foto" onclick="abrirLightbox('${srcEsc}')">`;
+    }).join('');
   }).catch(()=>{});
 }
 
@@ -6163,6 +6783,10 @@ function abrirPersonalizacao() {
   document.getElementById('personalizar-overlay')?.remove();
   _temaSeleccionado = null;
   _wallpaperSelecionado = null;
+  _capaArquivoTemp = null;
+  _capaRemovida = false;
+  _gifPoderArquivoTemp = null;
+  _gifPoderRemovido = false;
   const pid = _fsDocId(usuarioAtual, personagemAtual);
   const p = _personalizacoes[pid] || {};
 
@@ -6203,7 +6827,8 @@ function abrirPersonalizacao() {
           <button onclick="abrirSeletorCapaPersonalizacao()" style="width:100%;padding:.65rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);font-family:inherit;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s" onmouseover="this.style.background='rgba(156,42,42,.22)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
             <svg class="ic"><use href="#ic-camera"/></svg> Enviar Foto de Capa da Galeria
           </button>
-          ${p.wallpaperUrl && p.wallpaperUrl.startsWith('data:') ? `<img src="${p.wallpaperUrl}" style="width:100%;max-height:80px;object-fit:cover;border:1px solid rgba(60,40,60,.5);border-radius:2px;display:block;" onerror="this.style.display='none'">` : ''}
+          <img id="capa-preview-img" src="${p.wallpaperUrl||''}" style="width:100%;max-height:80px;object-fit:cover;border:1px solid rgba(60,40,60,.5);border-radius:2px;display:${p.wallpaperUrl?'block':'none'};" onerror="this.style.display='none'">
+          <button type="button" onclick="removerCapaPersonalizacao()" style="width:100%;padding:.4rem;min-height:44px;background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;font-family:inherit;font-size:.78rem;cursor:pointer" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">✕ Remover Capa</button>
         </div>
 
         <div class="personalizar-section-title">Wallpaper do Perfil (URL)</div>
@@ -6218,15 +6843,19 @@ function abrirPersonalizacao() {
 
         <div class="personalizar-section-title">GIFs do Personagem</div>
         <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.6rem">
-          Cole URLs de GIFs (hospedados no Firebase Storage ou qualquer CDN).<br>
-          <strong style="color:var(--accent-light)">Não armazene GIFs em base64 — use apenas URLs.</strong>
+          O GIF do Poder Principal pode ser enviado direto da galeria (vai para o Storage).<br>
+          Transformação e Habilidade Suprema ainda usam URL — cole o link de onde o GIF estiver hospedado.
         </p>
         <div class="gif-input-group">
           <div>
             <div class="gif-input-row">
               <div>
                 <label><svg class="ic"><use href="#ic-prism"/></svg> GIF — Poder Principal</label>
-                <input type="text" id="gif-poder" placeholder="https://storage.googleapis.com/..." value="${p.gifPoder||''}" oninput="previewGif('gif-poder','prev-poder')">
+                <input type="text" id="gif-poder" placeholder="https://... (ou envie da galeria)" value="${p.gifPoder||''}" oninput="previewGif('gif-poder','prev-poder')">
+                <button type="button" onclick="abrirSeletorGifPoder()" style="margin-top:.35rem;width:100%;padding:.45rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);font-family:inherit;font-size:.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem" onmouseover="this.style.background='rgba(156,42,42,.22)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
+                  <svg class="ic ic-sm"><use href="#ic-camera"/></svg> Enviar GIF da Galeria
+                </button>
+                <button type="button" onclick="removerGifPoderPersonalizacao()" style="margin-top:.3rem;width:100%;padding:.35rem;min-height:44px;background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;font-family:inherit;font-size:.72rem;cursor:pointer" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">✕ Remover GIF</button>
               </div>
               <img id="prev-poder" class="gif-preview-sm" src="${p.gifPoder||''}" onerror="this.style.display='none'" style="${p.gifPoder?'display:block':''}">
             </div>
@@ -6269,22 +6898,25 @@ function abrirSeletorCapaPersonalizacao() {
   input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
   input.onchange = async () => {
     if (!input.files[0]) { input.remove(); return; }
-    // Comprime a imagem para caber em base64 (máx 1200px larg)
-    const b64 = await imageToBase64Capa(input.files[0]);
-    // Armazena no campo oculto e pré-visualiza
+    // Redimensiona/comprime e gera um Blob pra subir no Firebase Storage —
+    // não mais base64. Capas grandes em base64 estouravam o limite de 1MB
+    // do Firestore e o salvamento falhava silenciosamente (ver fallback
+    // antigo em salvarPersonalizacao, que descartava a capa nesse caso).
+    const blob = await imageToBlobCapa(input.files[0]);
     document.getElementById('wp-custom-url').value = '';
     document.querySelectorAll('.wp-btn').forEach(b => b.classList.remove('selecionado'));
     _wallpaperSelecionado = null;
-    _capaBase64Temp = b64;
+    _capaArquivoTemp = blob;
+    const previewUrl = URL.createObjectURL(blob);
     // Pré-visualização no modal
     const existing = document.getElementById('capa-preview-img');
-    if (existing) { existing.src = b64; existing.style.display = 'block'; }
+    if (existing) { existing.src = previewUrl; existing.style.display = 'block'; }
     else {
       const btn = document.querySelector('[onclick="abrirSeletorCapaPersonalizacao()"]');
       if (btn) {
         const img = document.createElement('img');
         img.id = 'capa-preview-img';
-        img.src = b64;
+        img.src = previewUrl;
         img.style.cssText = 'width:100%;max-height:80px;object-fit:cover;border:1px solid rgba(60,40,60,.5);border-radius:2px;display:block;margin-top:.35rem';
         img.onerror = () => img.style.display = 'none';
         btn.insertAdjacentElement('afterend', img);
@@ -6296,14 +6928,15 @@ function abrirSeletorCapaPersonalizacao() {
   input.click();
 }
 
-// Redimensiona capa para 1400×400px landscape para economizar espaço
-function imageToBase64Capa(file) {
+// Redimensiona a capa para 1400×500px landscape e devolve um Blob — pronto
+// pra subir no Firebase Storage (ver abrirSeletorCapaPersonalizacao).
+function imageToBlobCapa(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = reject;
     reader.onload = () => {
       const img = new Image();
-      img.onerror = () => resolve(reader.result);
+      img.onerror = () => reject(new Error('Não foi possível processar a imagem.'));
       img.onload = () => {
         const MAX_W = 1400, MAX_H = 500;
         let { width: w, height: h } = img;
@@ -6313,8 +6946,7 @@ function imageToBase64Capa(file) {
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        try { resolve(canvas.toDataURL('image/jpeg', 0.78)); }
-        catch(e) { resolve(reader.result); }
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error('Falha ao gerar imagem.')), 'image/jpeg', 0.85);
       };
       img.src = reader.result;
     };
@@ -6322,7 +6954,62 @@ function imageToBase64Capa(file) {
   });
 }
 
-let _capaBase64Temp = null;
+let _capaArquivoTemp = null;
+let _capaRemovida = false;
+
+// Remove a capa atual (preview + arquivo pendente + sinaliza remoção pro
+// salvarPersonalizacao). A exclusão real no Storage só acontece ao salvar,
+// igual ao resto do modal (Cancelar não deve mudar nada).
+function removerCapaPersonalizacao() {
+  _capaArquivoTemp = null;
+  _capaRemovida = true;
+  _wallpaperSelecionado = null;
+  document.querySelectorAll('.wp-btn').forEach(b => b.classList.remove('selecionado'));
+  const urlInput = document.getElementById('wp-custom-url');
+  if (urlInput) urlInput.value = '';
+  const img = document.getElementById('capa-preview-img');
+  if (img) { img.style.display = 'none'; img.src = ''; }
+}
+
+// Seletor de GIF do Poder Principal — envia o ARQUIVO ORIGINAL direto pro
+// Storage, sem passar por canvas (redimensionar via canvas captura só um
+// frame e destruiria a animação do GIF).
+let _gifPoderArquivoTemp = null;
+let _gifPoderRemovido = false;
+
+function removerGifPoderPersonalizacao() {
+  _gifPoderArquivoTemp = null;
+  _gifPoderRemovido = true;
+  const urlInput = document.getElementById('gif-poder');
+  if (urlInput) urlInput.value = '';
+  const prev = document.getElementById('prev-poder');
+  if (prev) { prev.style.display = 'none'; prev.src = ''; }
+}
+
+function abrirSeletorGifPoder() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/gif,image/*';
+  input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  input.onchange = () => {
+    if (!input.files[0]) { input.remove(); return; }
+    const file = input.files[0];
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Esse GIF tem mais de 10MB. Escolha um arquivo menor.');
+      input.remove();
+      return;
+    }
+    _gifPoderArquivoTemp = file;
+    const urlInput = document.getElementById('gif-poder');
+    if (urlInput) urlInput.value = '';
+    const previewUrl = URL.createObjectURL(file);
+    const prev = document.getElementById('prev-poder');
+    if (prev) { prev.src = previewUrl; prev.style.display = 'block'; }
+    input.remove();
+  };
+  document.body.appendChild(input);
+  input.click();
+}
 
 
 
@@ -6357,14 +7044,30 @@ async function salvarPersonalizacao() {
   const pid = _fsDocId(usuarioAtual, personagemAtual);
   const old = _personalizacoes[pid] || {};
 
+  const btnSalvar = document.querySelector('.personalizar-btn-salvar');
+  const btnOrig = btnSalvar ? btnSalvar.innerHTML : '';
+  if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.innerHTML = icone('cloud','ic-sm') + ' Enviando…'; }
+
   const tema = _temaSeleccionado || old.tema || 'sangue';
   const wallpaper = _wallpaperSelecionado || old.wallpaper || '';
 
   const wpCustomInput = document.getElementById('wp-custom-url')?.value?.trim() || '';
-  // Se há foto base64 de capa enviada, usa ela. Se há URL nova, usa a URL. Se não, mantém a anterior.
+
+  // ── Capa: removida explicitamente? sobe arquivo novo? ou mantém? ──
+  // Obs: com preset unsigned do Cloudinary não dá pra excluir o arquivo
+  // remoto sem expor o API Secret no navegador — "remover" aqui só
+  // desvincula a URL salva no Firestore.
   let wallpaperUrl;
-  if (_capaBase64Temp) {
-    wallpaperUrl = _capaBase64Temp;
+  if (_capaRemovida) {
+    wallpaperUrl = '';
+  } else if (_capaArquivoTemp) {
+    try {
+      wallpaperUrl = await _cloudinaryUpload(_capaArquivoTemp, 'covers');
+    } catch(e) {
+      console.warn('[Personalizacao] Erro ao subir capa pro Cloudinary:', e);
+      alert('Não foi possível enviar a capa. Verifique sua conexão e tente novamente.');
+      wallpaperUrl = old.wallpaperUrl || '';
+    }
   } else if (wpCustomInput) {
     wallpaperUrl = wpCustomInput;
   } else if (_wallpaperSelecionado) {
@@ -6373,7 +7076,21 @@ async function salvarPersonalizacao() {
     wallpaperUrl = old.wallpaperUrl || '';
   }
 
-  const gifPoder = document.getElementById('gif-poder')?.value?.trim() || '';
+  // ── GIF do Poder: removido explicitamente? sobe arquivo novo? ou mantém? ──
+  let gifPoder;
+  if (_gifPoderRemovido) {
+    gifPoder = '';
+  } else if (_gifPoderArquivoTemp) {
+    try {
+      gifPoder = await _cloudinaryUpload(_gifPoderArquivoTemp, 'power-gifs');
+    } catch(e) {
+      console.warn('[Personalizacao] Erro ao subir GIF do poder pro Cloudinary:', e);
+      alert('Não foi possível enviar o GIF. Verifique sua conexão e tente novamente.');
+      gifPoder = old.gifPoder || '';
+    }
+  } else {
+    gifPoder = document.getElementById('gif-poder')?.value?.trim() || '';
+  }
   const gifTransformacao = document.getElementById('gif-transformacao')?.value?.trim() || '';
   const gifSuprema = document.getElementById('gif-suprema')?.value?.trim() || '';
 
@@ -6388,21 +7105,21 @@ async function salvarPersonalizacao() {
   };
 
   _personalizacoes[pid] = dados;
-  _capaBase64Temp = null; // limpa temporário
+  _capaArquivoTemp = null;
+  _capaRemovida = false;
+  _gifPoderArquivoTemp = null;
+  _gifPoderRemovido = false;
 
-  // Salva no Firestore — base64 de capa pode ser grande, tenta salvar
+  // Salva no Firestore — agora só URLs (Storage), nunca mais base64 pesado
   if (window.db && window.doc && window.setDoc) {
     try {
       await window.setDoc(window.doc(window.db, 'personalizacoes', pid), dados);
       console.log('[Personalizacao] Salvo:', pid);
     } catch(e) {
-      console.warn('[Personalizacao] Erro ao salvar (possível tamanho base64):', e);
-      // Fallback: salva sem a URL base64 da capa, só com preset
-      const dadosSemCapa = { ...dados, wallpaperUrl: old.wallpaperUrl || '' };
-      try {
-        await window.setDoc(window.doc(window.db, 'personalizacoes', pid), dadosSemCapa);
-        _personalizacoes[pid] = dadosSemCapa;
-      } catch(e2) { console.warn('[Personalizacao] Erro no fallback:', e2); }
+      console.warn('[Personalizacao] Erro ao salvar:', e);
+      alert('Não foi possível salvar a personalização. Tente novamente.');
+      if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.innerHTML = btnOrig; }
+      return;
     }
   }
 
@@ -6464,33 +7181,51 @@ async function carregarFotosPerfil(user, personagem) {
   return null;
 }
 
-function imageToBase64(file) {
+// ── Cloudinary: upload direto do navegador (sem backend, sem API secret) ──
+// Cada personagem nunca terá mais de ~1 capa + 1 gif + 1 avatar + 5-10 fotos
+// de galeria ativos por vez; remover só desvincula a URL no Firestore — o
+// preset é unsigned, então não dá pra excluir o arquivo de verdade sem
+// expor o API Secret no navegador (e isso a gente nunca faz).
+const CLOUDINARY_CLOUD_NAME = 'dgfjnlfld';
+const CLOUDINARY_UPLOAD_PRESET = 'player_uploads';
+
+async function _cloudinaryUpload(file, folder) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  formData.append('folder', folder);
+  const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
+    method: 'POST',
+    body: formData
+  });
+  if (!resp.ok) {
+    const errText = await resp.text().catch(() => '');
+    throw new Error('Cloudinary upload falhou (' + resp.status + '): ' + errText);
+  }
+  const data = await resp.json();
+  return data.secure_url;
+}
+
+// Redimensiona/comprime uma imagem estática e devolve um Blob, pronto pra
+// subir pro Cloudinary. NÃO usar em GIFs — canvas só captura um frame e
+// destruiria a animação.
+function imageToBlob(file, maxSize, quality) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = reject;
     reader.onload = () => {
-      // Redimensiona/comprime a imagem antes de converter para base64.
-      // Fotos tiradas direto do celular costumam vir muito grandes
-      // (vários MB) e excedem os limites do Firestore/sessionStorage,
-      // o que fazia a foto "não funcionar" no mobile.
       const img = new Image();
-      img.onerror = () => resolve(reader.result); // fallback: usa original se falhar
+      img.onerror = () => reject(new Error('Não foi possível processar a imagem.'));
       img.onload = () => {
-        const MAX = 900; // maior lado em px
         let { width, height } = img;
-        if (width > MAX || height > MAX) {
-          if (width >= height) { height = Math.round(height * (MAX / width)); width = MAX; }
-          else { width = Math.round(width * (MAX / height)); height = MAX; }
+        if (width > maxSize || height > maxSize) {
+          if (width >= height) { height = Math.round(height * (maxSize / width)); width = maxSize; }
+          else { width = Math.round(width * (maxSize / height)); height = maxSize; }
         }
         const canvas = document.createElement('canvas');
         canvas.width = width; canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        try {
-          resolve(canvas.toDataURL('image/jpeg', 0.82));
-        } catch (e) {
-          resolve(reader.result); // fallback
-        }
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error('Falha ao gerar imagem.')), 'image/jpeg', quality);
       };
       img.src = reader.result;
     };
@@ -6498,9 +7233,15 @@ function imageToBase64(file) {
   });
 }
 
+// Nota: a antiga imageToBase64() foi removida nesta migração — avatar e
+// galeria agora usam imageToBlob() + upload pro Cloudinary (ver acima).
+
 // variáveis de estado das fotos — resetadas ao trocar de personagem
 let _fotoPrincipal = null;
-let _galeriaFotos = [null, null, null, null, null]; // 5 slots
+let _galeriaFotos = new Array(10).fill(null); // até 10 slots (5 visíveis por padrão)
+// Controla se os slots 6-10 estão revelados na tela (não persiste — é só
+// estado de exibição da sessão atual).
+let _galeriaExpandida = false;
 
 async function abrirSeletorFotoPrincipal() {
   const input = document.createElement('input');
@@ -6510,8 +7251,16 @@ async function abrirSeletorFotoPrincipal() {
   input.onchange = async () => {
     if (!input.files[0]) { input.remove(); return; }
     if (!usuarioAtual || !personagemAtual) { alert('Nenhum personagem ativo. Ative um personagem antes de salvar a foto.'); input.remove(); return; }
-    const b64 = await imageToBase64(input.files[0]);
-    _fotoPrincipal = b64;
+    try {
+      const blob = await imageToBlob(input.files[0], 900, 0.85);
+      const url = await _cloudinaryUpload(blob, 'avatars');
+      _fotoPrincipal = url;
+    } catch(e) {
+      console.warn('[Fotos] Erro ao enviar avatar pro Cloudinary:', e);
+      alert('Não foi possível enviar a foto. Verifique sua conexão e tente novamente.');
+      input.remove();
+      return;
+    }
     renderFotoPersonagem();
     atualizarFichaHero();
     await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
@@ -6540,8 +7289,16 @@ async function adicionarFotoGaleria(slot) {
   input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
   input.onchange = async () => {
     if (!input.files[0]) { input.remove(); return; }
-    const b64 = await imageToBase64(input.files[0]);
-    _galeriaFotos[slot] = b64;
+    try {
+      const blob = await imageToBlob(input.files[0], 900, 0.85);
+      const url = await _cloudinaryUpload(blob, 'gallery');
+      _galeriaFotos[slot] = url;
+    } catch(e) {
+      console.warn('[Fotos] Erro ao enviar foto da galeria pro Cloudinary:', e);
+      alert('Não foi possível enviar a foto. Verifique sua conexão e tente novamente.');
+      input.remove();
+      return;
+    }
     renderFotoPersonagem();
     atualizarFichaHero();
     await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
@@ -6672,8 +7429,13 @@ function renderFotoPersonagem() {
        </div>`
     : `<div class="personagem-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><svg class="ic ic-xl"><use href="#ic-camera"/></svg><span>Foto Principal</span></div>`;
 
-  // 5 miniaturas — clique abre painel de ação (remover / trocar / ampliar)
-  const minis = _galeriaFotos.map((src, i) => {
+  // Galeria: 5 miniaturas visíveis por padrão, até 10 ao expandir —
+  // clique abre painel de ação (remover / trocar / ampliar)
+  const temFotosAlem5 = _galeriaFotos.slice(5).some(Boolean);
+  const mostrarTodas = _galeriaExpandida || temFotosAlem5;
+  const slotsVisiveis = mostrarTodas ? 10 : 5;
+
+  const minis = _galeriaFotos.slice(0, slotsVisiveis).map((src, i) => {
     if (src) {
       return `<div class="foto-miniatura-item">
         <img src="${src.replace(/'/g,"&apos;")}" onclick="abrirAcoesMiniatura(${i},'${src.replace(/'/g,"\\'")}');" title="Clique para gerenciar foto">
@@ -6683,10 +7445,15 @@ function renderFotoPersonagem() {
     return `<div class="foto-miniatura-vazia" onclick="adicionarFotoGaleria(${i})" title="Adicionar foto">+</div>`;
   }).join('');
 
+  const btnExpandir = mostrarTodas
+    ? (_galeriaExpandida ? `<button onclick="_galeriaExpandida=false;renderFotoPersonagem()" style="margin-top:.5rem;width:100%;padding:.4rem;background:none;border:1px solid var(--border);color:var(--text-muted);font-family:inherit;font-size:.75rem;cursor:pointer">Mostrar menos</button>` : '')
+    : `<button onclick="_galeriaExpandida=true;renderFotoPersonagem()" style="margin-top:.5rem;width:100%;padding:.4rem;background:none;border:1px solid var(--border);color:var(--text-muted);font-family:inherit;font-size:.75rem;cursor:pointer">+ Mostrar mais fotos (até 10)</button>`;
+
   area.innerHTML = `
     <div style="font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem;align-self:flex-start">Foto do Personagem</div>
     ${principal}
     <div class="foto-miniaturas" style="margin-top:.4rem">${minis}</div>
+    ${btnExpandir}
   `;
 }
 
@@ -6704,7 +7471,8 @@ async function inicializarFotos() {
 
   // reset de estado — CRÍTICO para não vazar fotos entre personagens
   _fotoPrincipal = null;
-  _galeriaFotos = [null, null, null, null, null];
+  _galeriaFotos = new Array(10).fill(null);
+  _galeriaExpandida = false;
 
   const dados = await carregarFotosPerfil(userNoMomento, personagemNoMomento);
 
@@ -6714,10 +7482,10 @@ async function inicializarFotos() {
 
   if (dados) {
     _fotoPrincipal = dados.principal || null;
-    // compatibilidade: se veio array antigo (< 5 items) ou formato legado
+    // compatibilidade: galeria antiga só tinha 5 itens, a nova tem até 10
     const gal = dados.galeria || [];
     if (Array.isArray(gal)) {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 10; i++) {
         _galeriaFotos[i] = gal[i] || null;
       }
     }
@@ -6830,7 +7598,7 @@ function atualizarFichaHero() {
 
 
 // Campos NARRATIVOS — apenas o próprio player pode editar
-const CAMPOS_NARRATIVOS = ['f-aparencia','f-roupas','r-tracos','r-ideais','r-ligacoes','r-defeitos','r-historia','r-eventos','r-npcs','f-cabelos','f-olhos','f-pele','f-genero','f-idade','f-altura','f-peso','f-frase','f-descricao-publica','soc-historia','soc-feitos','soc-conquistas','soc-titulos','soc-aliados','soc-rivais','soc-timeline'];
+const CAMPOS_NARRATIVOS = ['f-aparencia','f-roupas','r-tracos','r-ideais','r-ligacoes','r-defeitos','r-historia','r-eventos','r-npcs','f-cabelos','f-olhos','f-pele','f-genero','f-idade','f-altura','f-peso','f-frase','f-descricao-publica','soc-historia','soc-objetivos','soc-filosofia','soc-feitos','soc-conquistas','soc-titulos','soc-aliados','soc-rivais','soc-pactos','soc-mentores','soc-timeline'];
 
 // ═══════════════════════════════════════════════════════════════════════
 // ATRIBUTOS — definição, nomes completos, ordem e favoritos
@@ -8511,6 +9279,17 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       ${fieldGroup('Origem & Passado (resumo público)','soc-historia','textarea')}
     </div>
 
+    <!-- SEÇÃO: OBJETIVOS & FILOSOFIA DE VIDA -->
+    <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+      <div style="font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
+        <svg class="ic"><use href="#ic-eye"/></svg> Objetivos &amp; Filosofia de Vida <span style="flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;display:inline-block"></span>
+      </div>
+      <div class="field-row cols-2">
+        ${fieldGroup('Objetivos Atuais','soc-objetivos','textarea')}
+        ${fieldGroup('Filosofia de Vida (crenças, visão de mundo)','soc-filosofia','textarea')}
+      </div>
+    </div>
+
     <!-- SEÇÃO: FEITOS & CONQUISTAS -->
     <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
       <div style="font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
@@ -8530,14 +9309,18 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       ${fieldGroup('Títulos ostentados (separados por vírgula)','soc-titulos')}
     </div>
 
-    <!-- SEÇÃO: ALIADOS & RIVAIS -->
+    <!-- SEÇÃO: RELAÇÕES (Aliados, Rivais, Pactos, Mentores) -->
     <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
       <div style="font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
-        <svg class="ic"><use href="#ic-handshake"/></svg> Aliados &amp; Rivais <span style="flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;display:inline-block"></span>
+        <svg class="ic"><use href="#ic-handshake"/></svg> Relações <span style="flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;display:inline-block"></span>
       </div>
       <div class="field-row cols-2">
         ${fieldGroup('Aliados (um por linha, pode incluir nota)','soc-aliados','textarea')}
         ${fieldGroup('Rivais (um por linha, pode incluir nota)','soc-rivais','textarea')}
+      </div>
+      <div class="field-row cols-2" style="margin-top:.75rem">
+        ${fieldGroup('Pactos (um por linha, pode incluir nota)','soc-pactos','textarea')}
+        ${fieldGroup('Mentores (um por linha, pode incluir nota)','soc-mentores','textarea')}
       </div>
     </div>
 
@@ -8803,7 +9586,7 @@ function coletarDados() {
     'f-idade','f-altura','f-peso','f-genero','f-cabelos','f-olhos','f-pele','f-poder-nome','f-aparencia','f-roupas',
     'f-classe','f-rank','f-faccao','f-cidade','f-frase','f-descricao-publica',
     // social (grimório)
-    'soc-historia','soc-feitos','soc-conquistas','soc-titulos','soc-aliados','soc-rivais','soc-timeline',
+    'soc-historia','soc-objetivos','soc-filosofia','soc-feitos','soc-conquistas','soc-titulos','soc-aliados','soc-rivais','soc-pactos','soc-mentores','soc-timeline',
     // atributos
     'a-for','a-des','a-vig','a-int','a-alm','a-car',
     // recursos
@@ -9034,11 +9817,15 @@ async function updateRankingEntry(user, personagem, dados, foto, silencioso) {
       descricaoPublica: dados['f-descricao-publica'] || '',
       // ─── Grimório — Perfil Social ───
       socHistoria:    dados['soc-historia']    || '',
+      socObjetivos:   dados['soc-objetivos']   || '',
+      socFilosofia:   dados['soc-filosofia']   || '',
       socFeitos:      dados['soc-feitos']      || '',
       socConquistas:  dados['soc-conquistas']  || '',
       socTitulos:     dados['soc-titulos']     || '',
       socAliados:     dados['soc-aliados']     || '',
       socRivais:      dados['soc-rivais']      || '',
+      socPactos:      dados['soc-pactos']      || '',
+      socMentores:    dados['soc-mentores']    || '',
       socTimeline:    dados['soc-timeline']    || '',
       // ─── Grimório — Aba Poder (necessário para abrirPerfilPublico) ───
       poderDescricao: dados['p-descricao'] || '',
@@ -10974,8 +11761,12 @@ document.addEventListener('DOMContentLoaded', () => {
     getDoc,
     setDoc,
     deleteDoc,
+    addDoc,
     collection,
-    getDocs
+    getDocs,
+    query,
+    where,
+    getCountFromServer
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import {
     getAuth,
@@ -11008,8 +11799,12 @@ document.addEventListener('DOMContentLoaded', () => {
   window.getDoc      = getDoc;
   window.setDoc      = setDoc;
   window.deleteDoc   = deleteDoc;
+  window.addDoc      = addDoc;
   window.collection  = collection;
   window.getDocs     = getDocs;
+  window.query        = query;
+  window.where        = where;
+  window.getCountFromServer = getCountFromServer;
 
   // ── Firebase Auth helpers expostos para o script principal ──
   window._fbSignIn   = (email, pass) => signInWithEmailAndPassword(auth, email, pass);
