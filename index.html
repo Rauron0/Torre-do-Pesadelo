@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- saved from url=(0046)file:///C:/Users/Gamer/Downloads/index_15.html -->
+<!-- saved from url=(0046)file:///C:/Users/Gamer/Downloads/index_39.html -->
 <html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Torre do Pesadelo • Portal do Jogador</title>
-<link href="./index_files/css2" rel="stylesheet">
+<link href="file:///C:/Users/Gamer/Downloads/index_files/css2" rel="stylesheet">
 <link href="file:///C:/Users/Gamer/Downloads/index1_files/css2" rel="stylesheet">
 <style>
 :root {
@@ -3895,7 +3895,26 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
   box-shadow: none !important;
 }
 </style>
-<style type="text/css"></style></head>
+<style type="text/css"></style><style>
+    body.modo-editor-livro .bloco-editavel { outline:1px dashed rgba(180,140,30,.3); }
+    #livro-jogador.modo-editor-livro .bloco-editavel:hover { outline-color:var(--gold); background:rgba(180,140,30,.04); }
+    #livro-sidebar a.active { color:#fff; background:var(--accent); font-weight:600; border-radius:4px; }
+    #livro-sidebar a { color:#d4d2de; text-decoration:none; display:block; padding:.38rem .55rem; border-radius:4px; font-size:.93rem; transition:color .2s,background .2s; }
+    #livro-sidebar a:hover { color:#fff; background:rgba(156,42,42,.18); }
+    #livro-sidebar .toc-label { font-size:.7rem; text-transform:uppercase; letter-spacing:1.5px; color:#e8696e; margin:.9rem 0 .3rem; display:block; padding-left:.4rem; border-left:3px solid #e8696e; font-weight:600; }
+    /* BUG CORRIGIDO: links DENTRO do conteúdo do livro (Sumário Interativo e
+       qualquer referência cruzada no corpo do texto) não tinham nenhuma regra
+       de estilo — ficavam com o azul+sublinhado padrão do navegador, quebrando
+       a identidade visual do site em pelo menos 66 links espalhados pelo livro. */
+    #livro-content a { color: var(--accent-light); text-decoration: none; border-bottom: 1px solid rgba(193,63,63,.3); transition: color .2s, border-color .2s; }
+    #livro-content a:hover { color: var(--gold-light); border-bottom-color: var(--gold-light); }
+    #livro-content a:visited { color: var(--accent-light); }
+    @media (max-width:1024px) {
+      #livro-layout { flex-direction:column; }
+      #livro-sidebar { width:100%; max-height:none; position:static; border-right:none; border-bottom:1px solid var(--border); }
+      #livro-content { padding:1.5rem 1.25rem 4rem; }
+    }
+  </style></head>
 <body>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -3956,7 +3975,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
 
 <!-- ═══ TORRE DO PESADELO: CENÁRIO ATMOSFÉRICO ═══ -->
 <div id="tp-scene" aria-hidden="true"></div>
-<canvas id="tp-atmosphere" aria-hidden="true" width="1316" height="641"></canvas>
+<canvas id="tp-atmosphere" aria-hidden="true" width="1321" height="646"></canvas>
 
 <!-- Olhos na névoa (pares de olhos sincronizados) -->
 <div class="tp-eye" style="left:5%;top:38%;animation-delay:0s;animation-duration:9s;"></div>
@@ -4049,25 +4068,25 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
   <p class="landing-sub">Escolha como deseja entrar</p>
   <div class="landing-cards">
     <div class="landing-card ficha" onclick="irParaFicha()">
-      <div class="landing-card-icon"><svg class="ic ic-xl"><use href="#ic-ficha"/></svg></div>
+      <div class="landing-card-icon"><svg class="ic ic-xl"><use href="#ic-ficha"></use></svg></div>
       <div class="landing-card-title">Ficha do Personagem</div>
       <div class="landing-card-desc">Acesse sua ficha, ranking e painel de jogador</div>
     </div>
     <div class="landing-card livro" onclick="irParaLivro()">
-      <div class="landing-card-icon"><svg class="ic ic-xl"><use href="#ic-grimorio"/></svg></div>
+      <div class="landing-card-icon"><svg class="ic ic-xl"><use href="#ic-grimorio"></use></svg></div>
       <div class="landing-card-title">Livro do Jogador</div>
       <div class="landing-card-desc">Regras, lore e sistema do mundo — acesso livre</div>
     </div>
   </div>
   <a href="https://chat.whatsapp.com/JDKi4DrfuyfL8N5o2VrBo8" target="_blank" rel="noopener noreferrer" class="landing-obs-link">
-    <svg class="ic ic-sm"><use href="#ic-handshake"/></svg> Entrar no grupo do WhatsApp da comunidade — RPG de cenas narradas em texto
+    <svg class="ic ic-sm"><use href="#ic-handshake"></use></svg> Entrar no grupo do WhatsApp da comunidade — RPG de cenas narradas em texto
   </a>
 </div>
 
 <!-- LOGIN -->
 <div id="login-screen" style="display:none">
-  <button onclick="voltarParaLanding()" style="position:absolute;top:1.2rem;left:1.2rem;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.82rem;display:flex;align-items:center;gap:.3rem;padding:.3rem .6rem;transition:color .2s" onmouseover="this.style.color='var(--accent-light)'" onmouseout="this.style.color='var(--text-muted)'">
-    <svg class="ic ic-sm"><use href="#ic-arrow-left"/></svg> Voltar
+  <button onclick="voltarParaLanding()" style="position:absolute;top:1.2rem;left:1.2rem;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.82rem;display:flex;align-items:center;gap:.3rem;padding:.3rem .6rem;transition:color .2s" onmouseover="this.style.color=&#39;var(--accent-light)&#39;" onmouseout="this.style.color=&#39;var(--text-muted)&#39;">
+    <svg class="ic ic-sm"><use href="#ic-arrow-left"></use></svg> Voltar
   </button>
   <div class="login-ornament">Portal Oficial</div>
   <h1 class="login-title">Torre do Pesadelo</h1>
@@ -4134,7 +4153,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
     <button class="tabbar-btn" data-tab="ficha" id="tabbar-ficha" onclick="tabNav(&#39;ficha&#39;, this)">
       <svg class="ic"><use href="#ic-ficha"></use></svg><span>Ficha</span>
     </button>
-    <button class="tabbar-btn" data-tab="secao-ranking" onclick="tabNav('secao-ranking', this)">
+    <button class="tabbar-btn" data-tab="secao-ranking" onclick="tabNav(&#39;secao-ranking&#39;, this)">
       <svg class="ic"><use href="#ic-lendas"></use></svg><span>Lendas</span>
     </button>
     <button class="tabbar-btn" data-tab="livro" onclick="irParaLivroLogado()">
@@ -4176,7 +4195,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
     <div>
       <div class="sidebar-section-label"><svg class="ic"><use href="#ic-grimorio"></use></svg> Grimório</div>
       <ul class="sidebar-links">
-        <li><a data-nav="secao-ranking" onclick="navTo('secao-ranking')"><svg class="ic"><use href="#ic-lendas"></use></svg> Ranking dos Despertos</a></li>
+        <li><a data-nav="secao-ranking" onclick="navTo(&#39;secao-ranking&#39;)"><svg class="ic"><use href="#ic-lendas"></use></svg> Ranking dos Despertos</a></li>
         <li><a onclick="irParaLivroLogado()" style="cursor:pointer"><svg class="ic"><use href="#ic-grimorio"></use></svg> Livro do Jogador</a></li>
       </ul>
     </div>
@@ -4249,13 +4268,13 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
       </div>
 
       <div class="gm-tabs">
-        <button class="gm-tab active" id="tab-fichas" onclick="mostrarTab('tab-fichas')">Fichas dos Players</button>
-        <button class="gm-tab" id="tab-formulas" onclick="mostrarTab('tab-formulas')">Editor de Fórmulas</button>
-        <button class="gm-tab" id="tab-ranking-audit" onclick="mostrarTab('tab-ranking-audit')">
-          <svg class="ic ic-sm"><use href="#ic-refresh"/></svg> Ranking Global
+        <button class="gm-tab active" id="tab-fichas" onclick="mostrarTab(&#39;tab-fichas&#39;)">Fichas dos Players</button>
+        <button class="gm-tab" id="tab-formulas" onclick="mostrarTab(&#39;tab-formulas&#39;)">Editor de Fórmulas</button>
+        <button class="gm-tab" id="tab-ranking-audit" onclick="mostrarTab(&#39;tab-ranking-audit&#39;)">
+          <svg class="ic ic-sm"><use href="#ic-refresh"></use></svg> Ranking Global
         </button>
-        <button class="gm-tab" id="tab-visibilidade" onclick="mostrarTab('tab-visibilidade');renderGMRankingVisibilidade()">
-          <svg class="ic ic-sm"><use href="#ic-eye"/></svg> Visibilidade
+        <button class="gm-tab" id="tab-visibilidade" onclick="mostrarTab(&#39;tab-visibilidade&#39;);renderGMRankingVisibilidade()">
+          <svg class="ic ic-sm"><use href="#ic-eye"></use></svg> Visibilidade
         </button>
       </div>
 
@@ -4268,7 +4287,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
       <!-- TAB: VISIBILIDADE DO RANKING -->
       <div class="gm-tab-content" id="content-tab-visibilidade">
         <div class="lore-box" style="margin-bottom:1.5rem;border-color:rgba(110,147,232,.35)">
-          <strong style="color:var(--arcane-light)"><svg class="ic ic-sm"><use href="#ic-eye"/></svg> Controle de Visibilidade do Ranking</strong><br>
+          <strong style="color:var(--arcane-light)"><svg class="ic ic-sm"><use href="#ic-eye"></use></svg> Controle de Visibilidade do Ranking</strong><br>
           Escolha quais personagens aparecem publicamente no <strong>Livro das Lendas</strong>.
           Personagens ocultos <strong>continuam normais</strong> no login e na ficha do jogador — apenas não aparecem no ranking público.
         </div>
@@ -4285,14 +4304,10 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
           <strong style="color:var(--silver)">Use sempre que suspeitar que personagens não estão aparecendo.</strong>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
-          <button id="btn-sincronizar-ranking" onclick="sincronizarRankingCompleto()"
-            style="background:var(--accent);border:none;color:#fff;padding:.65rem 1.5rem;font-family:'Playfair Display',serif;font-size:.95rem;cursor:pointer;letter-spacing:1px;transition:background .2s"
-            onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='var(--accent)'">
+          <button id="btn-sincronizar-ranking" onclick="sincronizarRankingCompleto()" style="background:var(--accent);border:none;color:#fff;padding:.65rem 1.5rem;font-family:&#39;Playfair Display&#39;,serif;font-size:.95rem;cursor:pointer;letter-spacing:1px;transition:background .2s" onmouseover="this.style.background=&#39;var(--accent-light)&#39;" onmouseout="this.style.background=&#39;var(--accent)&#39;">
             🔄 Sincronizar Ranking Global
           </button>
-          <button onclick="carregarRanking()"
-            style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.65rem 1.5rem;font-family:'Playfair Display',serif;font-size:.95rem;cursor:pointer;letter-spacing:1px;transition:all .2s"
-            onmouseover="this.style.background='rgba(156,42,42,.15)'" onmouseout="this.style.background='none'">
+          <button onclick="carregarRanking()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.65rem 1.5rem;font-family:&#39;Playfair Display&#39;,serif;font-size:.95rem;cursor:pointer;letter-spacing:1px;transition:all .2s" onmouseover="this.style.background=&#39;rgba(156,42,42,.15)&#39;" onmouseout="this.style.background=&#39;none&#39;">
             ↻ Recarregar Ranking
           </button>
         </div>
@@ -4618,15 +4633,15 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
   <span class="editor-bar-label"><svg class="ic"><use href="#ic-edit"></use></svg> Modo Editor</span>
   <div class="editor-bar-separator"></div>
   <button class="editor-bar-btn" onclick="adicionarCapituloNovo()">+ Capítulo</button>
-  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('texto')">+ Texto</button>
-  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('titulo')">+ Título</button>
-  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('subtitulo')">+ Subtítulo</button>
-  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('destaque')">+ Lore Box</button>
-  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('caixa')">+ Caixa</button>
-  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('card')">+ Card</button>
-  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('lista')">+ Lista</button>
-  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('tabela')">+ Tabela</button>
-  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('imagem')">+ Imagem</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco(&#39;texto&#39;)">+ Texto</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco(&#39;titulo&#39;)">+ Título</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco(&#39;subtitulo&#39;)">+ Subtítulo</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco(&#39;destaque&#39;)">+ Lore Box</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco(&#39;caixa&#39;)">+ Caixa</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco(&#39;card&#39;)">+ Card</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco(&#39;lista&#39;)">+ Lista</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco(&#39;tabela&#39;)">+ Tabela</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco(&#39;imagem&#39;)">+ Imagem</button>
   <div class="editor-bar-separator"></div>
   <button class="editor-bar-btn" onclick="editarNavSidebar()"><svg class="ic"><use href="#ic-edit"></use></svg> Editar Índice</button>
   <div class="editor-bar-separator"></div>
@@ -5511,6 +5526,14 @@ async function carregarRanking() {
 
   const fichas = [];
   const idsConhecidos = new Set();
+  // Só GM/ADM têm permissão (pelas regras do Firestore) de gravar a entrada
+  // de ranking de OUTRO usuário. Jogadores comuns só migram a própria ficha
+  // (isso já acontece normalmente em _indexarPersonagensUsuarioAtual / ao
+  // salvar a própria ficha). Sem este filtro, qualquer jogador que abrisse
+  // o Livro das Lendas tentava escrever em nome de quem ainda não tinha
+  // sido migrado, e o Firestore corretamente negava — gerando o aviso de
+  // "Falha de acesso ao banco de dados" na tela de qualquer visitante.
+  const podeMigrarOutros = (roleAtual === 'gm' || roleAtual === 'adm');
 
   // ═══ FONTE PRINCIPAL: rankingGlobal ═══════════════════════════════
   // Uma única leitura de coleção traz TODOS os personagens (players,
@@ -5555,15 +5578,18 @@ async function carregarRanking() {
             fichas.push(f);
             idsConhecidos.add(fichaDocId);
             // Migra automaticamente para rankingGlobal para evitar custo futuro
-            try {
-              const dadosSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
-              if (dadosSnap.exists()) {
-                const raw = dadosSnap.data().dados;
-                const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
-                await updateRankingEntry(user, nomePersonagem, d, f.foto || null);
-                console.log('[Ranking] Auto-migrado para rankingGlobal:', fichaDocId);
-              }
-            } catch(me) { console.warn('[Ranking] Erro na auto-migração:', fichaDocId, me); }
+            // (apenas GM/ADM — ver comentário em podeMigrarOutros acima)
+            if (podeMigrarOutros) {
+              try {
+                const dadosSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
+                if (dadosSnap.exists()) {
+                  const raw = dadosSnap.data().dados;
+                  const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+                  await updateRankingEntry(user, nomePersonagem, d, f.foto || null, true);
+                  console.log('[Ranking] Auto-migrado para rankingGlobal:', fichaDocId);
+                }
+              } catch(me) { console.warn('[Ranking] Erro na auto-migração:', fichaDocId, me); }
+            }
           }
         } catch(e) { console.warn('[Ranking] fallback', user, nomePersonagem, e); }
       }
@@ -5590,13 +5616,15 @@ async function carregarRanking() {
           if (f) {
             fichas.push(f);
             idsConhecidos.add(docId);
-            // Migra para rankingGlobal
-            try {
-              const raw = data.dados;
-              const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
-              await updateRankingEntry(user, nomePersonagem, d, f.foto || null);
-              console.log('[Ranking] Auto-migrado (varredura fichas):', docId);
-            } catch(me) {}
+            // Migra para rankingGlobal (apenas GM/ADM — ver podeMigrarOutros)
+            if (podeMigrarOutros) {
+              try {
+                const raw = data.dados;
+                const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+                await updateRankingEntry(user, nomePersonagem, d, f.foto || null, true);
+                console.log('[Ranking] Auto-migrado (varredura fichas):', docId);
+              } catch(me) {}
+            }
           }
         } catch(e) { console.warn('[Ranking] varredura fichas:', docId, e); }
       }
@@ -8891,7 +8919,7 @@ async function salvarFichaFirestore(user, dados) {
   }
 }
 
-async function updateRankingEntry(user, personagem, dados, foto) {
+async function updateRankingEntry(user, personagem, dados, foto, silencioso) {
   if (!window.db || !window.doc || !window.setDoc) return;
   const docId = _fsDocId(user, personagem); // fora do try: precisa estar visível no catch
   try {
@@ -8941,7 +8969,7 @@ async function updateRankingEntry(user, personagem, dados, foto) {
       tecnicas:       Array.isArray(dados.tecnicas) ? dados.tecnicas.filter(t => t && (t.nome || t.desc)) : [],
     });
   } catch(e) {
-    _diag('updateRankingEntry(' + docId + ')', e);
+    if (!silencioso) _diag('updateRankingEntry(' + docId + ')', e);
     console.warn('[Ranking] Erro ao atualizar rankingGlobal:', e);
   }
 }
@@ -10860,13 +10888,13 @@ document.addEventListener('DOMContentLoaded', () => {
     border-bottom:1px solid var(--border);
     padding:.55rem 1.25rem;display:flex;align-items:center;gap:1rem;
   ">
-    <button onclick="fecharLivro()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.82rem;display:flex;align-items:center;gap:.3rem;padding:.3rem .6rem;transition:color .2s;flex-shrink:0" onmouseover="this.style.color='var(--accent-light)'" onmouseout="this.style.color='var(--text-muted)'">
-      <svg class="ic ic-sm"><use href="#ic-arrow-left"/></svg> Voltar
+    <button onclick="fecharLivro()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.82rem;display:flex;align-items:center;gap:.3rem;padding:.3rem .6rem;transition:color .2s;flex-shrink:0" onmouseover="this.style.color=&#39;var(--accent-light)&#39;" onmouseout="this.style.color=&#39;var(--text-muted)&#39;">
+      <svg class="ic ic-sm"><use href="#ic-arrow-left"></use></svg> Voltar
     </button>
-    <span style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold-light);flex:1;text-align:center">Torre do Pesadelo • Livro do Jogador</span>
+    <span style="font-family:&#39;Playfair Display&#39;,serif;font-size:1rem;color:var(--gold-light);flex:1;text-align:center">Torre do Pesadelo • Livro do Jogador</span>
     <div id="livro-gm-tools" style="display:none;flex-shrink:0">
       <button id="btn-livro-editor" onclick="toggleModoEditorLivro()" style="background:rgba(180,140,30,.12);border:1px solid rgba(180,140,30,.4);color:var(--gold-light);padding:.3rem .8rem;font-family:inherit;font-size:.76rem;cursor:pointer;transition:all .2s;border-radius:var(--r-sm)">
-        <svg class="ic ic-sm"><use href="#ic-edit"/></svg> Modo Editor
+        <svg class="ic ic-sm"><use href="#ic-edit"></use></svg> Modo Editor
       </button>
     </div>
   </div>
@@ -10882,79 +10910,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- Sidebar do Livro — agora flutuante, deslizando por cima do conteúdo -->
     <aside id="livro-sidebar">
-      <div style="font-family:'Playfair Display',serif;font-size:.95rem;color:var(--accent-light);margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:2px solid var(--accent)">Índice</div>
+      <div style="font-family:&#39;Playfair Display&#39;,serif;font-size:.95rem;color:var(--accent-light);margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:2px solid var(--accent)">Índice</div>
 
         <ul style="margin-bottom: 0.6rem;">
-            <li><a href="#livro-sumario" style="color: #c13f3f; font-weight: 600;">→ Sumário Interativo</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#livro-sumario" style="color: #c13f3f; font-weight: 600;">→ Sumário Interativo</a></li>
         </ul>
 
         <!-- I. O MUNDO -->
         <span class="toc-label">I. O Mundo</span>
         <ul>
-            <li><a href="#intro">O Mundo de Torre do Pesadelo</a></li>
-            <li><a href="#torre-pesadelo">A Torre do Pesadelo</a></li>
-            <li><a href="#guardias">As Quatro Torres Guardiãs</a></li>
-            <li><a href="#torre-disputas">A Torre das Disputas</a></li>
-            <li><a href="#nevoa">A Névoa e o Mundo Exterior</a></li>
-            <li><a href="#geopolitica">Geopolítica e Facções</a></li>
-            <li><a href="#despertos">Os Despertos</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#intro">O Mundo de Torre do Pesadelo</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#torre-pesadelo">A Torre do Pesadelo</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#guardias">As Quatro Torres Guardiãs</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#torre-disputas">A Torre das Disputas</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#nevoa">A Névoa e o Mundo Exterior</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#geopolitica">Geopolítica e Facções</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#despertos">Os Despertos</a></li>
         </ul>
 
         <!-- II. CRIAÇÃO DE PERSONAGEM -->
         <span class="toc-label">II. Criação de Personagem</span>
         <ul>
-            <li><a href="#criacao">Guia de Criação</a></li>
-            <li><a href="#personalidade-poder">Personalidade e Poder Principal</a></li>
-            <li><a href="#atributos">Sistema de Atributos</a></li>
-            <li><a href="#tracos-alma">Traços da Alma</a></li>
-            <li><a href="#aparencia">Aparência e Antecedentes</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#criacao">Guia de Criação</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#personalidade-poder">Personalidade e Poder Principal</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#atributos">Sistema de Atributos</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#tracos-alma">Traços da Alma</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#aparencia">Aparência e Antecedentes</a></li>
         </ul>
 
         <!-- III. SISTEMA DE PODER -->
         <span class="toc-label">III. Sistema de Poder</span>
         <ul>
-            <li><a href="#alma-fragmentada">Alma Fragmentada</a></li>
-            <li><a href="#evolucao-poder">Evolução do Poder</a></li>
-            <li><a href="#poder-mente-corpo">Poder, Mente e Corpo</a></li>
-            <li><a href="#tecnicas-habilidades">Criação de Técnicas e Habilidades</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#alma-fragmentada">Alma Fragmentada</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#evolucao-poder">Evolução do Poder</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#poder-mente-corpo">Poder, Mente e Corpo</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#tecnicas-habilidades">Criação de Técnicas e Habilidades</a></li>
         </ul>
 
         <!-- IV. PROGRESSÃO E ASCENSÃO -->
         <span class="toc-label">IV. Progressão e Ascensão</span>
         <ul>
-            <li><a href="#ascensao">As Espirais da Ascensão (Humanos)</a></li>
-            <li><a href="#corrupcao">As Espirais da Corrupção — Monstros</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ascensao">As Espirais da Ascensão (Humanos)</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#corrupcao">As Espirais da Corrupção — Monstros</a></li>
         </ul>
 
         <!-- V. ECONOMIA E ARTESANATO -->
         <span class="toc-label">V. Economia e Artesanato</span>
         <ul>
-            <li><a href="#economia">Sistema Monetário (Espíritos)</a></li>
-            <li><a href="#forja">Sistema de Forja</a></li>
-            <li><a href="#ranks-equipamentos">Classificação de Equipamentos</a></li>
-            <li><a href="#ferreiros">Ferreiros e Classificações</a></li>
-            <li><a href="#barmans">Barmans – As Vozes Invisíveis</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#economia">Sistema Monetário (Espíritos)</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#forja">Sistema de Forja</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ranks-equipamentos">Classificação de Equipamentos</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ferreiros">Ferreiros e Classificações</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#barmans">Barmans – As Vozes Invisíveis</a></li>
         </ul>
 
         <!-- VI. REGRAS DE JOGO -->
         <span class="toc-label">VI. Regras de Jogo</span>
         <ul>
-            <li><a href="#sistema-resolucao">Sistema de Resolução</a></li>
-            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#pericias">Perícias</a></li>
-            <li><a href="#combate">Combate</a></li>
-            <li><a href="#sobrecarga">Sobrecarga, Exaustão e Colapso</a></li>
-            <li><a href="#recuperacao">Recuperação</a></li>
-            <li><a href="#surtos">Surtos Decenais</a></li>
-            <li><a href="#sobrevivencia">Sobrevivência nas Torres</a></li>
-            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#acampamento">Acampamento</a></li>
-            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#sanidade">Sanidade e Corrupção</a></li>
-            <li><a href="#relacionamentos">Relacionamentos e Intimidade</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sistema-resolucao">Sistema de Resolução</a></li>
+            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#pericias">Perícias</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#combate">Combate</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sobrecarga">Sobrecarga, Exaustão e Colapso</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#recuperacao">Recuperação</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#surtos">Surtos Decenais</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sobrevivencia">Sobrevivência nas Torres</a></li>
+            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#acampamento">Acampamento</a></li>
+            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sanidade">Sanidade e Corrupção</a></li>
+            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#relacionamentos">Relacionamentos e Intimidade</a></li>
         </ul>
 
         <!-- Botão de saída — sempre visível ao final da lista de seções -->
         <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)">
-          <button onclick="fecharLivro()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.45rem;background:rgba(156,42,42,.1);border:1px solid rgba(193,63,63,.35);color:var(--accent-light);padding:.6rem .8rem;font-family:inherit;font-size:.85rem;cursor:pointer;border-radius:4px;transition:background .2s,border-color .2s" onmouseover="this.style.background='rgba(156,42,42,.22)';this.style.borderColor='var(--accent-light)'" onmouseout="this.style.background='rgba(156,42,42,.1)';this.style.borderColor='rgba(193,63,63,.35)'">
-            <svg class="ic ic-sm"><use href="#ic-arrow-left"/></svg> Sair do Livro
+          <button onclick="fecharLivro()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.45rem;background:rgba(156,42,42,.1);border:1px solid rgba(193,63,63,.35);color:var(--accent-light);padding:.6rem .8rem;font-family:inherit;font-size:.85rem;cursor:pointer;border-radius:4px;transition:background .2s,border-color .2s" onmouseover="this.style.background=&#39;rgba(156,42,42,.22)&#39;;this.style.borderColor=&#39;var(--accent-light)&#39;" onmouseout="this.style.background=&#39;rgba(156,42,42,.1)&#39;;this.style.borderColor=&#39;rgba(193,63,63,.35)&#39;">
+            <svg class="ic ic-sm"><use href="#ic-arrow-left"></use></svg> Sair do Livro
           </button>
         </div>
 
@@ -11001,13 +11029,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">I. O Mundo</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="#intro">O Mundo de Torre do Pesadelo</a></li>
-                            <li><a href="#torre-pesadelo">A Torre do Pesadelo</a></li>
-                            <li><a href="#guardias">As Quatro Torres Guardiãs</a></li>
-                            <li><a href="#torre-disputas">A Torre das Disputas</a></li>
-                            <li><a href="#nevoa">A Névoa e o Mundo Exterior</a></li>
-                            <li><a href="#geopolitica">Geopolítica e Facções</a></li>
-                            <li><a href="#despertos">Os Despertos</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#intro">O Mundo de Torre do Pesadelo</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#torre-pesadelo">A Torre do Pesadelo</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#guardias">As Quatro Torres Guardiãs</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#torre-disputas">A Torre das Disputas</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#nevoa">A Névoa e o Mundo Exterior</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#geopolitica">Geopolítica e Facções</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#despertos">Os Despertos</a></li>
                         </ul>
                     </div>
 
@@ -11015,11 +11043,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">II. Criação de Personagem</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="#criacao">Guia de Criação</a></li>
-                            <li><a href="#personalidade-poder">Personalidade e Poder Principal</a></li>
-                            <li><a href="#atributos">Sistema de Atributos</a></li>
-                            <li><a href="#tracos-alma">Traços da Alma</a></li>
-                            <li><a href="#aparencia">Aparência e Antecedentes</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#criacao">Guia de Criação</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#personalidade-poder">Personalidade e Poder Principal</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#atributos">Sistema de Atributos</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#tracos-alma">Traços da Alma</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#aparencia">Aparência e Antecedentes</a></li>
                         </ul>
                     </div>
 
@@ -11027,10 +11055,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">III. Sistema de Poder</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="#alma-fragmentada">Alma Fragmentada</a></li>
-                            <li><a href="#evolucao-poder">Evolução do Poder</a></li>
-                            <li><a href="#poder-mente-corpo">Poder, Mente e Corpo</a></li>
-                            <li><a href="#tecnicas-habilidades">Criação de Técnicas e Habilidades</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#alma-fragmentada">Alma Fragmentada</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#evolucao-poder">Evolução do Poder</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#poder-mente-corpo">Poder, Mente e Corpo</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#tecnicas-habilidades">Criação de Técnicas e Habilidades</a></li>
                         </ul>
                     </div>
 
@@ -11038,8 +11066,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">IV. Progressão e Ascensão</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="#ascensao">As Espirais da Ascensão (Humanos)</a></li>
-                            <li><a href="#corrupcao">As Espirais da Corrupção — Monstros</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ascensao">As Espirais da Ascensão (Humanos)</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#corrupcao">As Espirais da Corrupção — Monstros</a></li>
                         </ul>
                     </div>
 
@@ -11047,11 +11075,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">V. Economia e Artesanato</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="#economia">Sistema Monetário (Espíritos)</a></li>
-                            <li><a href="#forja">Sistema de Forja</a></li>
-                            <li><a href="#ranks-equipamentos">Classificação de Equipamentos</a></li>
-                            <li><a href="#ferreiros">Ferreiros e Classificações</a></li>
-                            <li><a href="#barmans">Barmans – As Vozes Invisíveis</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#economia">Sistema Monetário (Espíritos)</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#forja">Sistema de Forja</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ranks-equipamentos">Classificação de Equipamentos</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ferreiros">Ferreiros e Classificações</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#barmans">Barmans – As Vozes Invisíveis</a></li>
                         </ul>
                     </div>
 
@@ -11059,16 +11087,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div>
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">VI. Regras de Jogo</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="#sistema-resolucao">Sistema de Resolução</a></li>
-                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#pericias">Perícias</a></li>
-                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#combate">Combate</a></li>
-                            <li><a href="#sobrecarga">Sobrecarga, Exaustão e Colapso</a></li>
-                            <li><a href="#recuperacao">Recuperação</a></li>
-                            <li><a href="#surtos">Surtos Decenais</a></li>
-                            <li><a href="#sobrevivencia">Sobrevivência nas Torres</a></li>
-                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#acampamento">Acampamento</a></li>
-                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#sanidade">Sanidade e Corrupção</a></li>
-                            <li><a href="#relacionamentos">Relacionamentos e Intimidade</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sistema-resolucao">Sistema de Resolução</a></li>
+                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#pericias">Perícias</a></li>
+                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#combate">Combate</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sobrecarga">Sobrecarga, Exaustão e Colapso</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#recuperacao">Recuperação</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#surtos">Surtos Decenais</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sobrevivencia">Sobrevivência nas Torres</a></li>
+                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#acampamento">Acampamento</a></li>
+                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sanidade">Sanidade e Corrupção</a></li>
+                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#relacionamentos">Relacionamentos e Intimidade</a></li>
                         </ul>
                     </div>
 
