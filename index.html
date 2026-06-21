@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<!-- saved from url=(0046)file:///C:/Users/Gamer/Downloads/index_39.html -->
 <html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Torre do Pesadelo • Portal do Jogador</title>
-<link href="file:///C:/Users/Gamer/Downloads/index_files/css2" rel="stylesheet">
-<link href="file:///C:/Users/Gamer/Downloads/index1_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   /* ─── SUPERFÍCIES (escala de profundidade) ─── */
@@ -5772,9 +5771,20 @@ function abrirPerfilPublico(f) {
   // Se o registro veio do rankingGlobal e está faltando campos novos
   // (ex: 'idade' adicionado depois da criação), força um re-index em background.
   // Isso corrige fichas antigas sem exigir que o player salve novamente.
-  if (f.user && f.nomePersonagem && window.db) {
+  //
+  // IMPORTANTE: a escrita em rankingGlobal só é permitida pelas regras do
+  // Firestore para o DONO do personagem ou para GM/ADM. Antes, esse
+  // re-index era tentado em TODO clique de QUALQUER pessoa em QUALQUER
+  // card do ranking — então qualquer jogador que abrisse o perfil de
+  // outro levava um permission-denied (e o aviso de erro na tela), porque
+  // a escrita tentava gravar em nome do dono do perfil, não de quem clicou.
+  // Agora só tentamos a escrita quando o visitante é o próprio dono ou
+  // GM/ADM; qualquer outro visitante só lê os dados (sem tentar gravar).
+  const _podeRessincronizarPerfil = f.user && (
+    _normUser(f.user) === _normUser(usuarioAtual) || roleAtual === 'gm' || roleAtual === 'adm'
+  );
+  if (f.user && f.nomePersonagem && window.db && _podeRessincronizarPerfil) {
     const docId = _fsDocId(f.user, f.nomePersonagem);
-    const camposFaltando = !f.idade && f._fromRankingGlobal; // só migra se veio do rankingGlobal e falta campo
     // Sempre tenta re-sincronizar silenciosamente ao abrir perfil
     // (opera em background, não bloqueia a UI)
     (async () => {
@@ -5784,7 +5794,7 @@ function abrirPerfilPublico(f) {
           const raw = fichaSnap.data().dados;
           const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
           // Re-salva no rankingGlobal com todos os campos atuais (migração silenciosa)
-          await updateRankingEntry(f.user, f.nomePersonagem, d, f.foto || null);
+          await updateRankingEntry(f.user, f.nomePersonagem, d, f.foto || null, true);
           // Atualiza campos no objeto local para o perfil exibir imediatamente
           f.idade = d['f-idade'] || f.idade || '';
           f.genero = d['f-genero'] || f.genero || '';
@@ -6597,13 +6607,6 @@ function abrirAcoesMiniatura(slot, src) {
   document.body.appendChild(ov);
 }
 
-async function removerFotoPrincipal() {
-  _fotoPrincipal = null;
-  renderFotoPersonagem();
-  atualizarFichaHero();
-  await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
-}
-
 // ─── ARMAS DINÂMICAS ───────────────────────────────────────────
 let _armaCounter = 3;
 // Declarada explicitamente (antes era global implícita criada no 1º uso)
@@ -6687,12 +6690,28 @@ function renderFotoPersonagem() {
   `;
 }
 
+// Token de geração — incrementado a cada chamada de inicializarFotos().
+// Evita que uma chamada "antiga" (de uma troca de personagem anterior,
+// ainda buscando dados na nuvem) sobrescreva o que uma chamada mais nova
+// já carregou e renderizou, caso o jogador troque de personagem rápido
+// demais para a primeira busca terminar antes da segunda começar.
+let _fotosLoadToken = 0;
+
 async function inicializarFotos() {
+  const meuToken = ++_fotosLoadToken;
+  const userNoMomento = usuarioAtual;
+  const personagemNoMomento = personagemAtual;
+
   // reset de estado — CRÍTICO para não vazar fotos entre personagens
   _fotoPrincipal = null;
   _galeriaFotos = [null, null, null, null, null];
 
-  const dados = await carregarFotosPerfil(usuarioAtual, personagemAtual);
+  const dados = await carregarFotosPerfil(userNoMomento, personagemNoMomento);
+
+  // Se uma chamada mais nova já começou enquanto esperávamos a nuvem,
+  // este resultado é de um personagem que não é mais o atual — descarta.
+  if (meuToken !== _fotosLoadToken) return;
+
   if (dados) {
     _fotoPrincipal = dados.principal || null;
     // compatibilidade: se veio array antigo (< 5 items) ou formato legado
@@ -6707,8 +6726,8 @@ async function inicializarFotos() {
   atualizarFichaHero();
 
   // Cache da foto principal na sessionStorage para a sidebar usar
-  if (usuarioAtual && personagemAtual) {
-    const fotoKey = '_sbfoto_' + usuarioAtual + '_' + personagemAtual;
+  if (userNoMomento && personagemNoMomento) {
+    const fotoKey = '_sbfoto_' + userNoMomento + '_' + personagemNoMomento;
     if (_fotoPrincipal) sessionStorage.setItem(fotoKey, _fotoPrincipal);
     else sessionStorage.removeItem(fotoKey);
     // Atualiza sidebar para refletir foto nova
@@ -7051,6 +7070,14 @@ function renderizarPersonagensAccordion() {
   if (!accordion) return;
   accordion.innerHTML = '';
   const lista = getListaPersonagens();
+
+  if (lista.length === 0) {
+    // Mesma mensagem já usada em renderizarPersonagensNaSidebar() — antes,
+    // esta área ficava em branco (sem texto nenhum) pro jogador novo,
+    // diferente da sidebar, que já mostrava "Nenhum personagem".
+    accordion.innerHTML = `<div style="font-size:.82rem;color:var(--text-muted);padding:.5rem 0;font-style:italic">Nenhum personagem ainda. Crie o primeiro abaixo.</div>`;
+    return;
+  }
 
   lista.forEach(nome => {
     const slug = slugPersonagem(nome);  // ← ID seguro, sem espaços/especiais
@@ -7580,7 +7607,7 @@ function getFormulas() {
   const perMtNorm = typeof merged['per-mt'] === 'string' ? merged['per-mt'].replace(/\s+/g,'') : '';
   const perEsNorm = typeof merged['per-es'] === 'string' ? merged['per-es'].replace(/\s+/g,'') : '';
   // Fórmulas antigas/inválidas: sem metade do nível, ou com proficiencia, ou variante depreciada
-  const perMtInvalido = perMtNorm !== '' && !/floor\(nivel/.test(perMtNorm) && !/floor\(nivel/.test(perMtNorm);
+  const perMtInvalido = perMtNorm !== '' && !/floor\(nivel/.test(perMtNorm);
   const perEsInvalido = perEsNorm !== '' && !/floor\(nivel/.test(perEsNorm);
   if (perMtInvalido) {
     console.warn('[Fórmulas] per-mt corrompido, restaurando padrão. Anterior:', merged['per-mt']);
@@ -8606,15 +8633,14 @@ function _renderSlots(tipo, total) {
       const ctx = _getCalcCtx();
       const attrMap = {FOR:ctx.modForca,DES:ctx.modDestreza,VIG:ctx.modVigor,INT:ctx.modIntelecto,ALM:ctx.modAlma,CAR:ctx.modCarisma};
       const attrMod = attrMap[slot.attr] ?? 0;
-      const nivel   = ctx.nivel;
-      const maestria = ctx.maestria;
-      // Cálculo direto (sem parser de fórmulas) para garantir resultado correto:
-      // Maestria:       attrMod + floor(nivel/2) + maestria
-      // Especialização: attrMod + floor(nivel/2) + floor(maestria * 1.5)
-      const base = attrMod + Math.floor(nivel / 2);
-      const val  = tipo === 'maestria'
-        ? base + maestria
-        : base + Math.floor(maestria * 1.5);
+      // Usa a fórmula configurada pelo GM (per-mt/per-es), injetando o attrMod
+      // específico desta perícia no contexto antes de avaliar. Antes, esse
+      // valor era sempre calculado com a matemática oficial fixa direto no
+      // código — então qualquer fórmula customizada salva no Editor de
+      // Fórmulas era silenciosamente ignorada e nunca refletia na ficha.
+      const f = getFormulas();
+      const formulaKey = tipo === 'maestria' ? 'per-mt' : 'per-es';
+      const val = avaliarFormula(f[formulaKey], { ...ctx, attrMod });
       bonus = fmtMod(Math.round(val));
     }
 
@@ -8675,18 +8701,15 @@ function abrirSeletorPericia(tipo, slotIdx) {
   overlay.id = 'pericias-dropdown-overlay';
 
   const titulo = tipo === 'maestria' ? `Maestria #${slotIdx+1}` : `Especialização #${slotIdx+1}`;
-  const formula = tipo === 'maestria' ? f['per-mt'] : f['per-es'];
-
-  const nivel    = ctx.nivel;
-  const maestria = ctx.maestria;
+  const formulaKey = tipo === 'maestria' ? 'per-mt' : 'per-es';
 
   const itens = PERICIAS_DEF.map((p, i) => {
     const attrMod = attrMap[p.attr] ?? 0;
-    // Cálculo direto para garantir bônus correto no dropdown de seleção
-    const base = attrMod + Math.floor(nivel / 2);
-    const val  = tipo === 'maestria'
-      ? base + maestria
-      : base + Math.floor(maestria * 1.5);
+    // Usa a fórmula configurada (per-mt/per-es) — mesma correção aplicada
+    // em _renderSlots(). Antes havia até uma variável 'formula' calculada
+    // aqui e nunca usada; o bônus mostrado no seletor sempre vinha de um
+    // cálculo fixo, ignorando qualquer customização do GM.
+    const val = avaliarFormula(f[formulaKey], { ...ctx, attrMod });
     return `<div class="pericias-dropdown-item" onclick="selecionarPericia('${tipo}',${slotIdx},'${p.nome}','${p.attr}')">
       <span class="pericias-dropdown-item-attr">${p.attr}</span>
       <span class="pericias-dropdown-item-nome">${p.nome}</span>
@@ -8755,7 +8778,16 @@ function removeTecnica() {
 
 function removerTecnicaEl(btn) {
   const div = btn.closest('.poder-tecnica');
-  if (div) { div.remove(); salvarLocal(); }
+  if (div) { div.remove(); }
+  // Recalcula numTecnicas como o maior número de técnica ainda existente
+  // no DOM. Antes, remover uma técnica do MEIO não atualizava numTecnicas
+  // nenhum pouco — o loop de coleta (agora corrigido para escanear o DOM)
+  // ficava com uma entrada fantasma vazia presa pra sempre na posição
+  // removida, salva repetidamente em toda ficha.
+  const existentes = Array.from(document.querySelectorAll('#tecnicas-lista .poder-tecnica'))
+    .map(el => parseInt(el.id.match(/^tec-(\d+)$/)?.[1]) || 0);
+  numTecnicas = existentes.length ? Math.max(0, ...existentes) : 0;
+  salvarLocal();
 }
 
 // Nota: a antiga getChave() foi removida nesta auditoria — nunca era chamada
@@ -8789,10 +8821,22 @@ function coletarDados() {
     'pet-nome','pet-especie','pet-tipo','pet-for','pet-des','pet-vig','pet-int','pet-esp','pet-car',
     'pet-pv','pet-ca','pet-mov','pet-hab','pet-evo'
   ];
-  // pets adicionais (a partir do #2)
+  // pets adicionais (a partir do #2) — escaneia os pets REALMENTE
+  // presentes no DOM (mesmo padrão já usado para armas), em vez de
+  // confiar num intervalo contínuo 2..numPets. Antes, remover um pet do
+  // MEIO (ex: #2 de 1,2,3) decrementava numPets sem re-numerar nada, e o
+  // pet #3 — que continuava visível na tela — parava de ser salvo, porque
+  // o loop antigo só ia até numPets (agora 2).
   const petFields = [];
-  for(let n=2; n<=numPets; n++) {
-    ['nome','esp2','tipo','for','des','vig','int','esp','car','pv','ca','mov','hab','evo'].forEach(f => petFields.push(`pet${n}-${f==='esp2'?'especie':f}`));
+  const petsListaEl = document.getElementById('pets-lista');
+  if (petsListaEl) {
+    petsListaEl.querySelectorAll('[id^="pet-entry-"]').forEach(entry => {
+      const m = entry.id.match(/^pet-entry-(\d+)$/);
+      if (m) {
+        const n = m[1];
+        ['nome','especie','tipo','for','des','vig','int','esp','car','pv','ca','mov','hab','evo'].forEach(f => petFields.push(`pet${n}-${f}`));
+      }
+    });
   }
   const armaFields  = [];
   const armasTbody = document.getElementById('armas-tbody');
@@ -8813,10 +8857,30 @@ function coletarDados() {
   }
   const passFields  = Array.from({length:numPassivas},(_,i)=>i+1).flatMap(n=>['nome','desc'].map(f=>`pass${n}-${f}`));
   const despFields  = Array.from({length:numDespertares},(_,i)=>i+1).flatMap(n=>['nome','cond','efei'].map(f=>`desp${n}-${f}`));
-  const itemFields  = Array.from({length:_invCounters.item||1},(_,i)=>i+1).flatMap(n=>['nome','qtd','esp','desc'].map(f=>`item${n}-${f}`));
-  const consFields  = Array.from({length:_invCounters.cons||1},(_,i)=>i+1).flatMap(n=>['nome','qtd','efei'].map(f=>`cons${n}-${f}`));
-  const matFields   = Array.from({length:_invCounters.mat||1},(_,i)=>i+1).flatMap(n=>['nome','qtd'].map(f=>`mat${n}-${f}`));
-  const nucFields   = Array.from({length:_invCounters.nuc||1},(_,i)=>i+1).flatMap(n=>['nome','tipo','efei'].map(f=>`nuc${n}-${f}`));
+  // Escaneia as linhas de inventário REALMENTE presentes no DOM (mesmo
+  // padrão usado acima para armas), em vez de confiar em _invCounters.
+  // _invCounters nunca era decrementado ao remover uma linha do MEIO
+  // (removeInvRowEl remove só aquela linha específica) — o intervalo
+  // contínuo antigo deixava uma entrada fantasma vazia, presa pra sempre
+  // na posição removida, salva em toda ficha.
+  const _scanLinhasInventario = (tbodyId, prefix, campos) => {
+    const out = [];
+    const tbody = document.getElementById(tbodyId);
+    if (tbody) {
+      tbody.querySelectorAll('tr').forEach(tr => {
+        const firstInput = tr.querySelector('input, textarea');
+        if (firstInput) {
+          const m = firstInput.id.match(new RegExp('^' + prefix + '(\\d+)-'));
+          if (m) { const n = m[1]; campos.forEach(f => out.push(`${prefix}${n}-${f}`)); }
+        }
+      });
+    }
+    return out;
+  };
+  const itemFields  = _scanLinhasInventario('inv-itens-tbody', 'item', ['nome','qtd','esp','desc']);
+  const consFields  = _scanLinhasInventario('inv-cons-tbody',  'cons', ['nome','qtd','efei']);
+  const matFields   = _scanLinhasInventario('inv-mat-tbody',   'mat',  ['nome','qtd']);
+  const nucFields   = _scanLinhasInventario('inv-nuc-tbody',   'nuc',  ['nome','tipo','efei']);
 
   const todos = [...campos,...armaFields,...passFields,...despFields,...itemFields,...consFields,...matFields,...nucFields,...petFields];
   const d = {};
@@ -8824,12 +8888,25 @@ function coletarDados() {
   ['ms1','ms2','ms3','mf1','mf2','mf3'].forEach(id=>{ const el=document.getElementById(id); if(el) d[id]=el.checked; });
   d.pericias = PERICIAS_DEF.map((_,i)=>({mt:document.getElementById(`pm-${i}`)?.checked||false,es:document.getElementById(`pe-${i}`)?.checked||false}));
   d.slotsPericia = JSON.parse(JSON.stringify(_slotsPericia));
-  d.numTecnicas = numTecnicas;
   d.numPassivas = numPassivas;
   d.numDespertares = numDespertares;
   d.numPets = numPets;
   d.tecnicas = [];
-  for(let i=1;i<=numTecnicas;i++) d.tecnicas.push({nome:document.getElementById(`tn-${i}`)?.value||'',custo:document.getElementById(`tc-${i}`)?.value||'',desc:document.getElementById(`td-${i}`)?.value||'',efei:document.getElementById(`te-${i}`)?.value||''});
+  const tecnicasListaEl = document.getElementById('tecnicas-lista');
+  if (tecnicasListaEl) {
+    tecnicasListaEl.querySelectorAll('.poder-tecnica').forEach(div => {
+      const m = div.id.match(/^tec-(\d+)$/);
+      if (!m) return;
+      const i = m[1];
+      d.tecnicas.push({
+        nome: document.getElementById(`tn-${i}`)?.value || '',
+        custo: document.getElementById(`tc-${i}`)?.value || '',
+        desc: document.getElementById(`td-${i}`)?.value || '',
+        efei: document.getElementById(`te-${i}`)?.value || ''
+      });
+    });
+  }
+  d.numTecnicas = d.tecnicas.length;
   // Ordem e favoritos dos atributos — segue o personagem entre dispositivos
   // (a fonte de verdade imediata é o localStorage via _attrPrefsKey, mas
   // incluir aqui garante sincronização via Firestore como o resto da ficha).
@@ -9110,7 +9187,15 @@ function addPet() {
 function removerPet(n) {
   if (n === 1) return; // não remove o primeiro
   const div = document.getElementById(`pet-entry-${n}`);
-  if (div) { div.remove(); numPets = Math.max(1, numPets - 1); }
+  if (div) { div.remove(); }
+  // Recalcula numPets como o maior número de pet ainda existente no DOM.
+  // Antes, isso só decrementava numPets em 1 — removendo um pet do MEIO
+  // (ex: #2 de 1,2,3), o pet #3 continuava visível, mas o próximo
+  // "Adicionar Pet" criava de novo um pet-entry-3, colidindo com o que já
+  // existia (dois elementos com o mesmo id, campos não respondendo certo).
+  const existentes = Array.from(document.querySelectorAll('#pets-lista [id^="pet-entry-"]'))
+    .map(el => parseInt(el.id.match(/pet-entry-(\d+)/)?.[1]) || 0);
+  numPets = existentes.length ? Math.max(1, ...existentes) : 1;
   salvarLocal();
 }
 
@@ -9255,11 +9340,17 @@ function preencherCampos(d) {
     for(let i=0;i<extra;i++) addDespertar();
   }
 
-  // Restaura pets extras
-  if(d.numPets && d.numPets > numPets) {
-    const extra = d.numPets - numPets;
-    for(let i=0;i<extra;i++) addPet();
-  }
+  // Restaura pets extras — reconstrói com base nos pets REALMENTE salvos
+  // nos dados (escaneando petN-nome, mesmo padrão usado para armas/itens),
+  // em vez de confiar só em d.numPets. d.numPets podia ficar desalinhado
+  // com os números reais quando um pet do meio era removido; usar só ele
+  // criava pets vazios nos números errados e perdia os dados do pet certo.
+  const petKeysFromData = Object.keys(d).filter(k => k.match(/^pet(\d+)-nome$/));
+  const maiorPetSalvo = petKeysFromData.reduce((max, k) => {
+    const n = parseInt(k.match(/^pet(\d+)-/)[1]);
+    return Math.max(max, n);
+  }, 1);
+  while (numPets < maiorPetSalvo) addPet();
 
   if(d.tecnicas && d.numTecnicas) {
     for(let i=0;i<d.numTecnicas;i++) addTecnica();
@@ -9685,6 +9776,7 @@ async function salvarFichaPlayer(user) {
 
   // Salva no Firestore
   const docId = _fsDocId(user, persoAtivo);
+  let sucesso = false;
   try {
     if (window.db && window.doc && window.setDoc) {
       await window.setDoc(window.doc(window.db, 'fichas', docId), {
@@ -9698,13 +9790,24 @@ async function salvarFichaPlayer(user) {
       console.log('[Firestore] Ficha do player salva pelo GM:', docId);
       // Atualiza o ranking NA TELA imediatamente, caso o painel esteja aberto.
       if (document.getElementById('ranking-grid')) carregarRanking();
+      sucesso = true;
     }
   } catch(e) {
     console.error('[Firestore] Erro ao salvar ficha do player:', e);
   }
-  // Feedback visual sem alert() bloqueante
+  // Feedback visual sem alert() bloqueante — reflete o resultado real da
+  // gravação. Antes, o botão sempre mostrava "✓ Salvo!" mesmo quando o
+  // setDoc acima falhava (ex: permission-denied), escondendo o erro do GM.
   const btn = document.querySelector(`[onclick="salvarFichaPlayer('${user}')"]`);
-  if (btn) { const orig = btn.textContent; btn.textContent = '✓ Salvo!'; btn.style.background='#4a8'; setTimeout(()=>{ btn.textContent=orig; btn.style.background=''; }, 2000); }
+  if (btn) {
+    const orig = btn.textContent;
+    if (sucesso) {
+      btn.textContent = '✓ Salvo!'; btn.style.background = '#4a8';
+    } else {
+      btn.textContent = '✗ Erro ao salvar'; btn.style.background = '#a44';
+    }
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2500);
+  }
 }
 
 // ─── ADM: lista players (só mecânico) ───
@@ -10344,9 +10447,16 @@ function ativarEdicaoBlocosGM() {
   });
 }
 
-function abrirModalBloco(id, conteudoAtual) {
+function abrirModalBloco(id, conteudoAtual, aoSalvar) {
   // Remove modal anterior se existir
   document.getElementById('modal-bloco-overlay')?.remove();
+
+  // Permite customizar o que acontece ao clicar em "Salvar" (usado pelo
+  // editor do Livro do Jogador, que precisa gravar em blocos/livro_jogador
+  // em vez do sistema sitewide config/blocos_gm). Antes, esse parâmetro
+  // era recebido e nunca usado — o botão Salvar sempre chamava
+  // salvarBlocoGM(), então edições feitas no Livro iam pro destino errado.
+  window._modalBlocoAoSalvar = aoSalvar || null;
 
   const overlay = document.createElement('div');
   overlay.className = 'modal-bloco-overlay';
@@ -10358,7 +10468,7 @@ function abrirModalBloco(id, conteudoAtual) {
       <textarea id="modal-bloco-textarea">${conteudoAtual.replace(/<button class="btn-editar-bloco"[^>]*>.*?<\/button>/gs,'').trim()}</textarea>
       <div class="modal-bloco-actions">
         <button class="modal-btn-cancelar" onclick="fecharModalBloco()">Cancelar</button>
-        <button class="modal-btn-salvar" onclick="salvarBlocoGM('${id}')"><svg class="ic"><use href="#ic-check"/></svg> Salvar</button>
+        <button class="modal-btn-salvar" onclick="_confirmarSalvarModalBloco('${id}')"><svg class="ic"><use href="#ic-check"/></svg> Salvar</button>
       </div>
     </div>`;
   overlay.addEventListener('click', e => { if (e.target === overlay) fecharModalBloco(); });
@@ -10366,7 +10476,20 @@ function abrirModalBloco(id, conteudoAtual) {
   document.getElementById('modal-bloco-textarea').focus();
 }
 
-function fecharModalBloco() { document.getElementById('modal-bloco-overlay')?.remove(); }
+// Ponto único que o botão Salvar do modal chama: usa a função de
+// salvamento customizada se foi passada para abrirModalBloco(), senão
+// cai no salvamento sitewide padrão (salvarBlocoGM).
+function _confirmarSalvarModalBloco(id) {
+  if (window._modalBlocoAoSalvar) {
+    const ta = document.getElementById('modal-bloco-textarea');
+    window._modalBlocoAoSalvar(id, ta ? ta.value : '');
+    fecharModalBloco();
+  } else {
+    salvarBlocoGM(id);
+  }
+}
+
+function fecharModalBloco() { document.getElementById('modal-bloco-overlay')?.remove(); window._modalBlocoAoSalvar = null; }
 
 async function salvarBlocoGM(id) {
   const ta = document.getElementById('modal-bloco-textarea');
@@ -10606,6 +10729,10 @@ function _mostrarLivro() {
   if (gmTools) gmTools.style.display = (roleAtual === 'gm') ? 'flex' : 'none';
   // Inicializa links internos do livro
   _inicializarLinksLivro();
+  // Garante ids estáveis nos blocos do Livro ANTES de aplicar o conteúdo
+  // editado — precisa rodar para QUALQUER papel, não só GM (ver correção
+  // em _garantirIdsBlocosLivro).
+  _garantirIdsBlocosLivro();
   // Aplica blocos editados pelo GM (locais primeiro)
   _aplicarBlocosLivro();
   // Se GM, ativa edição dos blocos do livro
@@ -10698,9 +10825,30 @@ function toggleModoEditorLivro() {
   }
 }
 
+// Garante ids estáveis em todo bloco editável do Livro, para QUALQUER
+// papel — não só GM. SEM ISSO, _aplicarBlocosLivro() não encontra os
+// elementos certos pra aplicar o conteúdo editado, porque o id só existia
+// quando _ativarEdicaoBlocosLivro() rodava (e essa função só rodava pro
+// GM). Na prática, isso fazia qualquer edição do GM no Livro nunca
+// aparecer pros jogadores — o GM via a própria edição (já estava na tela
+// no momento de salvar), mas ninguém mais via.
+function _garantirIdsBlocosLivro() {
+  const livro = document.getElementById('livro-jogador');
+  if (!livro) return;
+  const seletores = ['#livro-content p', '#livro-content h1', '#livro-content h2',
+                     '#livro-content h3', '#livro-content .lore-box',
+                     '#livro-content .system-card'];
+  seletores.forEach(sel => {
+    livro.querySelectorAll(sel).forEach((el, i) => {
+      if (!el.id) el.id = 'livro-bloco-' + sel.replace(/[^a-z0-9]/gi,'_') + '_' + i;
+    });
+  });
+}
+
 function _ativarEdicaoBlocosLivro() {
   const livro = document.getElementById('livro-jogador');
   if (!livro || roleAtual !== 'gm') return;
+  _garantirIdsBlocosLivro();
   const seletores = ['#livro-content p', '#livro-content h1', '#livro-content h2',
                      '#livro-content h3', '#livro-content .lore-box',
                      '#livro-content .system-card'];
@@ -10913,70 +11061,70 @@ document.addEventListener('DOMContentLoaded', () => {
       <div style="font-family:&#39;Playfair Display&#39;,serif;font-size:.95rem;color:var(--accent-light);margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:2px solid var(--accent)">Índice</div>
 
         <ul style="margin-bottom: 0.6rem;">
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#livro-sumario" style="color: #c13f3f; font-weight: 600;">→ Sumário Interativo</a></li>
+            <li><a href="#livro-sumario" style="color: #c13f3f; font-weight: 600;">→ Sumário Interativo</a></li>
         </ul>
 
         <!-- I. O MUNDO -->
         <span class="toc-label">I. O Mundo</span>
         <ul>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#intro">O Mundo de Torre do Pesadelo</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#torre-pesadelo">A Torre do Pesadelo</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#guardias">As Quatro Torres Guardiãs</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#torre-disputas">A Torre das Disputas</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#nevoa">A Névoa e o Mundo Exterior</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#geopolitica">Geopolítica e Facções</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#despertos">Os Despertos</a></li>
+            <li><a href="#intro">O Mundo de Torre do Pesadelo</a></li>
+            <li><a href="#torre-pesadelo">A Torre do Pesadelo</a></li>
+            <li><a href="#guardias">As Quatro Torres Guardiãs</a></li>
+            <li><a href="#torre-disputas">A Torre das Disputas</a></li>
+            <li><a href="#nevoa">A Névoa e o Mundo Exterior</a></li>
+            <li><a href="#geopolitica">Geopolítica e Facções</a></li>
+            <li><a href="#despertos">Os Despertos</a></li>
         </ul>
 
         <!-- II. CRIAÇÃO DE PERSONAGEM -->
         <span class="toc-label">II. Criação de Personagem</span>
         <ul>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#criacao">Guia de Criação</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#personalidade-poder">Personalidade e Poder Principal</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#atributos">Sistema de Atributos</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#tracos-alma">Traços da Alma</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#aparencia">Aparência e Antecedentes</a></li>
+            <li><a href="#criacao">Guia de Criação</a></li>
+            <li><a href="#personalidade-poder">Personalidade e Poder Principal</a></li>
+            <li><a href="#atributos">Sistema de Atributos</a></li>
+            <li><a href="#tracos-alma">Traços da Alma</a></li>
+            <li><a href="#aparencia">Aparência e Antecedentes</a></li>
         </ul>
 
         <!-- III. SISTEMA DE PODER -->
         <span class="toc-label">III. Sistema de Poder</span>
         <ul>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#alma-fragmentada">Alma Fragmentada</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#evolucao-poder">Evolução do Poder</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#poder-mente-corpo">Poder, Mente e Corpo</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#tecnicas-habilidades">Criação de Técnicas e Habilidades</a></li>
+            <li><a href="#alma-fragmentada">Alma Fragmentada</a></li>
+            <li><a href="#evolucao-poder">Evolução do Poder</a></li>
+            <li><a href="#poder-mente-corpo">Poder, Mente e Corpo</a></li>
+            <li><a href="#tecnicas-habilidades">Criação de Técnicas e Habilidades</a></li>
         </ul>
 
         <!-- IV. PROGRESSÃO E ASCENSÃO -->
         <span class="toc-label">IV. Progressão e Ascensão</span>
         <ul>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ascensao">As Espirais da Ascensão (Humanos)</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#corrupcao">As Espirais da Corrupção — Monstros</a></li>
+            <li><a href="#ascensao">As Espirais da Ascensão (Humanos)</a></li>
+            <li><a href="#corrupcao">As Espirais da Corrupção — Monstros</a></li>
         </ul>
 
         <!-- V. ECONOMIA E ARTESANATO -->
         <span class="toc-label">V. Economia e Artesanato</span>
         <ul>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#economia">Sistema Monetário (Espíritos)</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#forja">Sistema de Forja</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ranks-equipamentos">Classificação de Equipamentos</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ferreiros">Ferreiros e Classificações</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#barmans">Barmans – As Vozes Invisíveis</a></li>
+            <li><a href="#economia">Sistema Monetário (Espíritos)</a></li>
+            <li><a href="#forja">Sistema de Forja</a></li>
+            <li><a href="#ranks-equipamentos">Classificação de Equipamentos</a></li>
+            <li><a href="#ferreiros">Ferreiros e Classificações</a></li>
+            <li><a href="#barmans">Barmans – As Vozes Invisíveis</a></li>
         </ul>
 
         <!-- VI. REGRAS DE JOGO -->
         <span class="toc-label">VI. Regras de Jogo</span>
         <ul>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sistema-resolucao">Sistema de Resolução</a></li>
-            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#pericias">Perícias</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#combate">Combate</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sobrecarga">Sobrecarga, Exaustão e Colapso</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#recuperacao">Recuperação</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#surtos">Surtos Decenais</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sobrevivencia">Sobrevivência nas Torres</a></li>
-            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#acampamento">Acampamento</a></li>
-            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sanidade">Sanidade e Corrupção</a></li>
-            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#relacionamentos">Relacionamentos e Intimidade</a></li>
+            <li><a href="#sistema-resolucao">Sistema de Resolução</a></li>
+            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#pericias">Perícias</a></li>
+            <li><a href="#combate">Combate</a></li>
+            <li><a href="#sobrecarga">Sobrecarga, Exaustão e Colapso</a></li>
+            <li><a href="#recuperacao">Recuperação</a></li>
+            <li><a href="#surtos">Surtos Decenais</a></li>
+            <li><a href="#sobrevivencia">Sobrevivência nas Torres</a></li>
+            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#acampamento">Acampamento</a></li>
+            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#sanidade">Sanidade e Corrupção</a></li>
+            <li><a href="#relacionamentos">Relacionamentos e Intimidade</a></li>
         </ul>
 
         <!-- Botão de saída — sempre visível ao final da lista de seções -->
@@ -11029,13 +11177,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">I. O Mundo</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#intro">O Mundo de Torre do Pesadelo</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#torre-pesadelo">A Torre do Pesadelo</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#guardias">As Quatro Torres Guardiãs</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#torre-disputas">A Torre das Disputas</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#nevoa">A Névoa e o Mundo Exterior</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#geopolitica">Geopolítica e Facções</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#despertos">Os Despertos</a></li>
+                            <li><a href="#intro">O Mundo de Torre do Pesadelo</a></li>
+                            <li><a href="#torre-pesadelo">A Torre do Pesadelo</a></li>
+                            <li><a href="#guardias">As Quatro Torres Guardiãs</a></li>
+                            <li><a href="#torre-disputas">A Torre das Disputas</a></li>
+                            <li><a href="#nevoa">A Névoa e o Mundo Exterior</a></li>
+                            <li><a href="#geopolitica">Geopolítica e Facções</a></li>
+                            <li><a href="#despertos">Os Despertos</a></li>
                         </ul>
                     </div>
 
@@ -11043,11 +11191,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">II. Criação de Personagem</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#criacao">Guia de Criação</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#personalidade-poder">Personalidade e Poder Principal</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#atributos">Sistema de Atributos</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#tracos-alma">Traços da Alma</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#aparencia">Aparência e Antecedentes</a></li>
+                            <li><a href="#criacao">Guia de Criação</a></li>
+                            <li><a href="#personalidade-poder">Personalidade e Poder Principal</a></li>
+                            <li><a href="#atributos">Sistema de Atributos</a></li>
+                            <li><a href="#tracos-alma">Traços da Alma</a></li>
+                            <li><a href="#aparencia">Aparência e Antecedentes</a></li>
                         </ul>
                     </div>
 
@@ -11055,10 +11203,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">III. Sistema de Poder</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#alma-fragmentada">Alma Fragmentada</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#evolucao-poder">Evolução do Poder</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#poder-mente-corpo">Poder, Mente e Corpo</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#tecnicas-habilidades">Criação de Técnicas e Habilidades</a></li>
+                            <li><a href="#alma-fragmentada">Alma Fragmentada</a></li>
+                            <li><a href="#evolucao-poder">Evolução do Poder</a></li>
+                            <li><a href="#poder-mente-corpo">Poder, Mente e Corpo</a></li>
+                            <li><a href="#tecnicas-habilidades">Criação de Técnicas e Habilidades</a></li>
                         </ul>
                     </div>
 
@@ -11066,8 +11214,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">IV. Progressão e Ascensão</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ascensao">As Espirais da Ascensão (Humanos)</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#corrupcao">As Espirais da Corrupção — Monstros</a></li>
+                            <li><a href="#ascensao">As Espirais da Ascensão (Humanos)</a></li>
+                            <li><a href="#corrupcao">As Espirais da Corrupção — Monstros</a></li>
                         </ul>
                     </div>
 
@@ -11075,11 +11223,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="margin-bottom: 1.4rem;">
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">V. Economia e Artesanato</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#economia">Sistema Monetário (Espíritos)</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#forja">Sistema de Forja</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ranks-equipamentos">Classificação de Equipamentos</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#ferreiros">Ferreiros e Classificações</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#barmans">Barmans – As Vozes Invisíveis</a></li>
+                            <li><a href="#economia">Sistema Monetário (Espíritos)</a></li>
+                            <li><a href="#forja">Sistema de Forja</a></li>
+                            <li><a href="#ranks-equipamentos">Classificação de Equipamentos</a></li>
+                            <li><a href="#ferreiros">Ferreiros e Classificações</a></li>
+                            <li><a href="#barmans">Barmans – As Vozes Invisíveis</a></li>
                         </ul>
                     </div>
 
@@ -11087,16 +11235,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div>
                         <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">VI. Regras de Jogo</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sistema-resolucao">Sistema de Resolução</a></li>
-                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#pericias">Perícias</a></li>
-                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#combate">Combate</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sobrecarga">Sobrecarga, Exaustão e Colapso</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#recuperacao">Recuperação</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#surtos">Surtos Decenais</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sobrevivencia">Sobrevivência nas Torres</a></li>
-                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#acampamento">Acampamento</a></li>
-                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="file:///C:/Users/Gamer/Downloads/index_39.html#sanidade">Sanidade e Corrupção</a></li>
-                            <li><a href="file:///C:/Users/Gamer/Downloads/index_39.html#relacionamentos">Relacionamentos e Intimidade</a></li>
+                            <li><a href="#sistema-resolucao">Sistema de Resolução</a></li>
+                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#pericias">Perícias</a></li>
+                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#combate">Combate</a></li>
+                            <li><a href="#sobrecarga">Sobrecarga, Exaustão e Colapso</a></li>
+                            <li><a href="#recuperacao">Recuperação</a></li>
+                            <li><a href="#surtos">Surtos Decenais</a></li>
+                            <li><a href="#sobrevivencia">Sobrevivência nas Torres</a></li>
+                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#acampamento">Acampamento</a></li>
+                            <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#sanidade">Sanidade e Corrupção</a></li>
+                            <li><a href="#relacionamentos">Relacionamentos e Intimidade</a></li>
                         </ul>
                     </div>
 
@@ -12002,7 +12150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p>Tudo deve responder: <strong>“Isso faz sentido com a alma desse personagem?”</strong> Essa é a lei fundamental. Builds quebradas ou poderes desconectados do conceito central do personagem não são permitidos.</p>
 
             <!-- DESPERTARES / PROGRESSÃO DE PODER -->
-            <h2>Despertares do Poder</h2>
+            <h2 id="evolucao-poder">Despertares do Poder</h2>
             <p>Todo poder possui potencial de evolução. O objetivo dos Despertares é liberar novas interpretações do conceito original da habilidade.</p>
 
             <p>Os Despertares de Poder estão diretamente ligados à sua Ascensão. Cada vez que você acumula energia suficiente para alcançar um novo nível na tabela das Espirais da Ascensão, sua Alma se expande o suficiente para provocar um Despertar no seu poder.</p>
