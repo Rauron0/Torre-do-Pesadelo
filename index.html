@@ -488,6 +488,32 @@ h3 { font-size:1.3rem; margin:1.5rem 0 .5rem; } h4 { font-size:1.1rem; margin:1.
 .chapter-number { font-size:.7rem; letter-spacing:3px; color:var(--accent-light); text-transform:uppercase; display:block; margin-bottom:.3rem; }
 p { color:#d4d4dc; margin-bottom:1rem; }
 .lore-box { background:linear-gradient(145deg,#18181d,#121215); border:1px solid var(--border); padding:1.4rem 1.6rem; margin:1.5rem 0; border-left:3px solid var(--accent); }
+
+/* ── Editor de Fórmulas (GM): "grimório de variáveis" em vez de
+   documentação técnica crua — mesma identidade visual do resto do site,
+   trocando uma lista corrida de <code> por chips agrupados e legíveis. ── */
+.formula-ajuda-titulo {
+  font-family: 'Playfair Display', serif; font-size: 1.05rem;
+  color: var(--gold-light); margin-bottom: .6rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.formula-ajuda-grupo { margin-bottom: .85rem; }
+.formula-ajuda-label {
+  display: block; font-size: .66rem; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: .4rem;
+}
+.formula-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.formula-chip {
+  font-family: 'Courier New', monospace; font-size: .78rem;
+  background: rgba(156,42,42,.08); border: 1px solid rgba(193,63,63,.25);
+  color: var(--silver); padding: .25rem .65rem; border-radius: var(--r-pill);
+  transition: border-color .2s, background .2s;
+}
+.formula-chip:hover { border-color: var(--accent-light); background: rgba(156,42,42,.16); }
+.formula-chip.op { color: var(--gold-light); border-color: rgba(180,140,30,.3); background: rgba(180,140,30,.08); }
+.formula-chip.fn { color: #a8e6b8; border-color: rgba(120,200,150,.3); background: rgba(120,200,150,.08); }
+.formula-chip.mod { color: var(--arcane-light); border-color: rgba(110,147,232,.3); background: rgba(110,147,232,.08); }
+.formula-chip.extra { color: #e0a8d8; border-color: rgba(200,130,190,.3); background: rgba(200,130,190,.08); }
 .system-card { background:var(--bg-elevated); border:1px solid var(--border); padding:1.2rem 1.4rem; margin:1.2rem 0; border-radius:4px; }
 .key-term { color:var(--accent-light); font-weight:600; }
 .attr-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; margin:1.5rem 0; }
@@ -538,9 +564,10 @@ tr:hover td { background:rgba(156,42,42,.05); }
   text-align:center;
   padding:1.4rem .5rem 1.2rem;
   position:relative;
-  transition:border-color .2s, box-shadow .2s, transform .15s;
+  transition:border-color .2s, box-shadow .2s, transform .15s, opacity .2s;
   min-width:0;
   border-radius:2px;
+  cursor:grab;
 }
 .atributo-box:hover {
   border-top-color:var(--accent-light);
@@ -548,9 +575,10 @@ tr:hover td { background:rgba(156,42,42,.05); }
   transform:translateY(-2px);
 }
 .atributo-box label {
-  font-size:.65rem; letter-spacing:3px; text-transform:uppercase;
+  font-size:.62rem; letter-spacing:1.5px; text-transform:uppercase;
   color:var(--accent-light); display:block; margin-bottom:.7rem; font-weight:700;
-  white-space:nowrap; text-shadow: 0 0 8px rgba(193,63,63,.35);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  text-shadow: 0 0 8px rgba(193,63,63,.35);
 }
 .atributo-box input {
   width:100%; background:transparent; border:none;
@@ -560,6 +588,27 @@ tr:hover td { background:rgba(156,42,42,.05); }
   line-height:1; min-width:0;
 }
 .atributo-box input:focus { border-bottom-color:var(--accent-light); }
+
+/* ── Favoritos ── */
+.atributo-fav-btn {
+  position:absolute; top:.35rem; right:.35rem;
+  background:none; border:none; cursor:pointer; padding:.2rem;
+  color:rgba(255,255,255,.18); display:flex; line-height:0;
+  transition:color .2s, transform .15s;
+}
+.atributo-fav-btn:hover { color:var(--gold); transform:scale(1.15); }
+.atributo-fav-btn.ativo { color:var(--gold-light); }
+.atributo-fav-btn.ativo svg { fill:currentColor; }
+.atributo-box.favorito {
+  border-top-color:var(--gold-light);
+  box-shadow:0 0 20px rgba(224,188,74,.25), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.atributo-box.favorito label { color:var(--gold-light); text-shadow:0 0 8px rgba(224,188,74,.35); }
+.atributo-box.favorito input { border-bottom-color:rgba(224,188,74,.45); }
+
+/* ── Drag and drop ── */
+.atributo-box.arrastando { opacity:.4; cursor:grabbing; }
+.atributo-box.drag-over { border-top-color:var(--arcane-light); transform:scale(1.03); }
 .atributo-mod {
   font-size:1.05rem; color:var(--silver); margin-top:.55rem;
   font-weight:700; min-height:1.3em;
@@ -724,7 +773,6 @@ tr:hover td { background:rgba(156,42,42,.05); }
 .save-btn:hover { background:var(--accent-light); }
 .save-status { font-size:.8rem; color:var(--text-muted); }
 .save-status.saved { color:#5cad7a; }
-.save-status.erro { color:#e08080; font-weight:600; }
 
 /* TOOLTIP */
 .info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:rgba(156,42,42,.2); border:1px solid var(--accent); color:var(--accent-light); font-size:.62rem; cursor:pointer; vertical-align:middle; margin-left:4px; font-style:normal; font-family:serif; position:relative; }
@@ -845,6 +893,16 @@ section { padding-top:1rem; }
 .player-card-badge { font-size:.65rem; padding:.2rem .6rem; background:rgba(156,42,42,.2); border:1px solid var(--accent); color:var(--accent-light); letter-spacing:1px; }
 .player-card-body { padding:0 1.2rem 1.2rem; display:none; }
 .player-card-body.open { display:block; }
+
+/* Botões de "editar ficha completa" no painel GM — um por personagem */
+.gm-perso-edit-btn {
+  background: rgba(180,140,30,.1); border: 1px solid rgba(180,140,30,.4);
+  color: var(--gold-light); padding: .4rem .85rem; font-family: inherit;
+  font-size: .8rem; cursor: pointer; border-radius: 3px;
+  display: inline-flex; align-items: center; gap: .4rem;
+  transition: background .2s, border-color .2s;
+}
+.gm-perso-edit-btn:hover { background: rgba(180,140,30,.22); border-color: var(--gold); }
 
 /* EDITOR DE FÓRMULAS */
 .formula-editor { background:var(--bg-elevated); border:1px solid var(--border); margin-bottom:1rem; }
@@ -1117,6 +1175,104 @@ body.modo-editor .bloco-editavel { outline: 1px dashed rgba(180,140,30,.3); }
 body.modo-editor .bloco-editavel:hover { outline-color: var(--gold); background: rgba(180,140,30,.04); }
 body.modo-editor .btn-editar-bloco { opacity: 1; pointer-events: auto; }
 
+/* ═══ CONSTRUTOR VISUAL DE BLOCOS (GM) ═══════════════════════════════
+   Ao clicar em "+ Texto/Tabela/Card/..." na barra do editor, o cursor
+   passa a "carregar" uma miniatura do bloco. Passando sobre qualquer
+   seção do site, linhas de inserção (drop-zones) aparecem ENTRE cada
+   elemento existente; clicar numa delas insere o bloco exatamente
+   naquele ponto — tudo abaixo desce automaticamente, pois é inserção
+   real no DOM (insertBefore), não apenas anexação no final. ══════════ */
+body.modo-inserindo-bloco { cursor: cell; }
+body.modo-inserindo-bloco .bloco-editavel,
+body.modo-inserindo-bloco section[id] > * {
+  position: relative;
+}
+.bloco-dropzone {
+  height: 10px; margin: 2px 0; border-radius: 3px;
+  background: transparent; border: 1px dashed transparent;
+  transition: background .15s, border-color .15s, height .15s;
+}
+body.modo-inserindo-bloco .bloco-dropzone {
+  border-color: rgba(180,140,30,.35);
+  background: rgba(180,140,30,.04);
+}
+body.modo-inserindo-bloco .bloco-dropzone:hover {
+  height: 26px;
+  background: rgba(180,140,30,.22);
+  border-color: var(--gold-light);
+  box-shadow: 0 0 14px rgba(180,140,30,.25);
+}
+/* ── MOBILE: alvo de toque confortável para as dropzones ─────────────
+   BUG CORRIGIDO: em 10px de altura, a dropzone só ficava maior no
+   :hover — que SIMPLESMENTE NÃO EXISTE em telas de toque. Num celular,
+   o GM precisaria acertar uma faixa de 10px com o dedo para inserir um
+   bloco, o que é impraticável. Em telas sem suporte a hover real
+   (a maioria dos toques), a dropzone já nasce com altura confortável
+   (~40px, próxima ao mínimo recomendado de alvo de toque). */
+@media (hover: none), (max-width: 1024px) {
+  body.modo-inserindo-bloco .bloco-dropzone {
+    height: 38px;
+    background: rgba(180,140,30,.1);
+  }
+  body.modo-inserindo-bloco .bloco-dropzone::after { opacity: .6; font-size: .62rem; }
+  body.modo-inserindo-bloco .bloco-dropzone:active {
+    height: 44px;
+    background: rgba(180,140,30,.28);
+    border-color: var(--gold-light);
+  }
+  body.modo-inserindo-bloco .bloco-dropzone:active::after { opacity: 1; }
+}
+.bloco-dropzone::after {
+  content: '+ Inserir aqui';
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; font-size: .68rem; letter-spacing: 1px;
+  color: var(--gold-light); opacity: 0; text-transform: uppercase;
+  transition: opacity .15s;
+}
+body.modo-inserindo-bloco .bloco-dropzone:hover::after { opacity: 1; }
+
+/* Miniatura "fantasma" do bloco escolhido, seguindo o cursor */
+#bloco-fantasma {
+  position: fixed; z-index: 9999; pointer-events: none;
+  background: rgba(20,16,8,.92); border: 1px solid var(--gold);
+  color: var(--gold-light); font-size: .72rem; letter-spacing: .5px;
+  padding: .4rem .7rem; border-radius: 4px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.6);
+  display: flex; align-items: center; gap: .4rem;
+  transform: translate(14px, -50%);
+}
+
+/* Barra de cancelamento durante a inserção */
+#bloco-insercao-aviso {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  z-index: 9998; background: rgba(20,16,8,.95); border: 1px solid var(--gold);
+  color: var(--gold-light); font-size: .8rem; padding: .55rem 1.1rem;
+  border-radius: 6px; display: flex; align-items: center; gap: .75rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+}
+#bloco-insercao-aviso button {
+  background: none; border: 1px solid rgba(193,63,63,.5); color: var(--accent-light);
+  padding: .25rem .7rem; font-size: .72rem; border-radius: 4px; cursor: pointer;
+  font-family: inherit;
+}
+
+/* Blocos de construtor: Card, Lista, Título, Subtítulo */
+.bloco-card-gm {
+  background: rgba(255,255,255,.02); border: 1px solid rgba(193,63,63,.25);
+  border-left: 3px solid var(--accent-light); border-radius: 4px;
+  padding: 1rem 1.25rem; margin: 1rem 0;
+}
+.bloco-card-gm h4 { font-family: 'Playfair Display', serif; color: var(--gold-light); margin-bottom: .4rem; font-size: 1rem; }
+.bloco-lista-gm { margin: 1rem 0; padding-left: 1.4rem; }
+.bloco-lista-gm li { margin-bottom: .4rem; line-height: 1.6; }
+.bloco-titulo-gm { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 1.5rem 0 .75rem; color: #f0f0f5; }
+.bloco-subtitulo-gm { font-family: 'Playfair Display', serif; font-size: 1.25rem; margin: 1.1rem 0 .6rem; color: var(--accent-light); }
+.bloco-imagem-gm { width: 100%; max-width: 560px; display: block; margin: 1rem auto; border-radius: 6px; border: 1px solid var(--border-strong); }
+.bloco-caixa-gm {
+  background: rgba(110,147,232,.06); border: 1px solid rgba(110,147,232,.3);
+  border-radius: 4px; padding: 1rem 1.25rem; margin: 1rem 0;
+}
+
 #editor-bar {
   display: none;
   position: fixed;
@@ -1133,6 +1289,31 @@ body.modo-editor .btn-editar-bloco { opacity: 1; pointer-events: auto; }
 .editor-bar-label { font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-light); font-family: 'Playfair Display', serif; }
 .editor-bar-btn { background: none; border: 1px solid var(--gold); color: var(--gold-light); padding: .35rem .9rem; font-family: inherit; font-size: .8rem; cursor: pointer; letter-spacing: 1px; transition: all .2s; }
 .editor-bar-btn:hover { background: var(--gold); color: #1a1200; }
+
+/* ── MOBILE: barra do editor GM ──────────────────────────────────────
+   BUG CORRIGIDO nesta auditoria: em telas estreitas, os 10+ botões
+   quebravam em várias linhas e a barra chegava a ocupar quase metade
+   da viewport (390×844) — além de ficar sobre a bottom tab bar de
+   navegação (ambas com position:fixed; bottom:0), escondendo-a por
+   completo enquanto o modo editor estivesse ativo.
+   Correção: uma única linha com scroll horizontal, altura fixa e
+   compacta, posicionada ACIMA da tab bar (não sobre ela). */
+@media (max-width: 1024px) {
+  #editor-bar {
+    left: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    bottom: calc(var(--tabbar-h, 60px) + var(--safe-bottom, 0px));
+    padding: .5rem .75rem;
+    gap: .5rem;
+  }
+  #editor-bar::-webkit-scrollbar { display: none; }
+  .editor-bar-label { flex-shrink: 0; white-space: nowrap; }
+  .editor-bar-btn { flex-shrink: 0; white-space: nowrap; padding: .35rem .7rem; font-size: .74rem; }
+  .editor-bar-separator { flex-shrink: 0; }
+}
 .editor-bar-btn.danger { border-color: var(--accent); color: var(--accent-light); }
 .editor-bar-btn.danger:hover { background: var(--accent); color: #fff; }
 .editor-bar-separator { width: 1px; height: 24px; background: rgba(180,140,30,.3); margin: 0 .25rem; }
@@ -1444,6 +1625,18 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   font-size: .72rem; color: var(--text-muted);
   text-align: center; font-style: italic;
   margin-bottom: .5rem;
+}
+.lenda-classe {
+  font-size: .68rem; color: var(--gold-light);
+  text-align: center; letter-spacing: 1.5px;
+  text-transform: uppercase; font-weight: 600;
+  margin-bottom: .35rem; opacity: .85;
+}
+.lenda-titulo {
+  font-size: .68rem; color: var(--silver);
+  text-align: center; letter-spacing: .5px;
+  font-style: italic; margin-bottom: .4rem; opacity: .8;
+  display: flex; align-items: center; justify-content: center; gap: .3rem;
 }
 .lenda-poder {
   font-size: .73rem; color: var(--accent-light);
@@ -2032,6 +2225,19 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
     scrollbar-width: none;
   }
   .livro-gallery::-webkit-scrollbar { display: none; }
+
+  /* Abas do Grimório: toque confortável, rolagem horizontal suave */
+  .livro-tabs-nav {
+    padding: 0 .75rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .livro-tab-btn {
+    font-size: .76rem;
+    padding: .8rem .7rem .7rem;
+    min-height: 44px; /* alvo de toque confortável */
+  }
+  .livro-tecnica-header { flex-direction: column; align-items: flex-start; gap: .15rem; }
+  .livro-ranking-numero { font-size: 2rem; }
 }
 
 /* ── CORPO DO LIVRO ── */
@@ -2040,6 +2246,31 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   background: #0a080f;
 }
 /* livro-body padding handled in the 640px block below */
+
+/* ── SISTEMA DE ABAS DO GRIMÓRIO ── */
+.livro-tabs-nav {
+  display: flex; gap: .35rem; overflow-x: auto;
+  padding: 0 1.25rem; background: #0a080f;
+  border-bottom: 1px solid rgba(193,63,63,.18);
+  scrollbar-width: none;
+}
+.livro-tabs-nav::-webkit-scrollbar { display: none; }
+.livro-tab-btn {
+  flex-shrink: 0;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); font-family: inherit;
+  font-size: .82rem; letter-spacing: .4px;
+  padding: .85rem 1rem .75rem;
+  display: flex; align-items: center; gap: .4rem;
+  border-bottom: 2px solid transparent;
+  transition: color .2s, border-color .2s;
+  white-space: nowrap;
+}
+.livro-tab-btn:hover { color: var(--text); }
+.livro-tab-btn.active { color: var(--livro-accent, var(--accent-light)); border-bottom-color: var(--livro-accent, var(--accent-light)); }
+.livro-tab-pane { display: none; }
+.livro-tab-pane.active { display: block; animation: livroTabFade .25s ease; }
+@keyframes livroTabFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
 /* ── SEÇÕES ── */
 .livro-section { margin-bottom: 1.75rem; }
@@ -2050,6 +2281,29 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   margin-bottom: .75rem;
   display: flex; align-items: center; gap: .55rem;
 }
+
+/* ── TÉCNICAS (aba Poder) ── */
+.livro-tecnicas-lista { display: flex; flex-direction: column; gap: .75rem; }
+.livro-tecnica-card {
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(193,63,63,.18);
+  border-left: 3px solid var(--accent-light);
+  border-radius: 4px; padding: .85rem 1rem;
+}
+.livro-tecnica-header { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; margin-bottom: .4rem; }
+.livro-tecnica-nome { font-family: 'Playfair Display', serif; color: #f0f0f5; font-size: .98rem; }
+.livro-tecnica-custo { font-size: .72rem; color: var(--arcane-light); letter-spacing: .5px; flex-shrink: 0; }
+.livro-tecnica-desc { font-size: .85rem; color: var(--text-muted); line-height: 1.6; }
+.livro-tecnica-efeito { font-size: .8rem; color: var(--text-muted); margin-top: .4rem; opacity: .85; }
+.livro-suprema { color: #f0d0a0; }
+
+/* ── RANKING (aba Ranking) ── */
+.livro-ranking-resumo { text-align: center; padding: 1rem 0; }
+.livro-ranking-posicao { display: flex; align-items: baseline; justify-content: center; gap: .6rem; margin-bottom: .6rem; }
+.livro-ranking-numero { font-family: 'Playfair Display', serif; font-size: 2.4rem; color: var(--gold-light); text-shadow: 0 0 20px rgba(224,188,74,.3); }
+.livro-ranking-total { font-size: .85rem; color: var(--text-muted); }
+.livro-ranking-score { font-size: .85rem; color: var(--text-muted); }
+.livro-ranking-score strong { color: var(--accent-light); }
 .livro-section-title::after {
   content: ''; flex: 1; height: 1px;
   background: linear-gradient(to right, rgba(193,63,63,.4), transparent);
@@ -2687,6 +2941,15 @@ body::after {
 #login-screen, #app { z-index: 1; position: relative; }
 .topbar, .sidebar { z-index: 200; }
 
+/* Enquanto o Livro do Jogador está aberto: neutraliza as 3 camadas de
+   vinheta do body (gradiente de fundo + "céu de sangue" no topo +
+   escurecimento nas bordas) — são fixas e cobrem a tela inteira,
+   prejudicando a leitura do texto longo do livro. Aplicada via classe
+   no <body>, alternada em JS (_toggleAtmosferaLivro). */
+body.livro-aberto { background: var(--bg) !important; }
+body.livro-aberto::before,
+body.livro-aberto::after { display: none !important; }
+
 /* --- Sidebar: pedra escura com bordas góticas --- */
 .sidebar {
   background: linear-gradient(180deg, #0f0d14 0%, #0c0a10 100%) !important;
@@ -2735,19 +2998,25 @@ body::after {
   background: linear-gradient(to right, var(--accent), rgba(156,42,42,.3), transparent) !important;
 }
 
-/* --- Cards de sistema: metal antigo --- */
+/* --- Cards de sistema: metal antigo ---
+   CLAREADO nesta correção: o fundo era quase preto puro (RGB ~15-20),
+   prejudicando a leitura do texto nas bordas das caixas no Livro do
+   Jogador. Mantém o tom escuro dark-fantasy, mas com contraste real. */
 .system-card {
-  background: linear-gradient(145deg, #141218, #0f0d14) !important;
-  border: 1px solid rgba(50,40,65,.7) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.02), 0 1px 8px rgba(0,0,0,.4);
+  background: linear-gradient(145deg, #232030, #1c1926) !important;
+  border: 1px solid rgba(80,65,100,.8) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 1px 8px rgba(0,0,0,.3);
 }
 
-/* --- Lore-box com borda gótica --- */
+/* --- Lore-box com borda gótica ---
+   CLAREADO pela mesma razão acima; o box-shadow inset também foi
+   suavizado (era 30px de sombra preta interna, escurecendo o texto
+   próximo às bordas). */
 .lore-box {
-  background: linear-gradient(145deg, #120f18, #0d0b12) !important;
-  border: 1px solid rgba(60,45,70,.5) !important;
+  background: linear-gradient(145deg, #1e1a28, #18141e) !important;
+  border: 1px solid rgba(85,65,105,.6) !important;
   border-left: 3px solid var(--accent) !important;
-  box-shadow: 0 0 20px rgba(156,42,42,.06), inset 0 0 30px rgba(0,0,0,.3);
+  box-shadow: 0 0 20px rgba(156,42,42,.06), inset 0 0 16px rgba(0,0,0,.15);
 }
 
 /* --- Atributo-box: pedra com runa --- */
@@ -2760,16 +3029,28 @@ body::after {
 .atributo-box:hover {
   box-shadow: 0 0 22px rgba(156,42,42,.22), inset 0 0 0 1px rgba(156,42,42,.15) !important;
 }
+/* Favoritos precisam vencer o !important acima — mesma especificidade,
+   mas declarados depois, então sobrescrevem corretamente. Sem isso, o
+   destaque dourado de favorito nunca aparecia (bug encontrado na auditoria). */
+.atributo-box.favorito {
+  border-top: 2px solid var(--gold-light) !important;
+  box-shadow: 0 0 20px rgba(224,188,74,.3), inset 0 -1px 0 rgba(224,188,74,.15) !important;
+}
+.atributo-box.favorito:hover {
+  box-shadow: 0 0 26px rgba(224,188,74,.4), inset 0 0 0 1px rgba(224,188,74,.2) !important;
+}
 
-/* --- Tabelas: estilo pergaminho escuro --- */
-table { background: #0e0c14 !important; }
+/* --- Tabelas: estilo pergaminho escuro ---
+   CLAREADO: fundo era #0e0c14 (RGB ~14), quase preto puro — texto
+   ficava com baixo contraste em várias tabelas do Livro do Jogador. */
+table { background: #1c1926 !important; }
 th {
-  background: linear-gradient(to right, #1a1224, #151022) !important;
+  background: linear-gradient(to right, #29213a, #221c30) !important;
   border-bottom: 2px solid rgba(156,42,42,.6) !important;
   letter-spacing: 1.5px;
 }
-tr:hover td { background: rgba(156,42,42,.07) !important; }
-.table-wrapper { border: 1px solid rgba(50,40,65,.5) !important; box-shadow: 0 2px 12px rgba(0,0,0,.4); }
+tr:hover td { background: rgba(156,42,42,.1) !important; }
+.table-wrapper { border: 1px solid rgba(85,65,105,.6) !important; box-shadow: 0 2px 12px rgba(0,0,0,.3); }
 
 /* --- Hero: névoa e glow sangue --- */
 .hero {
@@ -3311,7 +3592,7 @@ main { margin-left: 0 !important; }
 
 /* Sumário 2 colunas */
 #livro-jogador .sumario-content { display: grid; grid-template-columns: 1fr 320px; gap: 2rem; align-items: start; }
-#livro-jogador .sumario-side-panel { background: #1a1a20; border: 1px solid #2a2a32; border-radius: 6px; padding: 1.3rem 1.4rem; font-size: .88rem; color: #c5c5d1; }
+#livro-jogador .sumario-side-panel { background: #242030; border: 1px solid #3a3548; border-radius: 6px; padding: 1.3rem 1.4rem; font-size: .88rem; color: #c5c5d1; }
 #livro-jogador .sumario-side-panel h4 { color: #c13f3f; font-size: 1rem; margin-bottom: .8rem; padding-bottom: .4rem; border-bottom: 1px solid #2a2a32; }
 #livro-jogador .sumario-side-panel ul { list-style: none; padding: 0; margin: 0; }
 #livro-jogador .sumario-side-panel li { padding: .3rem 0; border-bottom: 1px solid #222228; font-size: .85rem; line-height: 1.3; }
@@ -3478,11 +3759,140 @@ main { margin-left: 0 !important; }
 .landing-card.livro:hover { border-color:var(--gold-light); box-shadow:0 16px 48px rgba(0,0,0,.5), 0 0 32px var(--gold-glow); }
 .landing-card.livro .landing-card-icon { color:var(--gold-light); }
 .landing-card.livro .landing-card-title { color:var(--gold-light); }
-.landing-obs-link { font-size:.8rem; color:var(--text-muted); cursor:pointer; text-decoration:underline; transition:color var(--dur); }
+.landing-obs-link { font-size:.8rem; color:var(--text-muted); cursor:pointer; text-decoration:underline; transition:color var(--dur); display:inline-flex; align-items:center; gap:.4rem; max-width:90vw; text-align:center; line-height:1.5; }
 .landing-obs-link:hover { color:var(--accent-light); }
+.landing-obs-link .ic { flex-shrink:0; }
 @media (max-width:480px) {
   .landing-cards { flex-direction:column; align-items:center; }
   .landing-card { min-width:240px; padding:1.5rem 2rem; }
+}
+
+/* ── HERO DO LIVRO DO JOGADOR ──────────────────────────────────────────
+   Restaura a identidade de abertura presente no arquivo de referência
+   original, perdida durante a integração ao portal. */
+.livro-hero {
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 3rem 1rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+  background: linear-gradient(180deg, transparent 0%, rgba(168,43,43,.04) 100%);
+}
+.livro-hero-content { max-width: 700px; }
+.livro-hero-symbol {
+  width: 58px; height: 58px; margin: 0 auto 1.3rem;
+  border: 2px solid var(--accent); position: relative;
+}
+.livro-hero-symbol-v {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  width: 3px; height: 38px; background: var(--accent);
+}
+.livro-hero-symbol-h {
+  position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+  width: 18px; height: 3px; background: var(--accent);
+}
+.livro-hero h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.3rem, 7vw, 3.6rem); letter-spacing: -1.5px;
+  color: #f5f5f7; margin: 0; line-height: 1.1;
+}
+.livro-hero-subtitle {
+  font-size: 1.05rem; color: var(--silver); letter-spacing: 3.5px;
+  text-transform: uppercase; margin: .4rem 0 1.4rem;
+}
+.livro-hero-tags { color: var(--text-muted); margin-bottom: .4rem; }
+.livro-hero-aviso { font-size: .85rem; color: var(--text-ghost); margin: 0; }
+@media (max-width:640px) {
+  .livro-hero { padding: 2.2rem 1rem 1.8rem; }
+  .livro-hero-subtitle { letter-spacing: 2px; font-size: .92rem; }
+}
+
+/* ═══ SIDEBAR FLUTUANTE DO LIVRO DO JOGADOR ═══════════════════════════
+   Mesmo mecanismo de drawer da sidebar principal do app (#sidebar):
+   fica fora da tela por padrão (translateX(-100%)) e desliza para
+   dentro ao abrir, sobrepondo o conteúdo em vez de empurrá-lo — por
+   isso #livro-layout não reserva mais espaço fixo de coluna. */
+#livro-sidebar-backdrop {
+  position: fixed; inset: 0; z-index: 350; background: rgba(0,0,0,.45);
+  opacity: 0; pointer-events: none; transition: opacity .35s ease;
+}
+#livro-sidebar-backdrop.show { opacity: 1; pointer-events: auto; }
+
+#livro-sidebar-arrow-btn {
+  position: fixed; top: 50%; left: 0; transform: translateY(-50%);
+  z-index: 410; width: 30px; height: 68px;
+  background: linear-gradient(135deg, rgba(28,26,34,.95), rgba(60,18,18,.85));
+  border: 1px solid rgba(193,63,63,.45); border-left: none;
+  border-radius: 0 12px 12px 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent-light); font-size: 1.05rem; cursor: pointer;
+  box-shadow: 3px 0 16px rgba(0,0,0,.55), 0 0 14px rgba(193,63,63,.08);
+  transition: left .38s cubic-bezier(.22,.85,.32,1.1), background .25s, color .25s, box-shadow .25s;
+}
+#livro-sidebar-arrow-btn:hover { background: var(--accent); color: #fff; box-shadow: 3px 0 18px rgba(0,0,0,.6), 0 0 20px rgba(193,63,63,.35); }
+#livro-sidebar-arrow-btn .arrow-ic { display: inline-block; transition: transform .38s cubic-bezier(.22,.85,.32,1.1); }
+#livro-sidebar-arrow-btn.open .arrow-ic { transform: rotate(180deg); }
+
+#livro-sidebar {
+  position: fixed !important; top: 0; left: 0; bottom: 0;
+  width: 290px; max-width: 86vw;
+  height: 100vh !important; max-height: 100vh !important;
+  background: linear-gradient(165deg, rgba(20,18,24,.99) 0%, rgba(12,10,14,.99) 55%, rgba(9,8,11,1) 100%) !important;
+  border-right: 1px solid rgba(193,63,63,.28);
+  box-shadow: 6px 0 36px rgba(0,0,0,.65), inset -1px 0 0 rgba(255,255,255,.03);
+  transform: translateX(-100%);
+  transition: transform .38s cubic-bezier(.22,.85,.32,1.1);
+  z-index: 400 !important;
+  padding: 4.5rem 1.1rem 1.5rem !important;
+  overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: rgba(193,63,63,.4) transparent;
+}
+#livro-sidebar.open { transform: translateX(0); }
+#livro-sidebar::-webkit-scrollbar { width: 5px; }
+#livro-sidebar::-webkit-scrollbar-track { background: transparent; }
+#livro-sidebar::-webkit-scrollbar-thumb { background: rgba(193,63,63,.4); border-radius: 3px; }
+#livro-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(193,63,63,.65); }
+
+/* Conteúdo ocupa a largura toda — a sidebar agora flutua por cima, não empurra mais */
+#livro-layout { display: block !important; }
+#livro-content { max-width: 900px; margin: 0 auto; }
+@media (min-width: 1024px) {
+  #livro-content { padding-left: 4.5rem !important; }
+}
+
+/* ═══ LIVRO DO JOGADOR — REMOÇÃO TOTAL DE SOMBRAS ════════════════════
+   O conteúdo do livro é leitura longa de texto corrido; os efeitos
+   atmosféricos "dark fantasy" do site (vinheta de torres nas bordas,
+   text-shadow pesado em todo título, box-shadow/inset-shadow nos cards)
+   prejudicavam a legibilidade em vez de só decorar. Esta seção neutraliza
+   tudo isso SOMENTE dentro de #livro-jogador, sem alterar a identidade
+   visual do resto do site (ficha, ranking, login). */
+
+/* Efeito de névoa/torres nas bordas da tela — oculto enquanto o livro
+   estiver aberto, pois fica por cima de tudo (position:fixed, inset:0). */
+body:has(#livro-jogador[style*="display: block"]) #tp-scene,
+body:has(#livro-jogador[style*="display: block"]) #tp-atmosphere,
+body:has(#livro-jogador[style*="display: block"]) .tp-eye {
+  display: none !important;
+}
+
+/* Títulos: remove a sombra preta pesada + glow vermelho herdados da
+   regra global "h1, h2 { text-shadow: ... }". */
+#livro-jogador h1, #livro-jogador h2, #livro-jogador h3, #livro-jogador h4 {
+  text-shadow: none !important;
+}
+
+/* Cards, caixas de destaque e tabelas: remove toda sombra projetada e
+   sombra interna (inset), mantendo só a borda para separar visualmente. */
+#livro-jogador .system-card,
+#livro-jogador .lore-box,
+#livro-jogador .table-wrapper,
+#livro-jogador table,
+#livro-jogador .sumario-content,
+#livro-jogador .sumario-side-panel,
+#livro-jogador .livro-hero,
+#livro-jogador #livro-sidebar,
+#livro-jogador #livro-sidebar-arrow-btn {
+  box-shadow: none !important;
 }
 </style>
 <style type="text/css"></style></head>
@@ -3540,6 +3950,7 @@ main { margin-left: 0 !important; }
     <symbol id="ic-paw" viewBox="0 0 24 24"><circle cx="7" cy="9" r="1.8"></circle><circle cx="12" cy="7" r="1.8"></circle><circle cx="17" cy="9" r="1.8"></circle><path d="M12 12c-3 0-5 2-5 4.5C7 18 9 19 12 19s5-1 5-2.5C17 14 15 12 12 12z"></path></symbol>
     <symbol id="ic-bag" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke-width="1.3"></path></symbol>
     <symbol id="ic-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"></path></symbol>
+    <symbol id="ic-star" viewBox="0 0 24 24"><path d="M12 3.5l2.55 5.17 5.7.83-4.13 4.02.97 5.68L12 16.4l-5.1 2.8.98-5.68L3.75 9.5l5.7-.83z" stroke-width="1.4"></path></symbol>
   </defs>
 </svg>
 
@@ -3648,9 +4059,9 @@ main { margin-left: 0 !important; }
       <div class="landing-card-desc">Regras, lore e sistema do mundo — acesso livre</div>
     </div>
   </div>
-  <span class="landing-obs-link" onclick="irParaFicha();entrarObservador()">
-    Entrar como Observador
-  </span>
+  <a href="https://chat.whatsapp.com/JDKi4DrfuyfL8N5o2VrBo8" target="_blank" rel="noopener noreferrer" class="landing-obs-link">
+    <svg class="ic ic-sm"><use href="#ic-handshake"/></svg> Entrar no grupo do WhatsApp da comunidade — RPG de cenas narradas em texto
+  </a>
 </div>
 
 <!-- LOGIN -->
@@ -3900,20 +4311,44 @@ main { margin-left: 0 !important; }
 
       <!-- TAB: FÓRMULAS -->
       <div class="gm-tab-content" id="content-tab-formulas">
-        <div class="lore-box" style="margin-bottom:1.5rem">
-          <strong style="color:var(--gold-light)">Como usar o editor:</strong><br>
-          Use os <strong>nomes legíveis</strong> dos atributos nas fórmulas. Após salvar, todas as fichas recalculam automaticamente.
-          Operadores: <code style="color:#a8e6b8;background:rgba(0,0,0,.4);padding:.1rem .3rem">+ - * / ( )</code>
-          Funções: <code style="color:#a8e6b8;background:rgba(0,0,0,.4);padding:.1rem .3rem">floor() ceil() round()</code><br><br>
-          <strong style="color:var(--silver)">Atributos brutos:</strong>
-          <code>forca</code> <code>destreza</code> <code>vigor</code> <code>intelecto</code> <code>alma</code> <code>carisma</code> <code>nivel</code><br>
-          <strong style="color:var(--silver)">Modificadores:</strong>
-          <code>modForca</code> <code>modDestreza</code> <code>modVigor</code> <code>modIntelecto</code> <code>modAlma</code> <code>modCarisma</code><br>
-          <strong style="color:var(--silver)">Extras:</strong>
-          <code>maestria</code> <code>pvBase</code> <code>staBase</code> <code>bonusPV</code> <code>bonusPE</code> <code>bonusCA</code> <code>attrMod</code>
-          <br><br>
-          <button onclick="restaurarFormulasPadrao()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.4rem 1rem;font-family:inherit;font-size:.82rem;cursor:pointer;letter-spacing:.5px" onmouseover="this.style.background=&#39;rgba(156,42,42,.12)&#39;" onmouseout="this.style.background=&#39;none&#39;">↺ Restaurar Fórmulas Padrão</button>
-          <span style="font-size:.78rem;color:var(--text-muted)">— corrige fórmulas salvas incorretamente (ex: PE retornando sempre 0).</span>
+        <div class="lore-box formula-ajuda" style="margin-bottom:1.5rem">
+          <div class="formula-ajuda-titulo"><svg class="ic ic-sm"><use href="#ic-scroll"></use></svg> Grimório de Variáveis</div>
+          <p style="margin:0 0 .9rem">
+            Use os <strong>nomes legíveis</strong> dos atributos nas fórmulas. Após salvar, todas as fichas recalculam automaticamente.
+          </p>
+          <div class="formula-ajuda-grupo">
+            <span class="formula-ajuda-label">Operadores</span>
+            <div class="formula-chips"><span class="formula-chip op">+</span><span class="formula-chip op">-</span><span class="formula-chip op">*</span><span class="formula-chip op">/</span><span class="formula-chip op">( )</span></div>
+          </div>
+          <div class="formula-ajuda-grupo">
+            <span class="formula-ajuda-label">Funções</span>
+            <div class="formula-chips"><span class="formula-chip fn">floor()</span><span class="formula-chip fn">ceil()</span><span class="formula-chip fn">round()</span></div>
+          </div>
+          <div class="formula-ajuda-grupo">
+            <span class="formula-ajuda-label">Atributos brutos</span>
+            <div class="formula-chips">
+              <span class="formula-chip">forca</span><span class="formula-chip">destreza</span><span class="formula-chip">vigor</span>
+              <span class="formula-chip">intelecto</span><span class="formula-chip">alma</span><span class="formula-chip">carisma</span><span class="formula-chip">nivel</span>
+            </div>
+          </div>
+          <div class="formula-ajuda-grupo">
+            <span class="formula-ajuda-label">Modificadores</span>
+            <div class="formula-chips">
+              <span class="formula-chip mod">modForca</span><span class="formula-chip mod">modDestreza</span><span class="formula-chip mod">modVigor</span>
+              <span class="formula-chip mod">modIntelecto</span><span class="formula-chip mod">modAlma</span><span class="formula-chip mod">modCarisma</span>
+            </div>
+          </div>
+          <div class="formula-ajuda-grupo">
+            <span class="formula-ajuda-label">Extras</span>
+            <div class="formula-chips">
+              <span class="formula-chip extra">maestria</span><span class="formula-chip extra">pvBase</span><span class="formula-chip extra">staBase</span>
+              <span class="formula-chip extra">bonusPV</span><span class="formula-chip extra">bonusPE</span><span class="formula-chip extra">bonusCA</span><span class="formula-chip extra">attrMod</span>
+            </div>
+          </div>
+          <div style="margin-top:1.1rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+            <button onclick="restaurarFormulasPadrao()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.4rem 1rem;font-family:inherit;font-size:.82rem;cursor:pointer;letter-spacing:.5px" onmouseover="this.style.background=&#39;rgba(156,42,42,.12)&#39;" onmouseout="this.style.background=&#39;none&#39;">↺ Restaurar Fórmulas Padrão</button>
+            <span style="font-size:.78rem;color:var(--text-muted)">— corrige fórmulas salvas incorretamente (ex: PE retornando sempre 0).</span>
+          </div>
         </div>
 
         <!-- PV -->
@@ -4183,9 +4618,15 @@ main { margin-left: 0 !important; }
   <span class="editor-bar-label"><svg class="ic"><use href="#ic-edit"></use></svg> Modo Editor</span>
   <div class="editor-bar-separator"></div>
   <button class="editor-bar-btn" onclick="adicionarCapituloNovo()">+ Capítulo</button>
-  <button class="editor-bar-btn" onclick="adicionarBlocoTexto()">+ Bloco de Texto</button>
-  <button class="editor-bar-btn" onclick="adicionarBlocoDestaque()">+ Destaque</button>
-  <button class="editor-bar-btn" onclick="adicionarBlocoTabela()">+ Tabela</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('texto')">+ Texto</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('titulo')">+ Título</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('subtitulo')">+ Subtítulo</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('destaque')">+ Lore Box</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('caixa')">+ Caixa</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('card')">+ Card</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('lista')">+ Lista</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('tabela')">+ Tabela</button>
+  <button class="editor-bar-btn" onclick="iniciarInsercaoBloco('imagem')">+ Imagem</button>
   <div class="editor-bar-separator"></div>
   <button class="editor-bar-btn" onclick="editarNavSidebar()"><svg class="ic"><use href="#ic-edit"></use></svg> Editar Índice</button>
   <div class="editor-bar-separator"></div>
@@ -4204,16 +4645,13 @@ const USUARIOS = {}; // preenchido dinamicamente via Firestore após login
 // ═══════════════════════════════════════════════════════════════════════
 // DIAGNÓSTICO DE ERROS DO FIRESTORE — torna erros antes silenciosos visíveis
 // ═══════════════════════════════════════════════════════════════════════
-// Problema histórico: dezenas de chamadas ao Firestore tinham catch(e){}
-// totalmente silencioso. Se as regras de segurança bloqueassem uma leitura
-// (ex: "permission-denied" após a migração para Firebase Auth) ou a sessão
-// ainda não estivesse autenticada ("unauthenticated"/"failed-precondition"),
-// o app simplesmente não mostrava nada — sem erro, sem aviso — dando a
-// falsa impressão de "personagem não existe" ou "foto não salvou".
-//
-// _diag() registra essas falhas num painel acessível e também na barra de
-// status, para que GM e devs vejam IMEDIATAMENTE o motivo real (em vez de
-// adivinhar). Não altera o comportamento funcional — é só visibilidade.
+// Histórico: várias chamadas ao Firestore tinham catch(e){} totalmente
+// silencioso. Se as regras de segurança bloqueassem uma leitura/escrita
+// ("permission-denied", "unauthenticated"), o app simplesmente não
+// mostrava nada — dando a falsa impressão de "personagem não existe"
+// ou "foto não salvou". _diag() registra essas falhas e, quando o
+// código indica problema grave de permissão/sessão, mostra um aviso
+// visível — sem alterar o comportamento funcional normal.
 const _diagLog = [];
 function _diag(origem, err) {
   const code = err && err.code ? err.code : 'erro-desconhecido';
@@ -4231,8 +4669,6 @@ function _diag(origem, err) {
   }
 }
 
-// Mostra um aviso discreto (não bloqueante) quando uma operação crítica
-// falha por permissão/autenticação — a causa nº1 de "sumiu sem explicação".
 let _avisoDiagnosticoMostrado = false;
 function _mostrarAvisoDiagnostico(origem, code) {
   if (_avisoDiagnosticoMostrado) return; // evita espalhar vários avisos iguais
@@ -4318,42 +4754,225 @@ function adicionarCapituloNovo() {
   salvarCapitulosNaNuvem();
 }
 
-function adicionarBlocoTexto() {
-  const secao = prompt('ID da seção onde inserir o bloco (ex: cap1):');
-  if (!secao) return;
-  const el = document.getElementById(secao);
-  if (!el) { alert('Seção não encontrada.'); return; }
-  const p = document.createElement('p');
-  p.id = 'bloco-gm-extra-' + Date.now();
-  p.textContent = 'Novo bloco de texto. Clique em Editar para personalizar.';
-  el.appendChild(p);
+// ═══════════════════════════════════════════════════════════════════════
+// CONSTRUTOR VISUAL DE BLOCOS (GM) ═══════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
+// Fluxo: GM clica em "+ Texto"/"+ Card"/etc → o cursor "carrega" uma
+// miniatura do bloco (#bloco-fantasma) → ao passar sobre qualquer seção
+// do site (capítulos, livro, etc.), zonas de inserção aparecem ENTRE cada
+// elemento existente → clicar numa delas chama document.insertBefore na
+// posição exata, então tudo que já estava ali abaixo desce naturalmente
+// (é inserção real no DOM, não apenas anexação no final como antes).
+//
+// Modelos de bloco disponíveis (cobrem o pedido original):
+//   texto, titulo, subtitulo, destaque (Lore Box), caixa, card, lista,
+//   tabela, imagem — Capítulo continua com fluxo próprio (cria seção nova).
+
+const TIPOS_BLOCO_GM = {
+  texto:     { tag: 'p',    classe: '',                texto: 'Novo bloco de texto. Clique em Editar para personalizar.' },
+  titulo:    { tag: 'h2',   classe: 'bloco-titulo-gm',    texto: 'Novo Título' },
+  subtitulo: { tag: 'h3',   classe: 'bloco-subtitulo-gm', texto: 'Novo Subtítulo' },
+  destaque:  { tag: 'div',  classe: 'lore-box',           texto: '<strong>Dica:</strong> Novo bloco de destaque (Lore Box). Clique em Editar para personalizar.' },
+  caixa:     { tag: 'div',  classe: 'bloco-caixa-gm',     texto: 'Nova caixa de conteúdo. Clique em Editar para personalizar.' },
+  card:      { tag: 'div',  classe: 'bloco-card-gm',      texto: '<h4>Título do Card</h4>Conteúdo do card. Clique em Editar para personalizar.' },
+  lista:     { tag: 'ul',   classe: 'bloco-lista-gm',     texto: '<li>Primeiro item</li><li>Segundo item</li><li>Terceiro item</li>' },
+  tabela:    { tag: 'div',  classe: 'table-wrapper',      texto: '<table><thead><tr><th>Coluna 1</th><th>Coluna 2</th><th>Coluna 3</th></tr></thead><tbody><tr><td>Linha 1</td><td>—</td><td>—</td></tr></tbody></table>' },
+  imagem:    { tag: 'img',  classe: 'bloco-imagem-gm',    texto: '' }, // tratado especialmente (pede URL antes)
+};
+
+const LABELS_BLOCO_GM = {
+  texto: 'Texto', titulo: 'Título', subtitulo: 'Subtítulo', destaque: 'Lore Box',
+  caixa: 'Caixa', card: 'Card', lista: 'Lista', tabela: 'Tabela', imagem: 'Imagem'
+};
+
+let _blocoInserindoTipo = null;
+let _blocosExtras = JSON.parse(localStorage.getItem('tp_blocos_extras') || '[]');
+
+function iniciarInsercaoBloco(tipo) {
+  if (tipo === 'imagem') {
+    const url = prompt('URL da imagem:');
+    if (!url) return;
+    TIPOS_BLOCO_GM.imagem._urlPendente = url;
+  }
+  _blocoInserindoTipo = tipo;
+  document.body.classList.add('modo-inserindo-bloco');
+  _criarFantasmaBloco(tipo);
+  _criarAvisoInsercao(tipo);
+  _ativarDropzones();
+  document.addEventListener('mousemove', _moverFantasmaBloco);
+  document.addEventListener('keydown', _escapeCancelaInsercao);
+}
+
+function _criarFantasmaBloco(tipo) {
+  document.getElementById('bloco-fantasma')?.remove();
+  const el = document.createElement('div');
+  el.id = 'bloco-fantasma';
+  el.innerHTML = `${icone('plus','ic-sm')} ${LABELS_BLOCO_GM[tipo] || tipo}`;
+  document.body.appendChild(el);
+}
+
+function _moverFantasmaBloco(e) {
+  const el = document.getElementById('bloco-fantasma');
+  if (el) { el.style.left = e.clientX + 'px'; el.style.top = e.clientY + 'px'; }
+}
+
+function _criarAvisoInsercao(tipo) {
+  document.getElementById('bloco-insercao-aviso')?.remove();
+  const aviso = document.createElement('div');
+  aviso.id = 'bloco-insercao-aviso';
+  aviso.innerHTML = `
+    <span>Clique em uma zona de inserção para posicionar o bloco "<strong>${LABELS_BLOCO_GM[tipo] || tipo}</strong>"</span>
+    <button onclick="cancelarInsercaoBloco()">Cancelar (Esc)</button>`;
+  document.body.appendChild(aviso);
+}
+
+function _escapeCancelaInsercao(e) { if (e.key === 'Escape') cancelarInsercaoBloco(); }
+
+// Cria uma fina dropzone ANTES e DEPOIS de cada filho direto editável de
+// uma seção/aba, permitindo inserir em qualquer ponto da sequência —
+// incluindo entre dois blocos já existentes, não só ao final.
+function _ativarDropzones() {
+  // Escopo restrito a seções estáticas do site (capítulos, livro de regras).
+  // O Grimório de personagem (#livro-overlay) é INTENCIONALMENTE excluído:
+  // suas abas (.livro-tab-pane) usam ids fixos e genéricos, reconstruídos
+  // do zero a cada vez que abrirPerfilPublico() roda para QUALQUER
+  // personagem — inserir um bloco extra lá "vazaria" para o Grimório de
+  // todo personagem do jogo, não só o que estava aberto no momento.
+  const containers = document.querySelectorAll('section[id]');
+  containers.forEach(container => {
+    if (container.closest('#ficha') || container.closest('#painel-gm') || container.closest('#painel-adm') || container.closest('#livro-overlay')) return;
+    const filhos = Array.from(container.children).filter(c => !c.classList.contains('bloco-dropzone') && !c.classList.contains('divider'));
+    if (!filhos.length) return;
+
+    filhos.forEach((filho, i) => {
+      // dropzone antes do primeiro filho
+      if (i === 0) container.insertBefore(_criarDropzoneEl(container, filho), filho);
+      // dropzone depois de cada filho
+      const dz = _criarDropzoneEl(container, filho.nextSibling);
+      filho.parentNode.insertBefore(dz, filho.nextSibling);
+    });
+  });
+}
+
+function _criarDropzoneEl(container, refNode) {
+  const dz = document.createElement('div');
+  dz.className = 'bloco-dropzone';
+  dz.onclick = (e) => { e.stopPropagation(); _confirmarInsercaoBloco(container, refNode); };
+  return dz;
+}
+
+function _confirmarInsercaoBloco(container, refNode) {
+  const tipo = _blocoInserindoTipo;
+  if (!tipo) return;
+  const def = TIPOS_BLOCO_GM[tipo];
+  const id = 'bloco-gm-' + tipo + '-' + Date.now();
+
+  const el = document.createElement(def.tag);
+  el.id = id;
+  if (def.classe) el.className = def.classe;
+  if (tipo === 'imagem') {
+    el.src = def._urlPendente || '';
+    el.alt = 'Imagem';
+  } else {
+    el.innerHTML = def.texto;
+  }
+
+  // refNode é o nó de referência (dropzone clicada ou null); insertBefore com
+  // segundo argumento null insere ao final do container — comportamento correto do DOM.
+  container.insertBefore(el, refNode);
+
+  // Tabela nova criada pelo construtor visual: aplica data-label imediatamente,
+  // para já nascer correta no mobile (mesma correção usada nas tabelas estáticas).
+  if (tipo === 'tabela') _aplicarDataLabelTabelas();
+
+  // Registra a posição estrutural para sobreviver a reloads (mesmo padrão de _capitulosExtras).
+  // BUG CORRIGIDO: o irmão imediato (previousElementSibling) ainda É uma
+  // dropzone neste momento (só são removidas depois, em finalizarInsercaoBloco).
+  // Por isso é preciso PULAR dropzones até achar o primeiro elemento real —
+  // sem isso, afterId virava sempre null e todo bloco "esquecia" sua posição
+  // real ao recarregar a página, voltando para o topo da seção.
+  let anterior = el.previousElementSibling;
+  while (anterior && anterior.classList.contains('bloco-dropzone')) {
+    anterior = anterior.previousElementSibling;
+  }
+  _blocosExtras.push({
+    id, tipo, secaoId: container.id || null,
+    classe: def.classe || '',
+    tag: def.tag,
+    afterId: (anterior && anterior.id) ? anterior.id : null,
+    src: tipo === 'imagem' ? (def._urlPendente || '') : undefined,
+  });
+  localStorage.setItem('tp_blocos_extras', JSON.stringify(_blocosExtras));
+  salvarBlocosExtrasNuvem();
+
+  // Salva o conteúdo textual no MESMO sistema já usado para blocos editáveis,
+  // assim o conteúdo (não só a existência/posição) também sincroniza.
+  if (tipo !== 'imagem') {
+    window._blocosEditados[id] = el.innerHTML;
+    localStorage.setItem('tp_blocos_gm', JSON.stringify(window._blocosEditados));
+    salvarBlocoGM(id);
+  }
+
+  finalizarInsercaoBloco();
   setTimeout(() => ativarEdicaoBlocosGM(), 50);
 }
 
-function adicionarBlocoDestaque() {
-  const secao = prompt('ID da seção (ex: cap1):');
-  if (!secao) return;
-  const el = document.getElementById(secao);
-  if (!el) { alert('Seção não encontrada.'); return; }
-  const div = document.createElement('div');
-  div.id = 'bloco-gm-dest-' + Date.now();
-  div.className = 'lore-box';
-  div.textContent = 'Novo bloco de destaque. Clique em Editar para personalizar.';
-  el.appendChild(div);
-  setTimeout(() => ativarEdicaoBlocosGM(), 50);
+function finalizarInsercaoBloco() {
+  _blocoInserindoTipo = null;
+  document.body.classList.remove('modo-inserindo-bloco');
+  document.getElementById('bloco-fantasma')?.remove();
+  document.getElementById('bloco-insercao-aviso')?.remove();
+  document.querySelectorAll('.bloco-dropzone').forEach(dz => dz.remove());
+  document.removeEventListener('mousemove', _moverFantasmaBloco);
+  document.removeEventListener('keydown', _escapeCancelaInsercao);
 }
 
-function adicionarBlocoTabela() {
-  const secao = prompt('ID da seção (ex: cap1):');
-  if (!secao) return;
-  const el = document.getElementById(secao);
-  if (!el) { alert('Seção não encontrada.'); return; }
-  const div = document.createElement('div');
-  div.id = 'bloco-gm-tab-' + Date.now();
-  div.className = 'table-wrapper';
-  div.innerHTML = '<table><thead><tr><th>Coluna 1</th><th>Coluna 2</th><th>Coluna 3</th></tr></thead><tbody><tr><td>Linha 1</td><td>—</td><td>—</td></tr></tbody></table>';
-  el.appendChild(div);
-  setTimeout(() => ativarEdicaoBlocosGM(), 50);
+function cancelarInsercaoBloco() { finalizarInsercaoBloco(); }
+
+async function salvarBlocosExtrasNuvem() {
+  if (!window.db || !window.doc || !window.setDoc) return;
+  try {
+    await window.setDoc(window.doc(window.db, 'config', 'blocos_extras'), {
+      dados: JSON.stringify(_blocosExtras), ts: Date.now()
+    });
+  } catch(e) { console.warn('[Firestore] Erro ao salvar blocos extras:', e); }
+}
+
+// Reconstrói no DOM todos os blocos extras criados pelo construtor visual,
+// na MESMA posição relativa em que foram inseridos — chamada no carregamento,
+// junto com carregarCapitulosExtras() (mesmo padrão estrutural).
+async function carregarBlocosExtras() {
+  if (window.db && window.doc && window.getDoc) {
+    try {
+      const snap = await window.getDoc(window.doc(window.db, 'config', 'blocos_extras'));
+      if (snap.exists()) {
+        _blocosExtras = JSON.parse(snap.data().dados || '[]');
+        localStorage.setItem('tp_blocos_extras', JSON.stringify(_blocosExtras));
+      }
+    } catch(e) {}
+  }
+  _blocosExtras.forEach(b => {
+    if (document.getElementById(b.id)) return; // já existe (reload parcial)
+    const container = b.secaoId ? document.getElementById(b.secaoId) : null;
+    if (!container) return;
+    const el = document.createElement(b.tag);
+    el.id = b.id;
+    if (b.classe) el.className = b.classe;
+    if (b.tipo === 'imagem') {
+      el.src = b.src || '';
+      el.alt = 'Imagem';
+    } else {
+      el.innerHTML = (window._blocosEditados && window._blocosEditados[b.id]) || '';
+    }
+    // BUG CORRIGIDO: nextSibling pode retornar um nó de TEXTO (espaços/quebras
+    // de linha entre tags no HTML original), não necessariamente o próximo
+    // elemento real — o que fazia o bloco às vezes "perder" a posição salva
+    // ao recarregar. nextElementSibling ignora nós de texto corretamente.
+    const ref = b.afterId ? document.getElementById(b.afterId) : null;
+    if (ref && ref.nextElementSibling) container.insertBefore(el, ref.nextElementSibling);
+    else if (ref) container.appendChild(el);
+    else container.insertBefore(el, container.firstChild);
+  });
 }
 
 function editarNavSidebar() {
@@ -4671,6 +5290,12 @@ function renderizarCartoes(fichas, aba) {
       ? `<div class="lenda-avatar-frame"><img class="lenda-avatar" src="${f.foto}" alt="${f.nome}" onerror="this.parentElement.innerHTML='<div class=\\'lenda-avatar-placeholder\\'>⚔</div>'"></div>`
       : `<div class="lenda-avatar-placeholder">⚔</div>`;
 
+    // Título principal: primeiro item da lista de títulos do Grimório social
+    // (campo explicitamente pedido na exibição do ranking: Foto/Nome/Classe/
+    // Poder/Nível/Título). "rank" (S/A/B) é uma informação diferente — ambos
+    // continuam exibidos, um abaixo do outro.
+    const tituloPrincipal = (f.socTitulos || '').split(',').map(s => s.trim()).filter(Boolean)[0] || '';
+
     const card = document.createElement('div');
     card.className = `lenda-card-outer tema-${tema}`;
     card.innerHTML = `
@@ -4684,6 +5309,8 @@ function renderizarCartoes(fichas, aba) {
           <div class="lenda-avatar-wrap">${avatarHtml}</div>
           <div class="lenda-nome">${f.nome}</div>
           ${f.alcunha ? `<div class="lenda-alcunha">"${f.alcunha}"</div>` : ''}
+          ${f.classe ? `<div class="lenda-classe">${f.classe}</div>` : ''}
+          ${tituloPrincipal ? `<div class="lenda-titulo">${icone('crown','ic-sm')} ${tituloPrincipal}</div>` : ''}
           ${f.poder && f.poder !== '—' ? `<div class="lenda-poder">${icone('prism','ic-sm')} ${f.poder}</div>` : ''}
           <div class="lenda-meta">
             <span class="lenda-meta-chip nivel">Nv. ${f.nivel}</span>
@@ -4750,6 +5377,10 @@ function _fichaFromRankingGlobal(docId, d) {
     socAliados:    d.socAliados    || '',
     socRivais:     d.socRivais     || '',
     socTimeline:   d.socTimeline   || '',
+    // ─ Grimório — Aba Poder ─
+    poderDescricao: d.poderDescricao || '',
+    poderSuprema:   d.poderSuprema   || '',
+    tecnicas:       Array.isArray(d.tecnicas) ? d.tecnicas : [],
     // Flag interna: indica origem do registro (para migração automática)
     _fromRankingGlobal: true,
   };
@@ -4807,6 +5438,10 @@ async function _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId) 
     socAliados:    dados['soc-aliados']     || '',
     socRivais:     dados['soc-rivais']      || '',
     socTimeline:   dados['soc-timeline']    || '',
+    // ─ Grimório — Aba Poder ─
+    poderDescricao: dados['p-descricao'] || '',
+    poderSuprema:   dados['p-suprema']   || '',
+    tecnicas:       Array.isArray(dados.tecnicas) ? dados.tecnicas.filter(t => t && (t.nome || t.desc)) : [],
   };
 }
 
@@ -4822,7 +5457,7 @@ async function _indexarPersonagensUsuarioAtual() {
     try {
       const charsSnap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(usuarioAtual)));
       if (charsSnap.exists()) listaNuvem = JSON.parse(charsSnap.data().lista || '[]');
-    } catch(e) { _diag('_indexarPersonagensUsuarioAtual → leitura de chars/' + usuarioAtual, e); }
+    } catch(e) {}
     // Merge sem duplicatas
     const lista = [...new Set([...listaNuvem, ...listaLocal])];
     if (!lista.length) return;
@@ -4842,7 +5477,7 @@ async function _indexarPersonagensUsuarioAtual() {
             const raw = fichaSnap.data().dados;
             dados = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
           }
-        } catch(e) { _diag('_indexarPersonagensUsuarioAtual → leitura de fichas/' + docId, e); }
+        } catch(e) {}
 
         // Se não existe no rankingGlobal, ou se existe mas está desatualizado, indexa
         if (!jaExiste) {
@@ -4851,17 +5486,15 @@ async function _indexarPersonagensUsuarioAtual() {
           try {
             const fotoSnap = await window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(usuarioAtual, nome)));
             if (fotoSnap.exists()) foto = fotoSnap.data().principal || null;
-          } catch(e) { _diag('_indexarPersonagensUsuarioAtual → leitura de fotos/' + _fotoDocId(usuarioAtual, nome), e); }
+          } catch(e) {}
           await updateRankingEntry(usuarioAtual, nome, dados, foto);
           console.log('[Ranking] Personagem indexado no login:', docId);
         }
       } catch(e) {
-        _diag('_indexarPersonagensUsuarioAtual → personagem ' + nome, e);
         console.warn('[Ranking] Erro ao indexar personagem:', nome, e);
       }
     }
   } catch(e) {
-    _diag('_indexarPersonagensUsuarioAtual', e);
     console.warn('[Ranking] Erro em _indexarPersonagensUsuarioAtual:', e);
   }
 }
@@ -4993,10 +5626,13 @@ async function carregarRanking() {
 
   if (!_rankingInterval) {
     _rankingInterval = setInterval(() => {
-      // Só recarrega se o painel de ranking estiver visível
+      // Só recarrega se o painel de ranking estiver visível.
+      // BUG CORRIGIDO: checava o id "lendas" (nunca existiu — a seção real
+      // é #secao-ranking). Por causa do && em cascata, a condição era
+      // sempre falsa e o auto-refresh de 30s nunca chegava a disparar.
       const grid = document.getElementById('ranking-grid');
-      const lendas = document.getElementById('lendas');
-      if (grid && lendas && lendas.style.display !== 'none' && lendas.offsetParent !== null) {
+      const secaoRanking = document.getElementById('secao-ranking');
+      if (grid && secaoRanking && secaoRanking.offsetParent !== null) {
         carregarRanking();
       }
     }, 30000);
@@ -5134,6 +5770,9 @@ function abrirPerfilPublico(f) {
           f.socAliados = d['soc-aliados'] || f.socAliados || '';
           f.socRivais = d['soc-rivais'] || f.socRivais || '';
           f.socTimeline = d['soc-timeline'] || f.socTimeline || '';
+          f.poderDescricao = d['p-descricao'] || f.poderDescricao || '';
+          f.poderSuprema = d['p-suprema'] || f.poderSuprema || '';
+          f.tecnicas = (Array.isArray(d.tecnicas) ? d.tecnicas.filter(t => t && (t.nome || t.desc)) : null) || f.tecnicas || [];
         }
       } catch(e) { /* silencioso — não interrompe a abertura do perfil */ }
     })();
@@ -5259,72 +5898,144 @@ function abrirPerfilPublico(f) {
         </div>
       </div>
 
-      <!-- ═══ CORPO DO GRIMÓRIO ═══ -->
+      <!-- ═══ CORPO DO GRIMÓRIO — SISTEMA DE ABAS ═══ -->
+      <!-- Substitui a rolagem longa anterior por 5 abas, reduzindo a
+           poluição visual e deixando o personagem (não o texto) como
+           foco imediato ao abrir o Grimório. -->
+      <div class="livro-tabs-nav" role="tablist">
+        <button class="livro-tab-btn active" data-tab="perfil" onclick="_mudarAbaLivro('perfil',this)" role="tab" aria-selected="true">${icone('ficha','ic-sm')} Perfil</button>
+        <button class="livro-tab-btn" data-tab="poder" onclick="_mudarAbaLivro('poder',this)" role="tab" aria-selected="false">${icone('bolt','ic-sm')} Poder</button>
+        <button class="livro-tab-btn" data-tab="historia" onclick="_mudarAbaLivro('historia',this)" role="tab" aria-selected="false">${icone('scroll','ic-sm')} História</button>
+        <button class="livro-tab-btn" data-tab="conquistas" onclick="_mudarAbaLivro('conquistas',this)" role="tab" aria-selected="false">${icone('moon','ic-sm')} Conquistas</button>
+        <button class="livro-tab-btn" data-tab="ranking" onclick="_mudarAbaLivro('ranking',this)" role="tab" aria-selected="false">${icone('lendas','ic-sm')} Ranking</button>
+      </div>
+
       <div class="livro-body">
 
-        <!-- Descrição Pública — só omite se vazia (não é seção estrutural obrigatória) -->
-        ${f.descricaoPublica ? `
-        <div class="livro-section">
-          <div class="livro-section-title">${icone('scroll','ic-sm')} Descrição</div>
-          <div class="livro-descricao">${f.descricaoPublica.replace(/\n/g,'<br>')}</div>
-        </div>` : ''}
+        <!-- ═══ ABA: PERFIL — Nome/Classe/Título/Poder/Nível já estão no header; aqui vai Descrição + Títulos ═══ -->
+        <div class="livro-tab-pane active" id="livro-pane-perfil">
+          ${f.descricaoPublica ? `
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('scroll','ic-sm')} Descrição</div>
+            <div class="livro-descricao">${f.descricaoPublica.replace(/\n/g,'<br>')}</div>
+          </div>` : `
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('scroll','ic-sm')} Descrição</div>
+            <span class="livro-area-empty">Nenhuma descrição registrada.</span>
+          </div>`}
 
-        <!-- Manifestações — GIFs (só aparece se o personagem tem GIFs configurados) -->
-        ${gifsHtml}
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('crown','ic-sm')} Títulos & Honrarias</div>
+            <div class="livro-badges">${titulosHtml}</div>
+          </div>
 
-        <!-- Títulos — SEMPRE exibido, mensagem padrão se vazio -->
-        <div class="livro-section">
-          <div class="livro-section-title">${icone('crown','ic-sm')} Títulos & Honrarias</div>
-          <div class="livro-badges">${titulosHtml}</div>
+          <!-- Galeria de Fotos — revelada via JS após carregamento assíncrono -->
+          <div class="livro-section" id="livro-galeria-section" style="display:none">
+            <div class="livro-section-title">${icone('camera','ic-sm')} Galeria</div>
+            <div class="livro-galeria" id="livro-galeria-fotos"></div>
+          </div>
         </div>
 
-        <!-- História — SEMPRE exibida -->
-        <div class="livro-section">
-          <div class="livro-section-title">${icone('scroll','ic-sm')} História</div>
-          ${f.socHistoria
-            ? `<div class="livro-descricao">${f.socHistoria.replace(/\n/g,'<br>')}</div>`
-            : `<span class="livro-area-empty">Nenhuma história registrada.</span>`}
+        <!-- ═══ ABA: PODER — Poder principal (já no header), Passiva/Descrição, Técnicas, Suprema ═══ -->
+        <div class="livro-tab-pane" id="livro-pane-poder">
+          ${gifsHtml}
+
+          ${f.poderDescricao ? `
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('bolt','ic-sm')} Descrição do Poder</div>
+            <div class="livro-descricao">${f.poderDescricao.replace(/\n/g,'<br>')}</div>
+          </div>` : `
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('bolt','ic-sm')} Descrição do Poder</div>
+            <span class="livro-area-empty">Nenhuma descrição de poder registrada.</span>
+          </div>`}
+
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('sword','ic-sm')} Técnicas</div>
+            ${(f.tecnicas && f.tecnicas.length) ? `
+            <div class="livro-tecnicas-lista">
+              ${f.tecnicas.map(t => `
+                <div class="livro-tecnica-card">
+                  <div class="livro-tecnica-header">
+                    <span class="livro-tecnica-nome">${t.nome || 'Técnica sem nome'}</span>
+                    ${t.custo ? `<span class="livro-tecnica-custo">${t.custo} PE</span>` : ''}
+                  </div>
+                  ${t.desc ? `<div class="livro-tecnica-desc">${t.desc.replace(/\n/g,'<br>')}</div>` : ''}
+                  ${t.efei ? `<div class="livro-tecnica-efeito"><strong>Efeitos:</strong> ${t.efei.replace(/\n/g,'<br>')}</div>` : ''}
+                </div>`).join('')}
+            </div>` : `<span class="livro-area-empty">Nenhuma técnica registrada.</span>`}
+          </div>
+
+          ${f.poderSuprema ? `
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('crown','ic-sm')} Técnica Suprema</div>
+            <div class="livro-descricao livro-suprema">${f.poderSuprema.replace(/\n/g,'<br>')}</div>
+          </div>` : `
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('crown','ic-sm')} Técnica Suprema</div>
+            <span class="livro-area-empty">Nenhuma técnica suprema registrada.</span>
+          </div>`}
         </div>
 
-        <!-- Feitos — SEMPRE exibido -->
-        <div class="livro-section">
-          <div class="livro-section-title">${icone('bolt','ic-sm')} Feitos em Batalha</div>
-          ${f.socFeitos
-            ? `<div class="livro-descricao">${f.socFeitos.replace(/\n/g,'<br>')}</div>`
-            : `<span class="livro-area-empty">Nenhum feito registrado.</span>`}
-        </div>
+        <!-- ═══ ABA: HISTÓRIA — História, Eventos (linha do tempo), NPCs (aliados/rivais) ═══ -->
+        <div class="livro-tab-pane" id="livro-pane-historia">
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('scroll','ic-sm')} História</div>
+            ${f.socHistoria
+              ? `<div class="livro-descricao">${f.socHistoria.replace(/\n/g,'<br>')}</div>`
+              : `<span class="livro-area-empty">Nenhuma história registrada.</span>`}
+          </div>
 
-        <!-- Conquistas — SEMPRE exibidas -->
-        <div class="livro-section">
-          <div class="livro-section-title">${icone('moon','ic-sm')} Conquistas</div>
-          ${conquistasHtml}
-        </div>
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('clock','ic-sm')} Linha do Tempo (Eventos)</div>
+            <div class="livro-timeline">${timelineHtml}</div>
+          </div>
 
-        <!-- Aliados & Rivais — SEMPRE exibidos -->
-        <div class="livro-section">
-          <div class="livro-section-title">${icone('sword','ic-sm')} Vínculos & Lendas</div>
-          <div class="livro-2col">
-            <div class="livro-area-card">
-              <div class="livro-area-title">${icone('shield','ic-sm')} Aliados & Pactos</div>
-              ${listaHTML(linhas(f.socAliados), 'Nenhum aliado registrado.')}
-            </div>
-            <div class="livro-area-card">
-              <div class="livro-area-title">${icone('skull','ic-sm')} Rivais & Inimigos</div>
-              ${listaHTML(linhas(f.socRivais), 'Nenhum rival registrado.')}
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('sword','ic-sm')} NPCs — Aliados & Rivais</div>
+            <div class="livro-2col">
+              <div class="livro-area-card">
+                <div class="livro-area-title">${icone('shield','ic-sm')} Aliados & Pactos</div>
+                ${listaHTML(linhas(f.socAliados), 'Nenhum aliado registrado.')}
+              </div>
+              <div class="livro-area-card">
+                <div class="livro-area-title">${icone('skull','ic-sm')} Rivais & Inimigos</div>
+                ${listaHTML(linhas(f.socRivais), 'Nenhum rival registrado.')}
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Linha do Tempo — SEMPRE exibida -->
-        <div class="livro-section">
-          <div class="livro-section-title">${icone('clock','ic-sm')} Linha do Tempo</div>
-          <div class="livro-timeline">${timelineHtml}</div>
+        <!-- ═══ ABA: CONQUISTAS — Conquistas, Torres concluídas, Chefes derrotados ═══ -->
+        <div class="livro-tab-pane" id="livro-pane-conquistas">
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('moon','ic-sm')} Conquistas</div>
+            ${conquistasHtml}
+          </div>
+
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('bolt','ic-sm')} Feitos em Batalha — Torres & Chefes</div>
+            ${f.socFeitos
+              ? `<div class="livro-descricao">${f.socFeitos.replace(/\n/g,'<br>')}</div>`
+              : `<span class="livro-area-empty">Nenhum feito registrado.</span>`}
+          </div>
         </div>
 
-        <!-- Galeria de Fotos — revelada via JS após carregamento assíncrono -->
-        <div class="livro-section" id="livro-galeria-section" style="display:none">
-          <div class="livro-section-title">${icone('camera','ic-sm')} Galeria</div>
-          <div class="livro-galeria" id="livro-galeria-fotos"></div>
+        <!-- ═══ ABA: RANKING — Integração com o Livro das Lendas ═══ -->
+        <div class="livro-tab-pane" id="livro-pane-ranking">
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('lendas','ic-sm')} Posição no Ranking</div>
+            <div id="livro-ranking-resumo" class="livro-ranking-resumo">
+              <span class="livro-area-empty">Calculando posição...</span>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:1rem">
+            <button onclick="document.getElementById('livro-overlay').remove();navTo('secao-ranking')"
+              style="background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.55rem 1.2rem;font-family:inherit;font-size:.83rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:all .2s"
+              onmouseover="this.style.background='rgba(156,42,42,.25)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
+              ${icone('lendas','ic-sm')} Ver Livro das Lendas completo
+            </button>
+          </div>
         </div>
 
         <!-- Rodapé épico -->
@@ -5347,6 +6058,47 @@ function abrirPerfilPublico(f) {
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
   _carregarGaleriaLivro(f.user, f.nomePersonagem || f.nome);
+  _carregarResumoRankingLivro(f);
+}
+
+// ─── Sistema de abas do Grimório ───
+function _mudarAbaLivro(aba, btn) {
+  const overlay = document.getElementById('livro-overlay');
+  if (!overlay) return;
+  overlay.querySelectorAll('.livro-tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  overlay.querySelectorAll('.livro-tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
+  document.getElementById('livro-pane-' + aba)?.classList.add('active');
+  // Rola o modal para o topo do corpo ao trocar de aba (conforto em telas pequenas)
+  overlay.querySelector('.livro-body')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Calcula e exibe a posição do personagem no ranking geral, dentro da
+// própria aba "Ranking" do Grimório — usa o cache já carregado em
+// _lendasFichas quando disponível, evitando nova leitura ao Firestore.
+function _carregarResumoRankingLivro(f) {
+  const container = document.getElementById('livro-ranking-resumo');
+  if (!container) return;
+  const fonte = (_lendasFichas && _lendasFichas.length) ? _lendasFichas : null;
+  if (!fonte) {
+    container.innerHTML = `<span class="livro-area-empty">Abra o Livro das Lendas para ver o ranking completo.</span>`;
+    return;
+  }
+  const ordenados = [...fonte].sort((a,b) => (b.score||0) - (a.score||0));
+  const idx = ordenados.findIndex(x => x.user === f.user && x.nomePersonagem === f.nomePersonagem);
+  if (idx === -1) {
+    container.innerHTML = `<span class="livro-area-empty">Personagem ainda não indexado no ranking.</span>`;
+    return;
+  }
+  const posicao = idx + 1;
+  const total = ordenados.length;
+  container.innerHTML = `
+    <div class="livro-ranking-posicao">
+      <span class="livro-ranking-numero">#${posicao}</span>
+      <span class="livro-ranking-total">de ${total} Despertos</span>
+    </div>
+    <div class="livro-ranking-score">${icone('core','ic-sm')} Pontuação: <strong>${f.score ?? (ordenados[idx].score || 0)}</strong></div>`;
 }
 
 function _carregarGaleriaLivro(user, personagem) {
@@ -5621,46 +6373,13 @@ async function salvarPersonalizacao() {
   // Re-renderiza o ranking com as novas personalizações
   if (_lendasFichas.length) renderizarCartoes(_lendasFichas, _abaAtual);
 }
-async function carregarGaleriaPublicaGrimorio(user, personagem) {
-  const container = document.getElementById('grimorio-galeria-fotos');
-  const section = document.getElementById('grimorio-galeria-section');
-  if (!container || !section) return;
-  if (!window.db || !window.doc || !window.getDoc) return;
-  try {
-    const snap = await window.getDoc(window.doc(window.db, 'fotos', _fotoDocId(user, personagem)));
-    if (!snap.exists()) return;
-    const gal = snap.data().galeria || [];
-    const fotos = gal.filter(Boolean);
-    if (!fotos.length) return;
-    section.style.display = '';
-    container.innerHTML = fotos.map(src =>
-      `<img src="${src}" alt="foto" onclick="abrirLightbox('${src.replace(/'/g,"\\'")}'">`
-    ).join('');
-  } catch(e) { _diag('carregarGaleriaPublicaGrimorio(' + user + ',' + personagem + ')', e); }
-}
-
-async function carregarGaleriaPublica(user, personagem) {
-  const container = document.getElementById('modal-perfil-galeria');
-  if (!container || !window.db || !window.doc || !window.getDoc) return;
-  try {
-    // Tenta chave nova (user_personagem), com fallback para chave legada (user)
-    const docId = personagem ? _fotoDocId(user, personagem) : _sanitizeDocPart(user);
-    let snap = await window.getDoc(window.doc(window.db, 'fotos', docId));
-    if (!snap.exists() && personagem) {
-      snap = await window.getDoc(window.doc(window.db, 'fotos', user));
-    }
-    if (snap.exists()) {
-      const galeria = (snap.data().galeria || []).filter(Boolean);
-      galeria.forEach(src => {
-        const img = document.createElement('img');
-        img.className = 'modal-perfil-foto';
-        img.src = src;
-        img.onclick = () => window.open(src, '_blank');
-        container.appendChild(img);
-      });
-    }
-  } catch(e) { _diag('carregarGaleriaPublica(' + user + ',' + personagem + ')', e); }
-}
+// Nota: a antiga carregarGaleriaPublicaGrimorio() foi removida nesta auditoria —
+// referenciava elementos HTML (#grimorio-galeria-fotos, #grimorio-galeria-section)
+// que não existem mais na ficha atual. A galeria do Grimório público é
+// carregada por _carregarGaleriaLivro(), usada pelo sistema de abas atual.
+// Nota: a antiga carregarGaleriaPublica() foi removida nesta auditoria —
+// referenciava #modal-perfil-galeria, que não existe mais. Mesmo papel
+// hoje cumprido por _carregarGaleriaLivro().
 
 // ═══════════════════════════════════════════════════════════════════════
 // ═══ FOTOS DO PERSONAGEM ════════════════════════════════════════════
@@ -5683,7 +6402,12 @@ async function salvarFotosPerfil(user, personagem, principal, galeria) {
     await window.setDoc(window.doc(window.db, 'fotos', docId), {
       principal: principal !== undefined ? principal : null,
       galeria: galeria || [],
-      ts: Date.now()
+      ts: Date.now(),
+      // Necessário para as regras de segurança do Firestore validarem o
+      // dono do documento pelo CONTEÚDO (o nome do doc é "user_personagem",
+      // comparar isso contra o e-mail autenticado nunca dá match).
+      user: _normUser(user || usuarioAtual),
+      personagem: personagem || personagemAtual || '_default'
     });
     console.log('[Fotos] salvo:', docId);
   } catch(e) { _diag('salvarFotosPerfil(' + docId + ')', e); }
@@ -5757,6 +6481,9 @@ async function abrirSeletorFotoPrincipal() {
     try {
       const dadosAtuais = JSON.parse(localStorage.getItem('ficha_' + usuarioAtual + '_' + personagemAtual) || '{}');
       await updateRankingEntry(usuarioAtual, personagemAtual, dadosAtuais, _fotoPrincipal);
+      // Atualiza o ranking NA TELA imediatamente — pedido explícito: alterar
+      // foto deve refletir no ranking sozinho, sem esperar o auto-refresh.
+      if (document.getElementById('ranking-grid')) carregarRanking();
     } catch(e) { console.warn('[Ranking] Erro ao atualizar foto no ranking:', e); }
     // Atualiza cache da sidebar
     const fotoKey = '_sbfoto_' + usuarioAtual + '_' + personagemAtual;
@@ -6058,6 +6785,144 @@ function atualizarFichaHero() {
 // Campos NARRATIVOS — apenas o próprio player pode editar
 const CAMPOS_NARRATIVOS = ['f-aparencia','f-roupas','r-tracos','r-ideais','r-ligacoes','r-defeitos','r-historia','r-eventos','r-npcs','f-cabelos','f-olhos','f-pele','f-genero','f-idade','f-altura','f-peso','f-frase','f-descricao-publica','soc-historia','soc-feitos','soc-conquistas','soc-titulos','soc-aliados','soc-rivais','soc-timeline'];
 
+// ═══════════════════════════════════════════════════════════════════════
+// ATRIBUTOS — definição, nomes completos, ordem e favoritos
+// ═══════════════════════════════════════════════════════════════════════
+// IMPORTANTE: a sigla ('for','des',...) continua sendo a base dos ids
+// (a-for, m-for) e dos nomes de variável usados nas fórmulas (forca,
+// modForca...). Só o RÓTULO visível muda para o nome completo — isso
+// preserva 100% de compatibilidade com fórmulas e dados já salvos.
+const ATRIBUTOS_BASE = [
+  { sigla: 'for', nome: 'Força' },
+  { sigla: 'des', nome: 'Destreza' },
+  { sigla: 'vig', nome: 'Vigor' },
+  { sigla: 'int', nome: 'Intelecto' },
+  { sigla: 'alm', nome: 'Alma' },
+  { sigla: 'car', nome: 'Carisma' },
+];
+// ATRIBUTOS_DEF é a ordem efetiva (pode ser personalizada por personagem).
+// Recalculada por _aplicarOrdemAtributos() ao carregar cada personagem.
+let ATRIBUTOS_DEF = ATRIBUTOS_BASE.slice();
+
+// Chave de armazenamento da ordem/favoritos — por personagem, como o resto da ficha.
+function _attrPrefsKey() {
+  return 'attrPrefs_' + usuarioAtual + '_' + personagemAtual;
+}
+
+function _carregarAttrPrefs() {
+  try {
+    const raw = localStorage.getItem(_attrPrefsKey());
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { ordem: ATRIBUTOS_BASE.map(a => a.sigla), favoritos: [] };
+}
+
+function _salvarAttrPrefs(prefs) {
+  localStorage.setItem(_attrPrefsKey(), JSON.stringify(prefs));
+  // Também entra no payload salvo na ficha (Firestore), para seguir o personagem entre dispositivos
+  salvarLocal();
+}
+
+// Aplica a ordem salva (se houver) e re-renderiza o grid de atributos.
+// Chamado ao trocar de personagem e ao carregar dados.
+function _aplicarOrdemAtributos() {
+  const prefs = _carregarAttrPrefs();
+  const porSigla = Object.fromEntries(ATRIBUTOS_BASE.map(a => [a.sigla, a]));
+  const ordemValida = (prefs.ordem || []).filter(s => porSigla[s]);
+  // Garante que toda sigla apareça mesmo se a ordem salva estiver incompleta (ex: dado antigo)
+  ATRIBUTOS_BASE.forEach(a => { if (!ordemValida.includes(a.sigla)) ordemValida.push(a.sigla); });
+  ATRIBUTOS_DEF = ordemValida.map(s => porSigla[s]);
+  _renderizarGridAtributos();
+  _aplicarFavoritosVisual(prefs.favoritos || []);
+}
+
+function _renderizarGridAtributos() {
+  const grid = document.getElementById('atributos-grid');
+  if (!grid) return;
+  // Preserva os valores atuais antes de re-renderizar (a ordem mudou, não o valor)
+  const valores = {};
+  ATRIBUTOS_BASE.forEach(({sigla}) => {
+    const el = document.getElementById('a-' + sigla);
+    if (el) valores[sigla] = el.value;
+  });
+  grid.innerHTML = ATRIBUTOS_DEF.map(({sigla, nome}) => `
+    <div class="atributo-box" id="attr-box-${sigla}" draggable="true"
+      ondragstart="_attrDragStart(event,'${sigla}')" ondragover="_attrDragOver(event)"
+      ondrop="_attrDrop(event,'${sigla}')" ondragend="_attrDragEnd(event)">
+      <button class="atributo-fav-btn" id="fav-${sigla}" onclick="toggleFavoritoAtributo('${sigla}',event)" title="Favoritar ${nome}">${icone('star','ic-sm')}</button>
+      <label style="letter-spacing:2px" title="${nome}">${nome}</label>
+      <input type="number" id="a-${sigla}" min="1" max="30" value="${valores[sigla] ?? 10}" oninput="calcTudoDebounced()">
+      <div class="atributo-mod" id="m-${sigla}">+0</div>
+    </div>`).join('');
+}
+
+function _aplicarFavoritosVisual(favoritos) {
+  ATRIBUTOS_BASE.forEach(({sigla}) => {
+    const box = document.getElementById('attr-box-' + sigla);
+    const btn = document.getElementById('fav-' + sigla);
+    const ativo = favoritos.includes(sigla);
+    if (box) box.classList.toggle('favorito', ativo);
+    if (btn) btn.classList.toggle('ativo', ativo);
+  });
+}
+
+function toggleFavoritoAtributo(sigla, ev) {
+  if (ev) ev.stopPropagation();
+  const prefs = _carregarAttrPrefs();
+  const favoritos = prefs.favoritos || [];
+  const idx = favoritos.indexOf(sigla);
+  if (idx >= 0) favoritos.splice(idx, 1);
+  else favoritos.push(sigla);
+  prefs.favoritos = favoritos;
+  _salvarAttrPrefs(prefs);
+  _aplicarFavoritosVisual(favoritos);
+}
+
+// ── Drag and drop para reordenar atributos ──
+let _attrArrastando = null;
+
+function _attrDragStart(ev, sigla) {
+  _attrArrastando = sigla;
+  ev.dataTransfer.effectAllowed = 'move';
+  ev.target.closest('.atributo-box')?.classList.add('arrastando');
+}
+
+function _attrDragOver(ev) {
+  ev.preventDefault(); // necessário para permitir o drop
+  const box = ev.target.closest('.atributo-box');
+  if (box) box.classList.add('drag-over');
+}
+
+function _attrDrop(ev, siglaDestino) {
+  ev.preventDefault();
+  document.querySelectorAll('.atributo-box.drag-over').forEach(el => el.classList.remove('drag-over'));
+  if (!_attrArrastando || _attrArrastando === siglaDestino) return;
+
+  const prefs = _carregarAttrPrefs();
+  const ordem = ATRIBUTOS_DEF.map(a => a.sigla); // ordem atual exibida
+  const origemIdx = ordem.indexOf(_attrArrastando);
+  const destinoIdx = ordem.indexOf(siglaDestino);
+  if (origemIdx === -1 || destinoIdx === -1) return;
+
+  ordem.splice(origemIdx, 1);
+  ordem.splice(destinoIdx, 0, _attrArrastando);
+  prefs.ordem = ordem;
+  _salvarAttrPrefs(prefs);
+
+  const porSigla = Object.fromEntries(ATRIBUTOS_BASE.map(a => [a.sigla, a]));
+  ATRIBUTOS_DEF = ordem.map(s => porSigla[s]);
+  _renderizarGridAtributos();
+  _aplicarFavoritosVisual(prefs.favoritos || []);
+  calcTudo(); // os ids são recriados — garante que mods/valores fiquem corretos na tela
+}
+
+function _attrDragEnd(ev) {
+  document.querySelectorAll('.atributo-box.arrastando, .atributo-box.drag-over').forEach(el => {
+    el.classList.remove('arrastando', 'drag-over');
+  });
+  _attrArrastando = null;
+}
+
 let usuarioAtual = null;
 let roleAtual = null;
 
@@ -6136,7 +7001,13 @@ function confirmarNovoPersonagem() {
       console.log('[Firestore] Ficha em branco criada:', nome);
       // Garante indexação no rankingGlobal mesmo que salvarFichaFirestore falhe internamente
       updateRankingEntry(usuarioAtual, nome, fichaVazia, null)
-        .then(() => console.log('[Ranking] Novo personagem indexado:', nome))
+        .then(() => {
+          console.log('[Ranking] Novo personagem indexado:', nome);
+          // Atualiza o ranking NA TELA imediatamente — sem isso, o personagem
+          // só apareceria depois do intervalo automático de 30s ou de o
+          // jogador navegar manualmente até a seção e clicar em "Atualizar".
+          if (document.getElementById('ranking-grid')) carregarRanking();
+        })
         .catch(e => console.warn('[Ranking] Erro ao indexar novo personagem:', e));
     });
   });
@@ -6405,6 +7276,7 @@ async function ativarPersonagem(nome) {
     await carregarDados(usuarioAtual);
     calcTudo();
     atualizarFichaHero();
+    _aplicarOrdemAtributos();
     _fichaExpandidos = { poder: false, lore: false, fichabase: false, aparencia: false, recursos: false, armas: false, pericias: false, inventario: false, pets: false, grimorio: false };
     _aplicarEstadoFichaExpand();
   }
@@ -6513,12 +7385,17 @@ async function deletarPersonagem(nome) {
       await carregarDados(usuarioAtual);
       calcTudo();
       await inicializarFotos();
+      _aplicarOrdemAtributos();
       _fichaExpandidos = { poder: false, lore: false, fichabase: false, aparencia: false, recursos: false, armas: false, pericias: false, inventario: false, pets: false, grimorio: false };
       _aplicarEstadoFichaExpand();
     }
   }
   renderizarPersonagensAccordion();
   renderizarPersonagensNaSidebar();
+  // Atualiza o ranking NA TELA imediatamente — consistente com os demais
+  // gatilhos (criar, editar, trocar foto): o personagem excluído some do
+  // Livro das Lendas sem precisar esperar o auto-refresh de 30s.
+  if (document.getElementById('ranking-grid')) carregarRanking();
 }
 // ═══ SIDEBAR — PERSONAGENS (painel de acesso rápido) ═══
 // Regras:
@@ -6618,28 +7495,14 @@ function criarNovoPersonagem() {
   setTimeout(() => adicionarPersonagemNovo(), 300);
 }
 
-// compatibilidade retroativa
-function adicionarPersonagem() { adicionarPersonagemNovo(); }
-function abrirPersonagem(index) {
-  const lista = getListaPersonagens();
-  if (lista[index]) ativarPersonagem(lista[index]);
-}
-function renderizarPersonagens() { renderizarPersonagensNaSidebar(); }
-function novoPersonagem() { adicionarPersonagemNovo(); }
+// Nota: as antigas funções de compatibilidade retroativa (adicionarPersonagem,
+// abrirPersonagem, renderizarPersonagens, novoPersonagem) foram removidas nesta
+// auditoria — nenhuma delas era chamada em nenhum ponto do código atual.
 
-
-function carregarFicha(){
-  if(!personagemAtual) return;
-  const dados = JSON.parse(
-    localStorage.getItem('ficha_' + usuarioAtual + '_' + personagemAtual) || '{}'
-  );
-  const nomeInput = document.getElementById('f-nome');
-  if(nomeInput){ nomeInput.value = dados.nome || ''; }
-  const nivelInput = document.getElementById('f-nivel');
-  if(nivelInput){ nivelInput.value = dados.nivel || 1; }
-  const racaInput = document.getElementById('f-raca');
-  if(racaInput){ racaInput.value = dados.raca || ''; }
-}
+// Nota: a antiga função carregarFicha() foi removida nesta auditoria —
+// nunca era chamada em nenhum ponto do código e lia chaves erradas
+// (dados.nome/dados.nivel/dados.raca em vez de f-nome/f-nivel/f-raca).
+// O carregamento real de ficha é feito por carregarDados()/preencherCampos().
 
 
 
@@ -7152,17 +8015,21 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
 <!-- ATRIBUTOS — logo abaixo da ficha base, largura total -->
 <div class="ficha-full-row">
   <div class="ficha-panel" style="border-top:3px solid var(--accent)!important;margin-bottom:1rem">
-    <div class="ficha-panel-title" style="font-size:.9rem;letter-spacing:4px;padding:1rem 1.5rem" id="toggle-atributos">
-      Atributos
+    <div class="ficha-panel-title" style="font-size:.9rem;letter-spacing:4px;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between" id="toggle-atributos">
+      <span>Atributos</span>
+      <span style="font-size:.62rem;letter-spacing:1px;color:var(--text-muted);text-transform:none;font-weight:400">arraste para reordenar · ⭐ para favoritar</span>
     </div>
     <div id="area-atributos">
     <div class="ficha-panel-body" style="padding:1.75rem 1.5rem 1.5rem">
-      <div class="atributos-grid" style="gap:.85rem">
-        ${['FOR','DES','VIG','INT','ALM','CAR'].map(a=>`
-        <div class="atributo-box">
-          <label style="letter-spacing:3px">${a}</label>
-          <input type="number" id="a-${a.toLowerCase()}" min="1" max="30" value="10" oninput="calcTudoDebounced()">
-          <div class="atributo-mod" id="m-${a.toLowerCase()}">+0</div>
+      <div class="atributos-grid" id="atributos-grid" style="gap:.85rem">
+        ${ATRIBUTOS_DEF.map(({sigla, nome}) => `
+        <div class="atributo-box" id="attr-box-${sigla}" draggable="true"
+          ondragstart="_attrDragStart(event,'${sigla}')" ondragover="_attrDragOver(event)"
+          ondrop="_attrDrop(event,'${sigla}')" ondragend="_attrDragEnd(event)">
+          <button class="atributo-fav-btn" id="fav-${sigla}" onclick="toggleFavoritoAtributo('${sigla}',event)" title="Favoritar ${nome}">${icone('star','ic-sm')}</button>
+          <label style="letter-spacing:2px" title="${nome}">${nome}</label>
+          <input type="number" id="a-${sigla}" min="1" max="30" value="10" oninput="calcTudoDebounced()">
+          <div class="atributo-mod" id="m-${sigla}">+0</div>
         </div>`).join('')}
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem;flex-wrap:wrap;gap:.75rem">
@@ -7182,6 +8049,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
     </div>
   </div>
 </div><!-- /ficha-full-row atributos -->
+
 
 <!-- LAYOUT DE DUAS COLUNAS (desktop): Recursos | Armas -->
 <div class="ficha-layout-cols">
@@ -7511,6 +8379,12 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
   </div>
   <div class="ficha-expand-area" id="area-aparencia">
   <div class="ficha-panel-body">
+    <!-- Galeria de fotos do personagem (foto principal + 5 miniaturas).
+         BUG CORRIGIDO nesta auditoria: este container não existia em
+         nenhum lugar do HTML, então renderFotoPersonagem() (chamada em
+         6 pontos do código) sempre escrevia em um elemento inexistente
+         e a galeria secundária de fotos nunca aparecia para o jogador. -->
+    <div id="personagem-foto-area" style="display:flex;flex-direction:column;align-items:flex-start;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)"></div>
     <div class="field-row cols-4" style="margin-bottom:.75rem">
       ${fieldGroup('Cabelos','f-cabelos')}
       ${fieldGroup('Olhos','f-olhos')}
@@ -7856,10 +8730,11 @@ function removerTecnicaEl(btn) {
   if (div) { div.remove(); salvarLocal(); }
 }
 
-// ─── SAVE / LOAD ───
-function getChave(user) {
-  return 'ficha_' + (user || usuarioAtual) + '_' + personagemAtual;
-}
+// Nota: a antiga getChave() foi removida nesta auditoria — nunca era chamada
+// e, além disso, montava a chave SEM normalizar o username (_normUser),
+// o que reintroduziria o bug de capitalização inconsistente já corrigido
+// em todos os outros pontos do código (ver _fsDocId/_fotoDocId/_charsDocId).
+
 
 function coletarDados() {
   const campos = [
@@ -7927,6 +8802,10 @@ function coletarDados() {
   d.numPets = numPets;
   d.tecnicas = [];
   for(let i=1;i<=numTecnicas;i++) d.tecnicas.push({nome:document.getElementById(`tn-${i}`)?.value||'',custo:document.getElementById(`tc-${i}`)?.value||'',desc:document.getElementById(`td-${i}`)?.value||'',efei:document.getElementById(`te-${i}`)?.value||''});
+  // Ordem e favoritos dos atributos — segue o personagem entre dispositivos
+  // (a fonte de verdade imediata é o localStorage via _attrPrefsKey, mas
+  // incluir aqui garante sincronização via Firestore como o resto da ficha).
+  d.attrPrefs = _carregarAttrPrefs();
   return d;
 }
 
@@ -7945,21 +8824,21 @@ function _sanitizeDocPart(s) {
   return String(s ?? '').trim().replace(/[\/\\#\?\[\]\.]/g, '-');
 }
 
-// Normaliza o USERNAME (nunca o nome do personagem) para minúsculas.
-// CAUSA RAIZ HISTÓRICA: o login (tentarLogin) e o cadastro (criarConta) sempre
-// normalizaram o username para lowercase antes de autenticar — mas funções de
-// indexação/auditoria do ranking (ex: sincronizarRankingCompleto) liam o campo
-// "user" gravado DENTRO do próprio documento da ficha, que podia ter sido
-// salvo com capitalização diferente (ex: "Joao") por versões antigas do app,
-// antes dessa normalização existir. Resultado: o personagem ficava indexado
-// sob o docId "Joao_Arthur", enquanto o jogador logado como "joao" (minúsculo)
-// sempre operava sobre "joao_Arthur" — dois documentos DIFERENTES no Firestore.
-// Da perspectiva do jogador: "o personagem não aparece" e "a foto não salva",
-// sem nenhum erro visível, porque cada operação criava/lia um doc novo e vazio
-// em vez de tocar no doc antigo com os dados reais.
-// Normalizar aqui, no ponto único onde todo ID é montado, garante que
-// QUALQUER variação de capitalização do username sempre resolve para o
-// mesmo documento.
+// ═══════════════════════════════════════════════════════════════════════
+// NORMALIZAÇÃO DE USERNAME — ponto único usado por TODA construção de
+// docId (fichas, fotos, chars, rankingGlobal, personalizacoes).
+//
+// Por quê: o e-mail interno do Firebase Auth é sempre login.toLowerCase()
+// + '@torredopesadelo.app' (ver tentarLogin). Se o docId de qualquer
+// coleção for montado com o username em outra capitalização (ex: o nome
+// vindo de USUARIOS[user].nome, ou de um parâmetro que não passou pelo
+// toLowerCase do login), o app passa a ler/escrever em um documento
+// DIFERENTE do original — o personagem, a foto ou o cálculo "desaparece"
+// porque o código está procurando no lugar errado, não porque o dado
+// foi perdido.
+//
+// Reaplicar SEMPRE este normalizador antes de montar qualquer docId
+// resolve a causa raiz de uma vez, em todas as coleções.
 function _normUser(u) {
   return String(u ?? '').trim().toLowerCase();
 }
@@ -7976,28 +8855,39 @@ function _fsDocId(user, personagem) {
   return _sanitizeDocPart(_normUser(user || usuarioAtual)) + '_' + _sanitizeDocPart(personagem || personagemAtual || '_default');
 }
 
+// ─── SALVAMENTO DA FICHA NO FIRESTORE ───────────────────────────────────
+// LIMITAÇÃO CONHECIDA (documentada nesta auditoria, não corrigida pois
+// está fora do escopo pedido e exigiria um sistema de locking/merge):
+// salvarFichaFirestore() usa setDoc() — sobrescrita completa do documento,
+// sem merge por campo. Se o GM e o player editarem o MESMO personagem
+// literalmente ao mesmo tempo (dentro da janela de debounce de 1.5s, ver
+// salvarLocal), a última escrita vence e pode sobrescrever campos que o
+// outro lado tinha alterado. Na prática o risco é baixo: gmAssumirPersonagem
+// sempre busca o estado mais recente do Firestore (sem cache obsoleto) no
+// momento em que o GM abre a ficha, então a janela de colisão real exige
+// edição simultânea genuína, não apenas sessões abertas em momentos
+// diferentes.
 async function salvarFichaFirestore(user, dados) {
   if (!window.db || !window.doc || !window.setDoc) {
     console.warn('[Firestore] SDK não disponível ainda, pulando salvamento na nuvem.');
-    return false;
+    return;
   }
   const persoNome = personagemAtual || '_default';
   const docId = _fsDocId(user, persoNome);
+  const userNorm = _normUser(user || usuarioAtual);
   try {
     await window.setDoc(window.doc(window.db, 'fichas', docId), {
       dados: JSON.stringify(dados),
       ts: Date.now(),
-      user: user || usuarioAtual,
+      user: userNorm,
       personagem: persoNome
     });
     console.log('[Firestore] Ficha salva:', docId);
     // Atualiza coleção rankingGlobal para evitar N×M leituras no ranking
-    await updateRankingEntry(user || usuarioAtual, persoNome, dados, _fotoPrincipal || null);
-    return true;
+    await updateRankingEntry(userNorm, persoNome, dados, _fotoPrincipal || null);
   } catch(e) {
     _diag('salvarFichaFirestore(' + docId + ')', e);
     console.error('[Firestore] Erro ao salvar ficha:', e);
-    return false;
   }
 }
 
@@ -8005,6 +8895,7 @@ async function updateRankingEntry(user, personagem, dados, foto) {
   if (!window.db || !window.doc || !window.setDoc) return;
   const docId = _fsDocId(user, personagem); // fora do try: precisa estar visível no catch
   try {
+    const userNorm = _normUser(user);
     const nucleoRaw = dados['f-nucleo'] || '0';
     const nucleos = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
     const nivel = parseInt(dados['f-nivel'] || '1') || 1;
@@ -8013,11 +8904,12 @@ async function updateRankingEntry(user, personagem, dados, foto) {
     // Campos ausentes em fichas antigas recebem string vazia (nunca undefined/null
     // para strings, para não quebrar o layout de nenhum personagem).
     await window.setDoc(window.doc(window.db, 'rankingGlobal', docId), {
-      user,
+      user: userNorm,
       personagem,                                              // necessário para galeria e lookup
       nome: dados['f-nome'] || personagem,
       nivel,
       poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
+      classe: dados['f-classe'] || '',
       nucleos,
       foto: foto || null,
       despertar: dados['f-despertar'] || 'Desperto',
@@ -8043,6 +8935,10 @@ async function updateRankingEntry(user, personagem, dados, foto) {
       socAliados:     dados['soc-aliados']     || '',
       socRivais:      dados['soc-rivais']      || '',
       socTimeline:    dados['soc-timeline']    || '',
+      // ─── Grimório — Aba Poder (necessário para abrirPerfilPublico) ───
+      poderDescricao: dados['p-descricao'] || '',
+      poderSuprema:   dados['p-suprema']   || '',
+      tecnicas:       Array.isArray(dados.tecnicas) ? dados.tecnicas.filter(t => t && (t.nome || t.desc)) : [],
     });
   } catch(e) {
     _diag('updateRankingEntry(' + docId + ')', e);
@@ -8253,11 +9149,8 @@ function salvarLocal(targetUser) {
   // Debounce: salva na nuvem 1.5s após última edição
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async () => {
-    const ok = await salvarFichaFirestore(u, dados);
-    if (el) {
-      if (ok) { el.innerHTML = icone('cloud','ic-sm')+' Salvo na nuvem'; el.className = 'save-status saved'; }
-      else { el.innerHTML = icone('close','ic-sm')+' Falha ao salvar na nuvem (só local)'; el.className = 'save-status erro'; }
-    }
+    await salvarFichaFirestore(u, dados);
+    if (el) { el.innerHTML = icone('cloud','ic-sm')+' Salvo na nuvem'; el.className = 'save-status saved'; }
   }, 1500);
 }
 
@@ -8267,11 +9160,11 @@ function salvarFicha() {
   localStorage.setItem('ficha_' + usuarioAtual + '_' + personagemAtual, JSON.stringify(dados));
   const el = document.getElementById('save-status');
   if (el) { el.textContent = '⏳ Salvando…'; el.className = 'save-status'; }
-  salvarFichaFirestore(usuarioAtual, dados).then(ok => {
-    if (el) {
-      if (ok) { el.innerHTML = icone('check','ic-sm')+' Ficha salva!'; el.className = 'save-status saved'; }
-      else { el.innerHTML = icone('close','ic-sm')+' Falha ao salvar na nuvem (só local)'; el.className = 'save-status erro'; }
-    }
+  salvarFichaFirestore(usuarioAtual, dados).then(() => {
+    if (el) { el.innerHTML = icone('check','ic-sm')+' Ficha salva!'; el.className = 'save-status saved'; }
+    // Atualiza o ranking NA TELA imediatamente, sem esperar o intervalo de 30s —
+    // pedido explícito: editar personagem deve refletir no ranking sozinho.
+    if (document.getElementById('ranking-grid')) carregarRanking();
   });
 }
 
@@ -8308,6 +9201,13 @@ function salvarListaPersonagens(lista) {
 
 function preencherCampos(d) {
   // Primeiro restaura linhas/elementos dinâmicos extras, depois preenche os campos
+
+  // Restaura ordem/favoritos dos atributos vindos da nuvem — escreve no
+  // localStorage local (fonte que _aplicarOrdemAtributos() lê) ANTES dela
+  // ser chamada (em ativarPersonagem/iniciar, logo após calcTudo()).
+  if (d.attrPrefs && (d.attrPrefs.ordem || d.attrPrefs.favoritos)) {
+    localStorage.setItem(_attrPrefsKey(), JSON.stringify(d.attrPrefs));
+  }
 
   // Restaura slots de perícias (novo sistema)
   if(d.slotsPericia) {
@@ -8411,6 +9311,110 @@ function preencherCampos(d) {
 }
 
 // ─── GM: listar fichas ───
+// ═══════════════════════════════════════════════════════════════════════
+// GM — ACESSO TOTAL À FICHA COMPLETA DE QUALQUER PERSONAGEM
+// ═══════════════════════════════════════════════════════════════════════
+// Antes: o GM só editava um subconjunto de campos via gerarCamposInline()
+// (atributos, nível, bônus, poder, narrativo) — não tinha acesso a
+// técnicas, passivas, despertares, pets, armas, inventário, perícias,
+// identidade pública ou Grimório social de outro jogador.
+//
+// Esta função resolve isso reaproveitando a MESMA gerarFichaHTML()/
+// carregarDados()/calcTudo() já usadas pelo player — em vez de duplicar
+// lógica de campo em um painel paralelo. Funciona "vestindo" temporariamente
+// o contexto do personagem-alvo (usuarioAtual/personagemAtual), exatamente
+// como ativarPersonagem() já faz para o próprio personagem do GM.
+let _gmContextoOriginal = null; // guarda { usuarioAtual, personagemAtual } do GM antes de assumir outro
+
+async function gmAssumirPersonagem(targetUser, nomePersonagem) {
+  if (roleAtual !== 'gm') return; // segurança: só GM pode assumir ficha de outro
+  if (personagemAtual && usuarioAtual === (_gmContextoOriginal?.usuarioAtual || usuarioAtual)) {
+    // Salva o que estava sendo editado (próprio personagem do GM ou outro assumido) antes de trocar
+    salvarLocal();
+  }
+  if (!_gmContextoOriginal) {
+    _gmContextoOriginal = { usuarioAtual, personagemAtual };
+  }
+
+  usuarioAtual = targetUser;
+  personagemAtual = nomePersonagem;
+
+  // Garante que a lista de personagens DESTE jogador (não a do GM) está no
+  // cache local antes de renderizar o accordion — sem isso, getListaPersonagens()
+  // ficaria vazia (cada sessão tem seu próprio localStorage).
+  const listaNuvem = await carregarListaNuvem(targetUser);
+  if (listaNuvem) salvarListaPersonagens(listaNuvem);
+
+  navTo('ficha');
+  const fichaContent = document.getElementById('ficha-content');
+  if (fichaContent) {
+    fichaContent.innerHTML = gerarFichaHTML(targetUser, 'gm');
+    buildPericias();
+    resetarContadoresFicha();
+    await carregarDados(targetUser);
+    calcTudo();
+    atualizarFichaHero();
+    _aplicarOrdemAtributos();
+    _fichaExpandidos = { poder: false, lore: false, fichabase: false, aparencia: false, recursos: false, armas: false, pericias: false, inventario: false, pets: false, grimorio: false };
+    _aplicarEstadoFichaExpand();
+  }
+  renderizarPersonagensAccordion();
+  abrirAccordionPersonagem(nomePersonagem);
+  await inicializarFotos();
+  _mostrarBarraGmAssumindo(targetUser, nomePersonagem);
+}
+
+// Restaura o GM para a própria ficha após editar a de outro jogador.
+async function gmVoltarParaPropriaFicha() {
+  if (!_gmContextoOriginal) return;
+  salvarLocal(); // garante que a última edição no personagem assumido foi salva
+
+  usuarioAtual = _gmContextoOriginal.usuarioAtual;
+  personagemAtual = _gmContextoOriginal.personagemAtual;
+  _gmContextoOriginal = null;
+
+  const fichaContent = document.getElementById('ficha-content');
+  if (fichaContent) {
+    fichaContent.innerHTML = gerarFichaHTML(usuarioAtual, roleAtual);
+    buildPericias();
+    resetarContadoresFicha();
+    await carregarDados(usuarioAtual);
+    calcTudo();
+    atualizarFichaHero();
+    _aplicarOrdemAtributos();
+    _aplicarEstadoFichaExpand();
+  }
+  renderizarPersonagensAccordion();
+  if (personagemAtual) abrirAccordionPersonagem(personagemAtual);
+  renderizarPersonagensNaSidebar();
+  await inicializarFotos();
+  document.getElementById('gm-assumindo-bar')?.remove();
+}
+
+function _mostrarBarraGmAssumindo(targetUser, nomePersonagem) {
+  document.getElementById('gm-assumindo-bar')?.remove();
+  const info = USUARIOS[targetUser] || { nome: targetUser };
+  const bar = document.createElement('div');
+  bar.id = 'gm-assumindo-bar';
+  bar.style.cssText = `
+    position:sticky; top:0; z-index:200;
+    background:linear-gradient(135deg,#1a1200,#0c0c0f);
+    border-bottom:2px solid var(--gold);
+    padding:.65rem 1.25rem;
+    display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  `;
+  bar.innerHTML = `
+    <span style="font-size:.82rem;color:var(--gold-light);display:flex;align-items:center;gap:.5rem">
+      ${icone('gear','ic-sm')} Editando como GM: <strong>${nomePersonagem}</strong> (jogador: ${info.nome})
+    </span>
+    <button onclick="gmVoltarParaPropriaFicha()" style="background:var(--gold);border:none;color:#1a1200;padding:.4rem 1rem;font-family:inherit;font-size:.8rem;cursor:pointer;font-weight:600;border-radius:3px">
+      ${icone('arrow-left','ic-sm')} Voltar à minha ficha
+    </button>`;
+  const ficha = document.getElementById('ficha');
+  ficha?.insertBefore(bar, ficha.firstChild);
+}
+
+
 async function renderGMPlayers() {
   const lista = document.getElementById('gm-players-list');
   if(!lista) return;
@@ -8448,16 +9452,27 @@ async function renderGMPlayers() {
     const nPersonagens = personagens.length;
     const card = document.createElement('div');
     card.className = 'player-card';
+    // Lista de botões — um por personagem — para acesso DIRETO à ficha completa.
+    // Substituiu o painel inline simplificado: agora o GM edita exatamente
+    // a mesma ficha completa (atributos, técnicas, pets, armas, inventário,
+    // perícias, identidade pública, Grimório social) que o player vê.
+    const botoesPersonagens = personagens.length
+      ? personagens.map(p => `<button class="gm-perso-edit-btn" onclick="gmAssumirPersonagem('${user}','${p.replace(/'/g,"\\'")}')">${icone('edit','ic-sm')} ${p}</button>`).join('')
+      : `<span style="color:#555;font-size:.78rem;font-style:italic">Nenhum personagem criado ainda.</span>`;
     card.innerHTML = `
       <div class="player-card-header" onclick="togglePlayerCard('gm-body-${user}')">
         <div>
           <div class="player-card-name">${info.nome} <span class="role-badge badge-${info.role}">${info.role}</span></div>
           <div class="player-card-meta">@${user} • ${primeiroNome} • Nível ${primeiroNivel} • ${primeiroRaca} • Poder: ${primeiroPoder} • ${nPersonagens} personagem${nPersonagens!==1?'s':''}</div>
         </div>
-        <span style="color:var(--text-muted);font-size:.8rem">▼ Ver ficha</span>
+        <span style="color:var(--text-muted);font-size:.8rem">▼ Ver opções</span>
       </div>
       <div class="player-card-body" id="gm-body-${user}">
-        <p style="color:var(--text-muted);font-size:.82rem;margin-bottom:1rem">Carregando ficha de ${info.nome}...</p>
+        <div style="margin-bottom:1rem">
+          <div style="font-size:.68rem;letter-spacing:1.5px;color:var(--gold-light);text-transform:uppercase;margin-bottom:.6rem">Editar ficha completa (acesso total)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.5rem">${botoesPersonagens}</div>
+        </div>
+        <p style="color:var(--text-muted);font-size:.82rem;margin-bottom:1rem">Carregando preview rápido de ${info.nome}...</p>
       </div>`;
     lista.appendChild(card);
   }
@@ -8469,18 +9484,20 @@ function togglePlayerCard(bodyId) {
   const user = bodyId.replace('gm-body-','');
   if(body.classList.contains('open')) { body.classList.remove('open'); return; }
   body.classList.add('open');
-  // renderiza ficha inline para GM (acesso total)
-  body.innerHTML = gerarFichaGMInline(user);
+  // Preserva os botões de "editar ficha completa" (gerados por renderGMPlayers)
+  // e anexa o preview rápido inline abaixo deles, em vez de substituir tudo.
+  const botoesExistentes = body.querySelector('div')?.outerHTML || '';
+  body.innerHTML = botoesExistentes + gerarFichaGMInline(user);
   carregarDadosInline(user, body);
 }
 
 function gerarFichaGMInline(user) {
   const info = USUARIOS[user];
   return `
-    <div style="padding:1rem 0;border-bottom:1px solid var(--border);margin-bottom:1rem">
+    <div style="padding:1rem 0;border-top:1px solid var(--border);margin-top:.5rem;margin-bottom:1rem">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
         <div>
-          <span style="font-size:.78rem;color:var(--text-muted)">Editando ficha de <strong style="color:var(--gold-light)">${info.nome}</strong> — acesso total</span>
+          <span style="font-size:.78rem;color:var(--text-muted)">Preview rápido de <strong style="color:var(--gold-light)">${info.nome}</strong> <span style="font-size:.68rem;color:#555">(para edição completa, use os botões acima)</span></span>
           <div style="margin-top:.4rem">
             <span style="font-size:.65rem;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase">Personagem: </span>
             <select id="gm-perso-select-${user}" style="background:var(--bg-input);border:1px solid rgba(180,140,30,.4);color:var(--gold-light);padding:.25rem .5rem;font-family:inherit;font-size:.78rem;outline:none;cursor:pointer" onchange="gmTrocarPersonagem('${user}')">
@@ -8651,6 +9668,8 @@ async function salvarFichaPlayer(user) {
       // Atualiza ranking para refletir as mudanças do GM
       await updateRankingEntry(user, persoAtivo, d, null);
       console.log('[Firestore] Ficha do player salva pelo GM:', docId);
+      // Atualiza o ranking NA TELA imediatamente, caso o painel esteja aberto.
+      if (document.getElementById('ranking-grid')) carregarRanking();
     }
   } catch(e) {
     console.error('[Firestore] Erro ao salvar ficha do player:', e);
@@ -8764,21 +9783,12 @@ function mostrarTab(tabId) {
 // ═══════════════════════════════════════════════════════════════════════
 // MIGRAÇÃO RETROATIVA DE CAPITALIZAÇÃO DE USERNAME
 // ═══════════════════════════════════════════════════════════════════════
-// Contexto: antes de _normUser existir, o docId de cada coleção (chars,
-// fichas, fotos, rankingGlobal) usava o username exatamente como foi
-// digitado/cadastrado (ex: "Joao", "JOAO", "joao" geravam 3 documentos
-// diferentes). A correção em _fsDocId/_fotoDocId/_charsDocId resolve
-// o problema para todo dado NOVO, mas não resolve por si só o dado
-// ANTIGO já gravado com a grafia "errada" — ele continua existindo sob
-// o ID antigo e fica invisível para o código novo (que só lê o ID
-// normalizado em minúsculas).
-//
-// Esta função roda uma vez por login: tenta localizar documentos do
-// usuário sob a grafia exata como está cadastrado em usuarios_extras
-// (campo 'nome' não serve, mas o id do doc malformado pode ter sobrado
-// em chars/<grafia antiga>). Como não sabemos de antemão qual era a
-// grafia antiga, tentamos as variações mais comuns: tal como digitada
-// no login (antes do toLowerCase) e capitalizada (Maiúscula inicial).
+// Documentos gravados ANTES da normalização (_normUser) podem existir sob
+// uma grafia diferente da que o login usa agora (sempre minúsculo). Esta
+// função roda uma vez por login: procura dados antigos sob variações
+// comuns de capitalização e, se encontrar, copia (sem apagar o original)
+// para o ID novo e normalizado — sem isso, personagens/fotos legados
+// continuam invisíveis para o código atual mesmo após a correção acima.
 async function _migrarCapitalizacaoAntiga(userDigitadoOriginal, userNormalizado) {
   if (!window.db || !window.doc || !window.getDoc || !window.setDoc) return;
   if (userDigitadoOriginal === userNormalizado) return; // nada para migrar
@@ -8792,7 +9802,6 @@ async function _migrarCapitalizacaoAntiga(userDigitadoOriginal, userNormalizado)
 
   for (const candidato of candidatos) {
     try {
-      // 1. Lista de personagens (coleção chars) sob a grafia antiga
       const charsAntigoRef = window.doc(window.db, 'chars', _sanitizeDocPart(candidato));
       const charsAntigoSnap = await window.getDoc(charsAntigoRef);
       if (!charsAntigoSnap.exists()) continue; // esse candidato não tem dados antigos
@@ -8800,14 +9809,12 @@ async function _migrarCapitalizacaoAntiga(userDigitadoOriginal, userNormalizado)
       console.log('[Migração] Encontrados dados antigos sob a grafia:', candidato);
       const listaAntiga = JSON.parse(charsAntigoSnap.data().lista || '[]');
 
-      // 2. Mescla com a lista já normalizada (se existir)
       const charsNovoRef = window.doc(window.db, 'chars', _sanitizeDocPart(userNormalizado));
       const charsNovoSnap = await window.getDoc(charsNovoRef);
       const listaNova = charsNovoSnap.exists() ? JSON.parse(charsNovoSnap.data().lista || '[]') : [];
       const listaMerge = [...new Set([...listaNova, ...listaAntiga])];
       await window.setDoc(charsNovoRef, { lista: JSON.stringify(listaMerge) });
 
-      // 3. Para cada personagem, migra fichas/fotos/rankingGlobal do ID antigo para o novo
       for (const nomePersonagem of listaAntiga) {
         const idAntigo = _sanitizeDocPart(candidato) + '_' + _sanitizeDocPart(nomePersonagem);
         const idNovo   = _fsDocId(userNormalizado, nomePersonagem);
@@ -8820,21 +9827,18 @@ async function _migrarCapitalizacaoAntiga(userDigitadoOriginal, userNormalizado)
             if (!snapAntigo.exists()) continue;
             const refNovo = window.doc(window.db, colecao, idNovo);
             const snapNovo = await window.getDoc(refNovo);
-            if (snapNovo.exists()) continue; // já migrado anteriormente — não sobrescreve dado novo
+            if (snapNovo.exists()) continue; // já migrado — não sobrescreve dado novo
             const dadosAntigos = snapAntigo.data();
             await window.setDoc(refNovo, { ...dadosAntigos, user: userNormalizado, personagem: nomePersonagem });
             console.log(`[Migração] ${colecao}/${idAntigo} → ${colecao}/${idNovo}`);
           } catch(e) {
-            _diag(`_migrarCapitalizacaoAntiga → ${colecao}/${idAntigo}`, e);
+            console.warn(`[Migração] Erro em ${colecao}/${idAntigo}:`, e);
           }
         }
       }
-
-      // Não removemos os documentos antigos automaticamente (segurança:
-      // preferimos manter um backup acessível do que perder dado por engano).
       console.log('[Migração] Concluída para a grafia antiga:', candidato);
     } catch(e) {
-      _diag('_migrarCapitalizacaoAntiga → candidato ' + candidato, e);
+      console.warn('[Migração] Erro ao processar candidato', candidato, e);
     }
   }
 }
@@ -8880,6 +9884,19 @@ async function tentarLogin() {
     await _migrarCapitalizacaoAntiga(userOriginal, user);
 
     iniciar();
+
+    // ── OBJETIVO PRINCIPAL DO PROJETO: o jogador deve entrar e ver o
+    // PRÓPRIO PERSONAGEM, não a home do site (que lembra documentação/
+    // livro de regras). Antes desta correção, iniciar() nunca navegava
+    // para lugar nenhum — o jogador ficava parado no topo absoluto da
+    // página (hero + capítulos) e precisava clicar manualmente em
+    // "Acessar Minha Ficha". Sem essa navegação automática, a experiência
+    // inteira contradizia o requisito central do prompt.
+    // Exceção: ADM não tem personagem jogável — continua vendo o próprio
+    // painel administrativo, que é o que faz sentido para esse papel.
+    if (roleAtual !== 'adm') {
+      setTimeout(() => navTo('ficha'), 150);
+    }
   } catch(e) {
     console.warn('[Auth] Erro no login:', e.code, e.message);
     if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
@@ -8905,12 +9922,17 @@ async function entrarObservador() {
   document.getElementById('app').style.display='block';
   _toggleTabbar(true);
   iniciarObservador();
+  // Mesmo princípio do login normal: o observador também deve ver a
+  // ficha (em modo leitura) imediatamente, não a home do site.
+  setTimeout(() => navTo('ficha'), 150);
 }
 
 async function logout() {
   if (_rankingInterval) { clearInterval(_rankingInterval); _rankingInterval = null; }
   if (_inputListener) { document.removeEventListener('input', _inputListener); _inputListener = null; }
   usuarioAtual=null; roleAtual=null; numTecnicas=0;
+  _gmContextoOriginal = null; // evita restaurar contexto de uma sessão GM anterior
+  document.getElementById('gm-assumindo-bar')?.remove();
   document.getElementById('app').style.display='none';
   _toggleTabbar(false);
   document.getElementById('login-screen').style.display='flex';
@@ -9088,6 +10110,9 @@ async function iniciarObservador() {
   await aguardarFirebase();
   await carregarRankingOcultos();
   carregarCapitulosExtras();
+  _garantirIdsBlocos(); // garante ids estáveis ANTES de reconstruir blocos extras
+  _aplicarDataLabelTabelas(); // garante rótulos de coluna em tabelas estáticas (correção mobile)
+  carregarBlocosExtras();
   carregarUsuariosExtras().then(() => carregarRanking());
   carregarRanking();
 }
@@ -9116,11 +10141,20 @@ async function iniciar() {
   if(statusEl) { statusEl.innerHTML = icone('cloud','ic-sm')+' Conectando…'; statusEl.className = 'save-status'; }
   await aguardarFirebase();
 
+  // ── Fórmulas: sincroniza da nuvem para TODOS os usuários, não só o GM ──
+  // BUG CORRIGIDO: antes, carregarFormulasDaNuvem() só era chamada dentro
+  // do bloco "if(roleAtual === 'gm')" — então quando o GM editava uma
+  // fórmula, ela ficava sincronizada no Firestore, mas nenhum PLAYER
+  // jamais a recebia (cada um continuava calculando com a fórmula antiga
+  // do próprio localStorage). "GM edita fórmula" só fazia efeito na
+  // sessão do próprio GM. Mover para fora do bloco condicional resolve
+  // isso para todas as roles.
+  await carregarFormulasDaNuvem();
+
   // GM
   if(roleAtual === 'gm') {
     document.getElementById('sb-gm-section').style.display='block';
     document.getElementById('painel-gm').style.display='block';
-    await carregarFormulasDaNuvem();
     carregarFormulaEditor();
     renderGMPlayers();
     document.getElementById('ficha-viewer-label').textContent = 'Visualizando como Game Master — acesso total';
@@ -9164,6 +10198,7 @@ async function iniciar() {
       await carregarDados(usuarioAtual);
       calcTudo();
       atualizarFichaHero();
+      _aplicarOrdemAtributos();
       _aplicarEstadoFichaExpand();
     }
     renderizarPersonagensAccordion();
@@ -9178,6 +10213,9 @@ async function iniciar() {
   await carregarUsuariosExtras();
   await carregarRankingOcultos(); // carrega lista de ocultos antes do ranking
   carregarCapitulosExtras();
+  _garantirIdsBlocos(); // garante ids estáveis ANTES de reconstruir blocos extras
+  _aplicarDataLabelTabelas(); // garante rótulos de coluna em tabelas estáticas (correção mobile)
+  carregarBlocosExtras();
 
   // ── Garante que os personagens do usuário atual existam no rankingGlobal ──
   // Isso resolve o caso de personagens criados antes do sistema de indexação
@@ -9200,14 +10238,48 @@ async function iniciar() {
 // Permite ao GM clicar e editar qualquer parágrafo/bloco de texto do site
 window._blocosEditados = JSON.parse(localStorage.getItem('tp_blocos_gm') || '{}');
 
-function ativarEdicaoBlocosGM() {
+// Garante que todo bloco editável tenha um id estável e que o conteúdo
+// salvo (window._blocosEditados) já esteja aplicado — para QUALQUER role,
+// não só o GM. É essencial rodar isso ANTES de carregarBlocosExtras(),
+// pois os ids de blocos extras usam "afterId" apontando para esses
+// elementos: se o id só existisse quando o GM estivesse logado, blocos
+// extras nunca encontrariam a referência para players/observadores
+// (e, na primeira visita de QUALQUER sessão, antes do id existir).
+// ═══════════════════════════════════════════════════════════════════════
+// CORREÇÃO MOBILE: data-label automático em tabelas estáticas ═══════════
+// ═══════════════════════════════════════════════════════════════════════
+// Em telas estreitas (≤860px), .table-wrapper transforma cada <tr> num
+// cartão vertical e usa o atributo data-label de cada <td> para mostrar
+// o nome da coluna (já que o <thead> original fica oculto). Tabelas
+// GERADAS PELA FICHA já recebem esse atributo automaticamente — mas
+// tabelas ESTÁTICAS de conteúdo (Sumário, tabela de Modificadores no
+// Capítulo 3, e qualquer tabela nova criada pelo construtor visual do
+// GM) não tinham. Sem o rótulo, o card no mobile perdia o contexto da
+// coluna (ex: "Cap. 1" e "A Ficha de Personagem" empilhados sem dizer
+// qual é qual). Esta função preenche o data-label automaticamente, lendo
+// o texto de cada <th> correspondente — roda uma vez no carregamento e
+// é chamada de novo sempre que um bloco/tabela novo é inserido.
+function _aplicarDataLabelTabelas() {
+  document.querySelectorAll('.table-wrapper table').forEach(table => {
+    const ths = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+    if (!ths.length) return;
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      Array.from(tr.children).forEach((td, i) => {
+        if (td.tagName === 'TD' && !td.hasAttribute('data-label') && ths[i]) {
+          td.setAttribute('data-label', ths[i]);
+        }
+      });
+    });
+  });
+}
+
+function _garantirIdsBlocos() {
   // Aplica textos salvos anteriormente
   Object.entries(window._blocosEditados).forEach(([id, texto]) => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = texto;
   });
 
-  // Adiciona botão de edição nos blocos editáveis
   const seletores = ['section[id] p', 'section[id] .lore-box', 'section[id] .system-card',
                      '.hero p', '.hero-eyebrow', '.hero-subtitle',
                      '.gm-subtitle', 'section[id] h1', 'section[id] h2'];
@@ -9216,6 +10288,21 @@ function ativarEdicaoBlocosGM() {
     document.querySelectorAll(sel).forEach((el, i) => {
       if (el.closest('#ficha') || el.closest('#painel-gm') || el.closest('#painel-adm')) return;
       if (!el.id) el.id = 'bloco-gm-' + sel.replace(/[^a-z0-9]/gi,'_') + '_' + i;
+    });
+  });
+}
+
+function ativarEdicaoBlocosGM() {
+  _garantirIdsBlocos(); // idempotente — não duplica nada se já tiver rodado
+
+  // Adiciona botão de edição nos blocos editáveis (só para o GM)
+  const seletores = ['section[id] p', 'section[id] .lore-box', 'section[id] .system-card',
+                     '.hero p', '.hero-eyebrow', '.hero-subtitle',
+                     '.gm-subtitle', 'section[id] h1', 'section[id] h2'];
+
+  seletores.forEach(sel => {
+    document.querySelectorAll(sel).forEach((el) => {
+      if (el.closest('#ficha') || el.closest('#painel-gm') || el.closest('#painel-adm')) return;
       el.classList.add('bloco-editavel');
       if (!el.querySelector('.btn-editar-bloco')) {
         const btn = document.createElement('button');
@@ -9321,6 +10408,33 @@ function toggleSidebar() {
   arrow.classList.toggle('open', open);
   if (backdrop) backdrop.classList.toggle('show', open);
   arrow.querySelector('.arrow-ic').textContent = open ? '◀' : '▶';
+}
+
+// Sidebar flutuante do Livro do Jogador — mesmo mecanismo de toggleSidebar(),
+// só que aplicado aos elementos próprios do livro (ids distintos para não
+// conflitar com a sidebar principal do app quando ambos existem no DOM).
+function toggleLivroSidebar() {
+  const sb = document.getElementById('livro-sidebar');
+  const arrow = document.getElementById('livro-sidebar-arrow-btn');
+  const backdrop = document.getElementById('livro-sidebar-backdrop');
+  if (!sb) return;
+  const open = sb.classList.toggle('open');
+  if (arrow) {
+    arrow.classList.toggle('open', open);
+    const ic = arrow.querySelector('.arrow-ic');
+    if (ic) ic.textContent = open ? '◀' : '▶';
+  }
+  if (backdrop) backdrop.classList.toggle('show', open);
+}
+
+// Fecha a sidebar flutuante do livro — chamada ao clicar em qualquer
+// link interno de navegação, mesmo comportamento de navTo() no app.
+function fecharLivroSidebar() {
+  document.getElementById('livro-sidebar')?.classList.remove('open');
+  document.getElementById('livro-sidebar-arrow-btn')?.classList.remove('open');
+  document.getElementById('livro-sidebar-backdrop')?.classList.remove('show');
+  const ic = document.querySelector('#livro-sidebar-arrow-btn .arrow-ic');
+  if (ic) ic.textContent = '▶';
 }
 
 function navTo(id) {
@@ -9455,6 +10569,10 @@ function _mostrarLivro() {
   if (!livro) return;
   livro.style.display = 'block';
   window.scrollTo(0, 0);
+  // Oculta o efeito atmosférico de fundo (vinheta de torres/névoa) — fica
+  // por cima de tudo e prejudica a leitura do conteúdo longo do livro.
+  // Feito também via JS (não só CSS :has) para garantir em qualquer navegador.
+  _toggleAtmosferaLivro(true);
   // Mostra ferramentas do GM se logado como GM
   const gmTools = document.getElementById('livro-gm-tools');
   if (gmTools) gmTools.style.display = (roleAtual === 'gm') ? 'flex' : 'none';
@@ -9474,8 +10592,23 @@ function _mostrarLivro() {
   }
 }
 
+// Esconde/restaura a camada atmosférica fixa (#tp-scene, #tp-atmosphere,
+// olhos na névoa, vinhetas do body) — usada ao entrar/sair do Livro do Jogador.
+function _toggleAtmosferaLivro(ocultar) {
+  ['tp-scene', 'tp-atmosphere'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = ocultar ? 'none' : '';
+  });
+  document.querySelectorAll('.tp-eye').forEach(el => {
+    el.style.display = ocultar ? 'none' : '';
+  });
+  document.body.classList.toggle('livro-aberto', ocultar);
+}
+
 function fecharLivro() {
   document.getElementById('livro-jogador').style.display = 'none';
+  // Restaura o efeito atmosférico de fundo (escondido só dentro do livro)
+  _toggleAtmosferaLivro(false);
   // Se estava logado, volta para o app; senão, para a landing
   if (usuarioAtual && usuarioAtual !== null) {
     document.getElementById('app').style.display = 'block';
@@ -9499,6 +10632,9 @@ function _inicializarLinksLivro() {
       e.preventDefault();
       const id = this.getAttribute('href').slice(1);
       const el = document.getElementById(id);
+      // Fecha a sidebar flutuante ao navegar — sem isso, ela continuaria
+      // sobreposta ao conteúdo, escondendo a seção recém-aberta.
+      fecharLivroSidebar();
       if (el) {
         const top = el.getBoundingClientRect().top + window.scrollY - 64;
         window.scrollTo({ top, behavior: 'smooth' });
@@ -9507,18 +10643,12 @@ function _inicializarLinksLivro() {
   });
 }
 
-// ── Sidebar responsiva do livro (oculta em mobile, toggle) ──
-function _livroSidebarResponsiva() {
-  const sidebar = document.getElementById('livro-sidebar');
-  if (!sidebar) return;
-  if (window.innerWidth <= 1024) {
-    sidebar.style.display = 'none';
-    sidebar._oculta = true;
-  } else {
-    sidebar.style.display = '';
-    sidebar._oculta = false;
-  }
-}
+// Nota: a sidebar do livro agora é flutuante em qualquer tamanho de tela
+// (mesmo mecanismo da sidebar principal do app — abre/fecha via classe
+// .open, nunca via display:none). A função antiga que escondia a sidebar
+// com display:none em telas largas foi removida: ela impediria o CSS de
+// animá-la para dentro/fora (transform não anima um elemento display:none).
+function _livroSidebarResponsiva() {}
 
 // ── Modo editor do livro (GM) ──
 let _livroModoEditor = false;
@@ -9640,9 +10770,16 @@ document.addEventListener('DOMContentLoaded', () => {
     body.modo-editor-livro .bloco-editavel { outline:1px dashed rgba(180,140,30,.3); }
     #livro-jogador.modo-editor-livro .bloco-editavel:hover { outline-color:var(--gold); background:rgba(180,140,30,.04); }
     #livro-sidebar a.active { color:#fff; background:var(--accent); font-weight:600; border-radius:4px; }
-    #livro-sidebar a { color:var(--text-muted); text-decoration:none; display:block; padding:.38rem .55rem; border-radius:4px; font-size:.93rem; transition:color .2s,background .2s; }
-    #livro-sidebar a:hover { color:var(--text); background:rgba(156,42,42,.1); }
-    #livro-sidebar .toc-label { font-size:.7rem; text-transform:uppercase; letter-spacing:1.5px; color:#c13f3f; margin:.9rem 0 .3rem; display:block; padding-left:.4rem; border-left:3px solid #c13f3f; }
+    #livro-sidebar a { color:#d4d2de; text-decoration:none; display:block; padding:.38rem .55rem; border-radius:4px; font-size:.93rem; transition:color .2s,background .2s; }
+    #livro-sidebar a:hover { color:#fff; background:rgba(156,42,42,.18); }
+    #livro-sidebar .toc-label { font-size:.7rem; text-transform:uppercase; letter-spacing:1.5px; color:#e8696e; margin:.9rem 0 .3rem; display:block; padding-left:.4rem; border-left:3px solid #e8696e; font-weight:600; }
+    /* BUG CORRIGIDO: links DENTRO do conteúdo do livro (Sumário Interativo e
+       qualquer referência cruzada no corpo do texto) não tinham nenhuma regra
+       de estilo — ficavam com o azul+sublinhado padrão do navegador, quebrando
+       a identidade visual do site em pelo menos 66 links espalhados pelo livro. */
+    #livro-content a { color: var(--accent-light); text-decoration: none; border-bottom: 1px solid rgba(193,63,63,.3); transition: color .2s, border-color .2s; }
+    #livro-content a:hover { color: var(--gold-light); border-bottom-color: var(--gold-light); }
+    #livro-content a:visited { color: var(--accent-light); }
     @media (max-width:1024px) {
       #livro-layout { flex-direction:column; }
       #livro-sidebar { width:100%; max-height:none; position:static; border-right:none; border-bottom:1px solid var(--border); }
@@ -9734,22 +10871,21 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </div>
 
-  <!-- Layout: sidebar interna + conteúdo -->
-  <div id="livro-layout" style="display:flex;min-height:calc(100vh - 52px)">
+  <!-- Sidebar flutuante: botão de seta + backdrop (mesmo padrão da sidebar principal do app) -->
+  <button id="livro-sidebar-arrow-btn" title="Abrir/fechar índice" onclick="toggleLivroSidebar()" aria-label="Índice do Livro">
+    <span class="arrow-ic">▶</span>
+  </button>
+  <div id="livro-sidebar-backdrop" onclick="toggleLivroSidebar()"></div>
 
-    <!-- Sidebar do Livro (dentro do painel) -->
-    <aside id="livro-sidebar" style="
-      width:250px;flex-shrink:0;
-      background:var(--bg-surface);border-right:1px solid var(--border);
-      padding:1.5rem 1.1rem;overflow-y:auto;
-      position:sticky;top:52px;max-height:calc(100vh - 52px);
-    ">
+  <!-- Layout: sidebar flutuante + conteúdo -->
+  <div id="livro-layout">
+
+    <!-- Sidebar do Livro — agora flutuante, deslizando por cima do conteúdo -->
+    <aside id="livro-sidebar">
       <div style="font-family:'Playfair Display',serif;font-size:.95rem;color:var(--accent-light);margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:2px solid var(--accent)">Índice</div>
-      
-        <h2>Índice</h2>
 
         <ul style="margin-bottom: 0.6rem;">
-            <li><a href="#sumario" style="color: #c13f3f; font-weight: 600;">→ Sumário Interativo</a></li>
+            <li><a href="#livro-sumario" style="color: #c13f3f; font-weight: 600;">→ Sumário Interativo</a></li>
         </ul>
 
         <!-- I. O MUNDO -->
@@ -9814,15 +10950,39 @@ document.addEventListener('DOMContentLoaded', () => {
             <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#sanidade">Sanidade e Corrupção</a></li>
             <li><a href="#relacionamentos">Relacionamentos e Intimidade</a></li>
         </ul>
-    
+
+        <!-- Botão de saída — sempre visível ao final da lista de seções -->
+        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)">
+          <button onclick="fecharLivro()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.45rem;background:rgba(156,42,42,.1);border:1px solid rgba(193,63,63,.35);color:var(--accent-light);padding:.6rem .8rem;font-family:inherit;font-size:.85rem;cursor:pointer;border-radius:4px;transition:background .2s,border-color .2s" onmouseover="this.style.background='rgba(156,42,42,.22)';this.style.borderColor='var(--accent-light)'" onmouseout="this.style.background='rgba(156,42,42,.1)';this.style.borderColor='rgba(193,63,63,.35)'">
+            <svg class="ic ic-sm"><use href="#ic-arrow-left"/></svg> Sair do Livro
+          </button>
+        </div>
+
     </aside>
 
     <!-- Conteúdo do Livro -->
     <div id="livro-content" style="flex:1;padding:2.5rem 3rem 5rem;max-width:900px;overflow-x:hidden">
-      
+
+        <!-- HERO — título de abertura do Livro do Jogador.
+             BUG CORRIGIDO: esta seção existia no arquivo de referência
+             original (Livro_do_Jogador.html) mas foi perdida durante a
+             integração ao portal — o livro pulava direto para o Sumário,
+             sem nenhuma introdução/identidade visual de abertura. -->
+        <header class="livro-hero">
+          <div class="livro-hero-content">
+            <div class="livro-hero-symbol">
+              <div class="livro-hero-symbol-v"></div>
+              <div class="livro-hero-symbol-h"></div>
+            </div>
+            <h1>TORRE DO PESADELO</h1>
+            <p class="livro-hero-subtitle">Livro do Jogador</p>
+            <p class="livro-hero-tags">Sobrevivência • Dark Fantasy • Horror • Evolução de Poder</p>
+            <p class="livro-hero-aviso">Versão para Jogadores — Não contém segredos do Mestre.</p>
+          </div>
+        </header>
 
         <!-- SUMÁRIO INTERATIVO -->
-        <section id="sumario" style="margin-bottom: 2.5rem;">
+        <section id="livro-sumario" style="margin-bottom: 2.5rem;">
             <h2 style="text-align: center; color: #c13f3f; font-size: 1.6rem; margin-bottom: 1.2rem; letter-spacing: 1px;">Sumário</h2>
             
             <p style="text-align: center; max-width: 700px; margin: 0 auto 1.5rem; color: #a8a8b3; font-size: 0.95rem;">
@@ -9832,7 +10992,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </p>
 
             <!-- Sumário com layout de duas colunas internas -->
-            <div class="sumario-content" style="background: #141418; padding: 1.8rem 2.2rem; border: 1px solid #2a2a32; border-radius: 6px; font-size: 0.95rem; display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
+            <div class="sumario-content" style="background: #1e1a28; padding: 1.8rem 2.2rem; border: 1px solid #3a3548; border-radius: 6px; font-size: 0.95rem; display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
 
                 <!-- Coluna esquerda: índice tradicional -->
                 <div>
@@ -9991,7 +11151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <!-- GUARDIÃS -->
         <section id="guardias">
             <h2>As Quatro Torres Guardiãs</h2>
-            <p>As Torres Guardiãs são quatro torres gigantescas posicionadas ao redor da Torre do Pesadelo. Elas estão entre os maiores desafios conhecidos pela humanidade e são consideradas **extremamente letais** mesmo em seus andares iniciais.</p>
+            <p>As Torres Guardiãs são quatro torres gigantescas posicionadas ao redor da Torre do Pesadelo. Elas estão entre os maiores desafios conhecidos pela humanidade e são consideradas <strong>extremamente letais</strong> mesmo em seus andares iniciais.</p>
             <p>Em termos de dificuldade, os andares iniciais de uma Torre Guardiã são equivalentes a andares 15+ de torres menores comuns. Andares intermediários e profundos de uma Guardiã rivalizam ou superam os desafios encontrados na Torre do Pesadelo em profundidades médias.</p>
             <p>Por isso, ser forte em uma torre não significa dominar outra. Muitos Despertos acreditam que as Guardiãs existem para obrigar guerreiros a expandirem suas builds e superarem suas limitações.</p>
 
@@ -10622,10 +11782,10 @@ document.addEventListener('DOMContentLoaded', () => {
         </section>
 
         <section id="tracos-alma">
-            <h1 id="tracos-alma">Traços da Alma</h1>
+            <h1>Traços da Alma</h1>
             <h2>Sistema Expandido de Traços</h2>
             
-            <p>Ao manifestar seu Núcleo da Alma, cada Desperto desenvolve **Traços únicos** — fragmentos de sua identidade, experiências e evolução que moldam tanto suas capacidades quanto suas limitações.</p>
+            <p>Ao manifestar seu Núcleo da Alma, cada Desperto desenvolve <strong>Traços únicos</strong> — fragmentos de sua identidade, experiências e evolução que moldam tanto suas capacidades quanto suas limitações.</p>
 
             <h3>Regras Gerais</h3>
             <ul>
@@ -11658,8 +12818,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <strong>Aviso Importante:</strong> Ferreiros de nível V e VI quase nunca aceitam apenas dinheiro. Quando eles cobram um preço "não medido em Espíritos", estão falando sério. Muitos clientes que aceitaram esses termos desapareceram, enlouqueceram ou voltaram transformados de formas que não conseguem explicar.
         </div>
 
-        <h4 id="materiais">Qualidade do Material: Núcleo + Origem</h4>
-        <p>A qualidade final de um item depende principalmente de dois fatores: a **Qualidade do Núcleo** e o **Tier do Monstro** de onde ele veio. Abaixo está a tabela de **Potencial Bruto do Material**, que os jogadores e ferreiros usam como referência.</p>
+        <h4 id="qualidade-material">Qualidade do Material: Núcleo + Origem</h4>
+        <p>A qualidade final de um item depende principalmente de dois fatores: a <strong>Qualidade do Núcleo</strong> e o <strong>Tier do Monstro</strong> de onde ele veio. Abaixo está a tabela de <strong>Potencial Bruto do Material</strong>, que os jogadores e ferreiros usam como referência.</p>
 
         <div class="table-wrapper">
             <table>
