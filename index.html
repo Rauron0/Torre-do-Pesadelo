@@ -5538,156 +5538,197 @@ async function _indexarPersonagensUsuarioAtual() {
   }
 }
 
+// Evita que o auto-refresh de 30s comece uma nova varredura por cima de
+// uma que ainda está rodando — cada chamada sobreposta resetava a tela
+// pra "Carregando..." de novo, e em sistemas com muitos usuários a
+// varredura pesada (abaixo) podia demorar mais que os 30s do intervalo,
+// criando um efeito cascata onde o ranking nunca terminava de aparecer.
+let _rankingCarregando = false;
+// A varredura de fallback (todo usuário + coleção fichas inteira) é cara
+// e só serve pra achar personagens AINDA não migrados pro rankingGlobal.
+// Rodar isso em TODA atualização de 30s é desnecessário e cresce com o
+// tamanho da base de jogadores — agora só roda uma vez por sessão.
+let _fallbackScanFeito = false;
+
 async function carregarRanking() {
   const grid = document.getElementById('ranking-grid');
   if (!grid) return;
-  if (!window.db || !window.doc || !window.getDoc) {
-    grid.innerHTML = '<div class="lendas-loading"><p style="color:var(--text-muted)">Firebase não disponível.</p></div>';
-    return;
-  }
-
-  grid.innerHTML = `<div class="lendas-loading"><div class="lendas-loading-rune"><svg class="ic"><use href="#ic-moon"/></svg></div><p>Invocando os registros do Abismo...</p></div>`;
-
-  const fichas = [];
-  const idsConhecidos = new Set();
-  // Só GM/ADM têm permissão (pelas regras do Firestore) de gravar a entrada
-  // de ranking de OUTRO usuário. Jogadores comuns só migram a própria ficha
-  // (isso já acontece normalmente em _indexarPersonagensUsuarioAtual / ao
-  // salvar a própria ficha). Sem este filtro, qualquer jogador que abrisse
-  // o Livro das Lendas tentava escrever em nome de quem ainda não tinha
-  // sido migrado, e o Firestore corretamente negava — gerando o aviso de
-  // "Falha de acesso ao banco de dados" na tela de qualquer visitante.
-  const podeMigrarOutros = (roleAtual === 'gm' || roleAtual === 'adm');
-
-  // ═══ FONTE PRINCIPAL: rankingGlobal ═══════════════════════════════
-  // Uma única leitura de coleção traz TODOS os personagens (players,
-  // GMs, ADMs, antigos e novos) sem depender de USUARIOS e sem o
-  // custo de N×M leituras (1 leitura por usuário × personagens).
-  if (window.collection && window.getDocs) {
-    try {
-      const rankingSnap = await window.getDocs(window.collection(window.db, 'rankingGlobal'));
-      rankingSnap.forEach(docSnap => {
-        const d = docSnap.data() || {};
-        if (d.status === 'arquivado') return; // compat: registros antigos podem ter sido marcados assim
-        fichas.push(_fichaFromRankingGlobal(docSnap.id, d));
-        idsConhecidos.add(docSnap.id);
-      });
-    } catch(e) {
-      _diag('carregarRanking → leitura de rankingGlobal', e);
-      console.warn('[Ranking] Erro ao ler rankingGlobal, usando apenas fallback por ficha:', e);
+  if (_rankingCarregando) return;
+  _rankingCarregando = true;
+  try {
+    if (!window.db || !window.doc || !window.getDoc) {
+      grid.innerHTML = '<div class="lendas-loading"><p style="color:var(--text-muted)">Firebase não disponível.</p></div>';
+      return;
     }
-  } else {
-    console.warn('[Ranking] collection/getDocs indisponíveis — usando apenas fallback por ficha.');
-  }
 
-  // ═══ FALLBACK: fichas antigas ainda não migradas para rankingGlobal ═══
-  // Cobre personagens criados/salvos antes desta atualização (que ainda
-  // não passaram por updateRankingEntry). Na próxima vez que o jogador
-  // salvar a ficha, o registro passa a existir em rankingGlobal.
-  const todos = Object.entries(USUARIOS);
-  for (const [user, info] of todos) {
-    try {
-      const listaSnap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(user)));
-      let listaPersonagens = [];
-      if (listaSnap.exists()) listaPersonagens = JSON.parse(listaSnap.data().lista || '[]');
-      if (!listaPersonagens.length) continue;
+    // Só mostra a tela de "carregando" na primeira vez — em atualizações
+    // automáticas seguintes, evita o "flash" que jogava a tela de volta
+    // pro estado de loading toda hora.
+    if (!_fallbackScanFeito) {
+      grid.innerHTML = `<div class="lendas-loading"><div class="lendas-loading-rune"><svg class="ic"><use href="#ic-moon"/></svg></div><p>Invocando os registros do Abismo...</p></div>`;
+    }
 
-      for (const nomePersonagem of listaPersonagens) {
-        const fichaDocId = _fsDocId(user, nomePersonagem);
-        if (idsConhecidos.has(fichaDocId)) continue; // já coberto por rankingGlobal
+    const fichas = [];
+    const idsConhecidos = new Set();
+    // Só GM/ADM têm permissão (pelas regras do Firestore) de gravar a entrada
+    // de ranking de OUTRO usuário. Jogadores comuns só migram a própria ficha
+    // (isso já acontece normalmente em _indexarPersonagensUsuarioAtual / ao
+    // salvar a própria ficha). Sem este filtro, qualquer jogador que abrisse
+    // o Livro das Lendas tentava escrever em nome de quem ainda não tinha
+    // sido migrado, e o Firestore corretamente negava — gerando o aviso de
+    // "Falha de acesso ao banco de dados" na tela de qualquer visitante.
+    const podeMigrarOutros = (roleAtual === 'gm' || roleAtual === 'adm');
 
+    // ═══ FONTE PRINCIPAL: rankingGlobal ═══════════════════════════════
+    // Uma única leitura de coleção traz TODOS os personagens (players,
+    // GMs, ADMs, antigos e novos) sem depender de USUARIOS e sem o
+    // custo de N×M leituras (1 leitura por usuário × personagens).
+    if (window.collection && window.getDocs) {
+      try {
+        const rankingSnap = await window.getDocs(window.collection(window.db, 'rankingGlobal'));
+        rankingSnap.forEach(docSnap => {
+          const d = docSnap.data() || {};
+          if (d.status === 'arquivado') return; // compat: registros antigos podem ter sido marcados assim
+          fichas.push(_fichaFromRankingGlobal(docSnap.id, d));
+          idsConhecidos.add(docSnap.id);
+        });
+      } catch(e) {
+        _diag('carregarRanking → leitura de rankingGlobal', e);
+        console.warn('[Ranking] Erro ao ler rankingGlobal, usando apenas fallback por ficha:', e);
+      }
+    } else {
+      console.warn('[Ranking] collection/getDocs indisponíveis — usando apenas fallback por ficha.');
+    }
+
+    // ═══ FALLBACK: fichas antigas ainda não migradas para rankingGlobal ═══
+    // Cobre personagens criados/salvos antes desta atualização (que ainda
+    // não passaram por updateRankingEntry). Pesado (1 leitura por usuário
+    // cadastrado + leitura da coleção fichas inteira) — por isso só roda
+    // uma vez por sessão (ver _fallbackScanFeito), não em todo auto-refresh.
+    if (!_fallbackScanFeito) {
+      const todos = Object.entries(USUARIOS);
+      for (const [user, info] of todos) {
         try {
-          const f = await _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId);
-          if (f) {
-            fichas.push(f);
-            idsConhecidos.add(fichaDocId);
-            // Migra automaticamente para rankingGlobal para evitar custo futuro
-            // (apenas GM/ADM — ver comentário em podeMigrarOutros acima)
-            if (podeMigrarOutros) {
-              try {
-                const dadosSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
-                if (dadosSnap.exists()) {
-                  const raw = dadosSnap.data().dados;
-                  const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
-                  await updateRankingEntry(user, nomePersonagem, d, f.foto || null, true);
-                  console.log('[Ranking] Auto-migrado para rankingGlobal:', fichaDocId);
+          const listaSnap = await window.getDoc(window.doc(window.db, 'chars', _charsDocId(user)));
+          let listaPersonagens = [];
+          if (listaSnap.exists()) listaPersonagens = JSON.parse(listaSnap.data().lista || '[]');
+          if (!listaPersonagens.length) continue;
+
+          for (const nomePersonagem of listaPersonagens) {
+            const fichaDocId = _fsDocId(user, nomePersonagem);
+            if (idsConhecidos.has(fichaDocId)) continue; // já coberto por rankingGlobal
+
+            try {
+              const f = await _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId);
+              if (f) {
+                fichas.push(f);
+                idsConhecidos.add(fichaDocId);
+                // Migra automaticamente para rankingGlobal para evitar custo futuro
+                // (apenas GM/ADM — ver comentário em podeMigrarOutros acima)
+                if (podeMigrarOutros) {
+                  try {
+                    const dadosSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
+                    if (dadosSnap.exists()) {
+                      const raw = dadosSnap.data().dados;
+                      const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+                      await updateRankingEntry(user, nomePersonagem, d, f.foto || null, true);
+                      console.log('[Ranking] Auto-migrado para rankingGlobal:', fichaDocId);
+                    }
+                  } catch(me) { console.warn('[Ranking] Erro na auto-migração:', fichaDocId, me); }
                 }
-              } catch(me) { console.warn('[Ranking] Erro na auto-migração:', fichaDocId, me); }
-            }
+              }
+            } catch(e) { console.warn('[Ranking] fallback', user, nomePersonagem, e); }
           }
-        } catch(e) { console.warn('[Ranking] fallback', user, nomePersonagem, e); }
+        } catch(e) { console.warn('[Ranking] user:', user, e); }
       }
-    } catch(e) { console.warn('[Ranking] user:', user, e); }
-  }
 
-  // ═══ FALLBACK EXTRA: varredura da coleção fichas ═══
-  // Captura personagens que existem em fichas/ mas NÃO estão em chars/
-  // (ex: personagens criados antes do sistema de lista, ou por GMs).
-  if (window.collection && window.getDocs) {
-    try {
-      const fichasSnap = await window.getDocs(window.collection(window.db, 'fichas'));
-      for (const docSnap of fichasSnap.docs) {
-        const docId = docSnap.id;
-        if (idsConhecidos.has(docId)) continue; // já incluído
-        const data = docSnap.data() || {};
-        if (data.status === 'arquivado') continue;
-        const user = data.user || '';
-        if (!user) continue;
-        const nomePersonagem = data.personagem || docId.replace(new RegExp('^' + _sanitizeDocPart(user) + '_'), '');
-        const info = USUARIOS[user] || { nome: user, role: 'player' };
+      // ═══ FALLBACK EXTRA: varredura da coleção fichas ═══
+      // Captura personagens que existem em fichas/ mas NÃO estão em chars/
+      // (ex: personagens criados antes do sistema de lista, ou por GMs).
+      if (window.collection && window.getDocs) {
         try {
-          const f = await _fichaFallbackIndividual(user, info, nomePersonagem, docId);
-          if (f) {
-            fichas.push(f);
-            idsConhecidos.add(docId);
-            // Migra para rankingGlobal (apenas GM/ADM — ver podeMigrarOutros)
-            if (podeMigrarOutros) {
-              try {
-                const raw = data.dados;
-                const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
-                await updateRankingEntry(user, nomePersonagem, d, f.foto || null, true);
-                console.log('[Ranking] Auto-migrado (varredura fichas):', docId);
-              } catch(me) {}
-            }
+          const fichasSnap = await window.getDocs(window.collection(window.db, 'fichas'));
+          for (const docSnap of fichasSnap.docs) {
+            const docId = docSnap.id;
+            if (idsConhecidos.has(docId)) continue; // já incluído
+            const data = docSnap.data() || {};
+            if (data.status === 'arquivado') continue;
+            const user = data.user || '';
+            if (!user) continue;
+            const nomePersonagem = data.personagem || docId.replace(new RegExp('^' + _sanitizeDocPart(user) + '_'), '');
+            const info = USUARIOS[user] || { nome: user, role: 'player' };
+            try {
+              const f = await _fichaFallbackIndividual(user, info, nomePersonagem, docId);
+              if (f) {
+                fichas.push(f);
+                idsConhecidos.add(docId);
+                // Migra para rankingGlobal (apenas GM/ADM — ver podeMigrarOutros)
+                if (podeMigrarOutros) {
+                  try {
+                    const raw = data.dados;
+                    const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+                    await updateRankingEntry(user, nomePersonagem, d, f.foto || null, true);
+                    console.log('[Ranking] Auto-migrado (varredura fichas):', docId);
+                  } catch(me) {}
+                }
+              }
+            } catch(e) { console.warn('[Ranking] varredura fichas:', docId, e); }
           }
-        } catch(e) { console.warn('[Ranking] varredura fichas:', docId, e); }
+        } catch(e) { console.warn('[Ranking] Erro na varredura da coleção fichas:', e); }
       }
-    } catch(e) { console.warn('[Ranking] Erro na varredura da coleção fichas:', e); }
-  }
 
-  // ═══ PERSONALIZAÇÕES (tema, wallpaper, gifs) ═══
-  // Leitura individual — não reintroduz o custo N×M, pois o ranking em
-  // si já é resolvido em 1 leitura via rankingGlobal.
-  for (const f of fichas) {
-    const pid = _fsDocId(f.user, f.nomePersonagem);
-    if (_personalizacoes[pid]) continue;
-    try {
-      const pSnap = await window.getDoc(window.doc(window.db, 'personalizacoes', pid));
-      if (pSnap.exists()) _personalizacoes[pid] = pSnap.data();
-    } catch(e) {}
-  }
-
-  // ── Filtra personagens ocultos pelo GM antes de renderizar ──
-  const visiveis = fichas.filter(f => {
-    const docId = _fsDocId(f.user, f.nomePersonagem);
-    return !_rankingOcultos.has(docId);
-  });
-
-  _lendasFichas = visiveis;
-  renderizarCartoes(visiveis, _abaAtual);
-
-  if (!_rankingInterval) {
-    _rankingInterval = setInterval(() => {
-      // Só recarrega se o painel de ranking estiver visível.
-      // BUG CORRIGIDO: checava o id "lendas" (nunca existiu — a seção real
-      // é #secao-ranking). Por causa do && em cascata, a condição era
-      // sempre falsa e o auto-refresh de 30s nunca chegava a disparar.
-      const grid = document.getElementById('ranking-grid');
-      const secaoRanking = document.getElementById('secao-ranking');
-      if (grid && secaoRanking && secaoRanking.offsetParent !== null) {
-        carregarRanking();
+      _fallbackScanFeito = true;
+    } else {
+      // Já fizemos a varredura pesada antes nesta sessão — mantém na lista
+      // os personagens "fallback" já encontrados anteriormente, já que eles
+      // continuam fora do rankingGlobal até serem migrados.
+      for (const f of _lendasFichas) {
+        const docId = _fsDocId(f.user, f.nomePersonagem);
+        if (!idsConhecidos.has(docId)) {
+          fichas.push(f);
+          idsConhecidos.add(docId);
+        }
       }
-    }, 30000);
+    }
+
+    // ═══ PERSONALIZAÇÕES (tema, wallpaper, gifs) ═══
+    // Leitura individual — não reintroduz o custo N×M, pois o ranking em
+    // si já é resolvido em 1 leitura via rankingGlobal. Já é condicional
+    // por personagem (_personalizacoes[pid]), então atualizações seguintes
+    // só leem o que ainda não está em cache.
+    for (const f of fichas) {
+      const pid = _fsDocId(f.user, f.nomePersonagem);
+      if (_personalizacoes[pid]) continue;
+      try {
+        const pSnap = await window.getDoc(window.doc(window.db, 'personalizacoes', pid));
+        if (pSnap.exists()) _personalizacoes[pid] = pSnap.data();
+      } catch(e) {}
+    }
+
+    // ── Filtra personagens ocultos pelo GM antes de renderizar ──
+    const visiveis = fichas.filter(f => {
+      const docId = _fsDocId(f.user, f.nomePersonagem);
+      return !_rankingOcultos.has(docId);
+    });
+
+    _lendasFichas = visiveis;
+    renderizarCartoes(visiveis, _abaAtual);
+
+    if (!_rankingInterval) {
+      _rankingInterval = setInterval(() => {
+        // Só recarrega se o painel de ranking estiver visível.
+        // BUG CORRIGIDO: checava o id "lendas" (nunca existiu — a seção real
+        // é #secao-ranking). Por causa do && em cascata, a condição era
+        // sempre falsa e o auto-refresh de 30s nunca chegava a disparar.
+        const grid = document.getElementById('ranking-grid');
+        const secaoRanking = document.getElementById('secao-ranking');
+        if (grid && secaoRanking && secaoRanking.offsetParent !== null) {
+          carregarRanking();
+        }
+      }, 30000);
+    }
+  } finally {
+    _rankingCarregando = false;
   }
 }
 
