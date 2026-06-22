@@ -1957,6 +1957,11 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 }
 
 /* ── AVATAR ÉPICO ── */
+/* Nota: NÃO usar overflow:hidden aqui — o selo de rank (::after, abaixo)
+   fica de propósito com bottom:-6px, parcialmente fora da caixa do wrap.
+   A defesa contra imagem "vazando" já está garantida no .livro-avatar
+   abaixo (width/height/max-width/max-height fixos + object-fit:cover),
+   que é a camada correta e suficiente para isso. */
 .livro-avatar-wrap {
   flex-shrink: 0;
   position: relative;
@@ -1964,6 +1969,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 }
 .livro-avatar {
   width: 130px; height: 130px;
+  max-width: 130px; max-height: 130px;
   border-radius: 6px;
   object-fit: cover;
   border: 3px solid rgba(193,63,63,.75);
@@ -1981,7 +1987,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   box-shadow: 0 8px 40px rgba(0,0,0,.95), 0 0 50px rgba(210,74,74,.4);
 }
 .livro-avatar-placeholder {
-  width: 130px; height: 130px; border-radius: 6px;
+  width: 130px; height: 130px; max-width: 130px; max-height: 130px; border-radius: 6px;
   border: 3px solid rgba(193,63,63,.5);
   background: linear-gradient(160deg, #1a0a0a 0%, #0d0b12 100%);
   display: flex; align-items: center; justify-content: center;
@@ -2151,6 +2157,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   .livro-avatar {
     width: 116px;
     height: 116px;
+    max-width: 116px;
+    max-height: 116px;
     border-radius: 8px;
     border: 3px solid rgba(193,63,63,.85);
     box-shadow:
@@ -2164,6 +2172,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   .livro-avatar-placeholder {
     width: 116px;
     height: 116px;
+    max-width: 116px;
+    max-height: 116px;
     border-radius: 8px;
     border: 3px solid rgba(193,63,63,.6);
     font-size: 3rem;
@@ -5136,8 +5146,55 @@ function _escHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// Escapa texto livre (ex.: nome de personagem) para uso seguro DENTRO de
+// uma string JS de aspas simples, que por sua vez está embutida num
+// atributo HTML de aspas duplas — padrão usado em toda parte como
+// onclick="minhaFuncao('${_escJsAttr(nome)}')".
+// Mesma família do bug do avatar (ver _escUrl acima), só que disparada
+// por um NOME com aspas duplas em vez de uma URL de foto: ex. um
+// personagem chamado Jeff "the Killer" quebraria o atributo onclick="..."
+// inteiro no primeiro " do nome, vazando o resto do markup pra fora —
+// idêntico ao que acontecia com o avatar. \\' escapa a aspa simples (pra
+// não fechar a string JS antes da hora) e &quot; escapa a aspa dupla via
+// entidade HTML (o navegador decodifica de volta pra " só depois de já
+// ter fechado corretamente o atributo, então o JS recebe o caractere
+// original sem nunca expor uma " literal dentro do atributo).
+function _escJsAttr(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '\\n');
+}
+
 function icone(nome, cls = '') {
   return `<svg class="ic ${cls}" aria-hidden="true"><use href="#ic-${nome}"/></svg>`;
+}
+
+// ── FALLBACK SEGURO DE AVATAR (correção de bug crítico) ─────────────────
+// ANTES: o onerror do avatar do Grimório (livro-avatar) fazia
+//   onerror="this.outerHTML='<div...>${icone('sword','ic-xl')}</div>'"
+// O HTML devolvido por icone() contém aspas duplas (class="ic ic-xl",
+// aria-hidden="true"). Como esse HTML era colado DENTRO do valor do
+// atributo onerror="..." (também delimitado por aspas duplas), o parser
+// do navegador fechava o atributo no primeiro " que encontrasse dentro do
+// SVG — MUITO antes do onerror realmente disparar. Ou seja, a página já
+// nascia com a tag <img> corrompida no momento em que o HTML era montado
+// (overlay.innerHTML = ...), não só quando a foto falhava ao carregar.
+// Isso acontecia em QUALQUER personagem com foto (f.foto truthy), pois é
+// nesse ramo do ternário que o onerror malformado existia; personagens
+// sem foto usavam o <div> placeholder direto (sem atributo), por isso
+// nunca quebravam. É exatamente a causa do "Jeff quebrado / Liev OK".
+// AGORA: o onerror só chama uma função JS por nome (sem HTML embutido em
+// atributo), e a função monta o placeholder via DOM, sem risco de aspas
+// conflitantes — corrige a causa raiz para qualquer imagem futura também.
+function _avatarFallback(imgEl) {
+  if (!imgEl || !imgEl.parentNode) return;
+  const div = document.createElement('div');
+  div.className = 'livro-avatar-placeholder';
+  div.innerHTML = icone('sword', 'ic-xl');
+  imgEl.replaceWith(div);
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -6080,7 +6137,7 @@ function _renderComposerPost(pid, authorUser, authorPersonagem) {
         </button>
         <button type="button" onclick="removerAnexoPost()" style="background:none;border:none;color:var(--text-muted);font-size:.78rem;cursor:pointer;text-decoration:underline;padding:.6rem;min-height:44px">remover anexo</button>
       </div>
-      <button type="button" onclick="publicarPost('${pid}','${authorUser}','${authorPersonagem.replace(/'/g,"\\'")}')" style="width:100%;margin-top:.6rem;background:var(--accent);border:none;color:#fff;padding:.7rem 1.2rem;font-family:'Playfair Display',serif;font-size:.9rem;cursor:pointer;min-height:44px">Publicar</button>
+      <button type="button" onclick="publicarPost('${pid}','${authorUser}','${_escJsAttr(authorPersonagem)}')" style="width:100%;margin-top:.6rem;background:var(--accent);border:none;color:#fff;padding:.7rem 1.2rem;font-family:'Playfair Display',serif;font-size:.9rem;cursor:pointer;min-height:44px">Publicar</button>
     </div>
   `;
 }
@@ -6330,7 +6387,7 @@ function abrirEditarPerfilUsuario() {
     <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;max-width:380px;width:90%;max-height:80vh;overflow-y:auto;padding:1.3rem" onclick="event.stopPropagation()">
       <h3 style="margin:0 0 .9rem;font-family:'Playfair Display',serif;color:var(--gold-light)">Editar Perfil de Usuário</h3>
       <div style="text-align:center;margin-bottom:.8rem">
-        <img id="editar-usuario-foto-preview" src="${dadosAtuais.foto || ''}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--border);display:${dadosAtuais.foto ? 'inline-block' : 'none'};margin-bottom:.5rem" onerror="this.style.display='none'">
+        <img id="editar-usuario-foto-preview" src="${_escUrl(dadosAtuais.foto)}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--border);display:${dadosAtuais.foto ? 'inline-block' : 'none'};margin-bottom:.5rem" onerror="this.style.display='none'">
         <div>
           <button type="button" onclick="abrirSeletorFotoUsuario()" style="background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.5rem .9rem;font-family:inherit;font-size:.78rem;cursor:pointer;min-height:44px">Trocar Foto</button>
         </div>
@@ -6393,7 +6450,7 @@ async function _carregarPersonagensVinculados(targetUser) {
     const lista = snap.exists() ? (JSON.parse(snap.data().lista || '[]')) : [];
     if (!lista.length) { container.innerHTML = '<span class="livro-area-empty">Nenhum personagem vinculado.</span>'; return; }
     container.innerHTML = lista.map(nome => `
-      <button onclick="_abrirPersonagemVinculado('${_normUser(targetUser)}','${nome.replace(/'/g,"\\'")}')"
+      <button onclick="_abrirPersonagemVinculado('${_normUser(targetUser)}','${_escJsAttr(nome)}')"
         style="display:flex;align-items:center;gap:.5rem;width:100%;text-align:left;cursor:pointer;background:rgba(255,255,255,.02);border:1px solid var(--border);padding:.7rem;margin-bottom:.5rem;min-height:44px;color:var(--text);font-family:inherit;font-size:.85rem">
         <svg class="ic ic-sm"><use href="#ic-ficha"/></svg> ${_escHtml(nome)}
       </button>
@@ -6502,14 +6559,19 @@ function abrirPerfilPublico(f) {
   // Títulos
   const titulosArr = (f.socTitulos||'').split(',').map(s=>s.trim()).filter(Boolean);
   const _perfilEhProprio = (f.user === usuarioAtual && (f.nomePersonagem||f.nome) === personagemAtual);
-  const _nomePersonagemEscapado = (f.nomePersonagem||f.nome||'').replace(/'/g,"\\'");
+  const _nomePersonagemEscapado = _escJsAttr(f.nomePersonagem||f.nome||'');
   const titulosHtml = titulosArr.length
     ? titulosArr.map(t=>`<span class="livro-badge">${_escHtml(t)}</span>`).join('')
     : '<span style="color:#444;font-size:.8rem;font-style:italic">Nenhum título ostentado.</span>';
 
-  // Avatar com lightbox ao clicar
+  // Avatar com lightbox ao clicar.
+  // onerror chama _avatarFallback(this) — uma função JS por nome, sem HTML
+  // embutido dentro do atributo (ver comentário em _avatarFallback acima
+  // para o bug que isso corrige). loading="lazy" evita travar o parsing
+  // em fotos muito grandes; decoding="async" evita bloquear a thread
+  // principal durante a decodificação de imagens pesadas.
   const avatarHtml = f.foto
-    ? `<img class="livro-avatar" src="${_escUrl(f.foto)}" alt="${_escHtml(f.nome)}" onclick="abrirLightbox('${_escUrl(f.foto)}')" title="Ampliar foto" onerror="this.outerHTML='<div class=\\'livro-avatar-placeholder\\'>${icone('sword','ic-xl')}</div>'">`
+    ? `<img class="livro-avatar" src="${_escUrl(f.foto)}" alt="${_escHtml(f.nome)}" onclick="abrirLightbox('${_escUrl(f.foto)}')" title="Ampliar foto" loading="lazy" decoding="async" onerror="_avatarFallback(this)">`
     : `<div class="livro-avatar-placeholder">${icone('sword','ic-xl')}</div>`;
 
   // Tags — exibidas no header do perfil.
@@ -7472,7 +7534,7 @@ function abrirAcoesMiniatura(slot, src) {
           onmouseover="this.style.background='rgba(193,63,63,.25)'" onmouseout="this.style.background='rgba(156,42,42,.15)'">
           <svg class="ic"><use href="#ic-close"/></svg> Remover Foto
         </button>
-        <button onclick="abrirLightbox('${src.replace(/'/g,"\\'")}')"
+        <button onclick="abrirLightbox('${_escUrl(src)}')"
           style="width:100%;padding:.5rem;background:none;border:1px solid rgba(50,40,65,.6);color:var(--text-muted);font-family:inherit;font-size:.82rem;cursor:pointer;transition:all .2s"
           onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='rgba(50,40,65,.6)'">
           ⤢ Ampliar
@@ -7690,9 +7752,13 @@ function atualizarFichaHero() {
     ? `<img src="${_escUrl(_fotoPrincipal)}" class="ficha-hero-foto-img" onclick="abrirSeletorFotoPrincipal()" title="Trocar foto">`
     : `<div class="ficha-hero-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><svg class="ic ic-xl"><use href="#ic-camera"/></svg><span>Foto</span></div>`;
 
-  // Miniaturas no hero — clique abre painel de ação
+  // Miniaturas no hero — clique abre painel de ação.
+  // Usa _escUrl (já usado em todo o resto do arquivo) em vez de um
+  // replace manual que só tratava aspas simples — uma URL com aspas
+  // duplas ainda quebraria o atributo src="..." do mesmo jeito que o
+  // bug do avatar do Grimório, só que aqui na ficha do próprio jogador.
   const miniHtml = _galeriaFotos.map((src, i) => {
-    if (src) return `<img class="ficha-hero-mini-img" src="${src.replace(/'/g,"&apos;")}" onclick="abrirAcoesMiniatura(${i},'${src.replace(/'/g,"\\'")}');" title="Gerenciar foto">`;
+    if (src) return `<img class="ficha-hero-mini-img" src="${_escUrl(src)}" onclick="abrirAcoesMiniatura(${i},'${_escUrl(src)}')" title="Gerenciar foto">`;
     return `<div class="ficha-hero-mini-placeholder" onclick="adicionarFotoGaleria(${i})" title="Adicionar miniatura">+</div>`;
   }).join('');
 
@@ -8065,13 +8131,13 @@ function editarNomePersonagem(nomeAntigo) {
     <div class="modal-confirm" style="max-width:400px">
       <div class="modal-confirm-title"><svg class="ic"><use href="#ic-edit"/></svg> Renomear Personagem</div>
       <div class="modal-confirm-sub" style="margin-bottom:1rem">
-        <input id="input-renomear-personagem" type="text" value="${nomeAntigo.replace(/"/g,'&quot;')}"
+        <input id="input-renomear-personagem" type="text" value="${_escHtml(nomeAntigo)}"
           style="width:100%;background:var(--bg-input);border:1px solid var(--accent-light);color:var(--text);padding:.6rem .8rem;font-family:inherit;font-size:.95rem;outline:none;"
-          onkeydown="if(event.key==='Enter')_confirmarRenomear('${nomeAntigo.replace(/'/g,"\\'")}');if(event.key==='Escape')document.getElementById('modal-renomear-overlay').remove()">
+          onkeydown="if(event.key==='Enter')_confirmarRenomear('${_escJsAttr(nomeAntigo)}');if(event.key==='Escape')document.getElementById('modal-renomear-overlay').remove()">
       </div>
       <div class="modal-confirm-btns">
         <button class="modal-confirm-cancel" onclick="document.getElementById('modal-renomear-overlay').remove()">Cancelar</button>
-        <button class="modal-confirm-ok" onclick="_confirmarRenomear('${nomeAntigo.replace(/'/g,"\\'")}')">✓ Renomear</button>
+        <button class="modal-confirm-ok" onclick="_confirmarRenomear('${_escJsAttr(nomeAntigo)}')">✓ Renomear</button>
       </div>
     </div>`;
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
@@ -10486,7 +10552,7 @@ async function renderGMPlayers() {
     // a mesma ficha completa (atributos, técnicas, pets, armas, inventário,
     // perícias, identidade pública, Grimório social) que o player vê.
     const botoesPersonagens = personagens.length
-      ? personagens.map(p => `<button class="gm-perso-edit-btn" onclick="gmAssumirPersonagem('${user}','${p.replace(/'/g,"\\'")}')">${icone('edit','ic-sm')} ${p}</button>`).join('')
+      ? personagens.map(p => `<button class="gm-perso-edit-btn" onclick="gmAssumirPersonagem('${_escJsAttr(user)}','${_escJsAttr(p)}')">${icone('edit','ic-sm')} ${_escHtml(p)}</button>`).join('')
       : `<span style="color:#555;font-size:.78rem;font-style:italic">Nenhum personagem criado ainda.</span>`;
     card.innerHTML = `
       <div class="player-card-header" onclick="togglePlayerCard('gm-body-${user}')">
