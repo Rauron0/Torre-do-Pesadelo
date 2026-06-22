@@ -5103,6 +5103,21 @@ function getDespertar(dados) {
 // ═══ HELPER DE ÍCONES SVG ═══════════════════════════════════════════════
 // Gera markup de um ícone do sprite. Uso em template strings:
 //   ${icone('sword')}  ou  ${icone('crown','ic-lg')}
+// Escapa caracteres especiais de HTML antes de inserir texto livre do
+// jogador no innerHTML. Sem isso, um campo contendo "<" ou ">" (ex: poder
+// chamado "Lâmina <Sombria>") é interpretado pelo navegador como uma tag
+// HTML de verdade, quebrando a estrutura da página pra aquele personagem
+// especificamente — sempre do mesmo jeito, já que o dado não muda.
+function _escHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function icone(nome, cls = '') {
   return `<svg class="ic ${cls}" aria-hidden="true"><use href="#ic-${nome}"/></svg>`;
 }
@@ -5318,7 +5333,7 @@ function renderizarCartoes(fichas, aba) {
     const wp = WALLPAPERS.find(w => w.id === p.wallpaper);
 
     const avatarHtml = f.foto
-      ? `<div class="lenda-avatar-frame"><img class="lenda-avatar" src="${f.foto}" alt="${f.nome}" onerror="this.parentElement.innerHTML='<div class=\\'lenda-avatar-placeholder\\'>⚔</div>'"></div>`
+      ? `<div class="lenda-avatar-frame"><img class="lenda-avatar" src="${f.foto}" alt="${_escHtml(f.nome)}" onerror="this.parentElement.innerHTML='<div class=\\'lenda-avatar-placeholder\\'>⚔</div>'"></div>`
       : `<div class="lenda-avatar-placeholder">⚔</div>`;
 
     // Título principal: primeiro item da lista de títulos do Grimório social
@@ -5336,17 +5351,17 @@ function renderizarCartoes(fichas, aba) {
         <div class="lenda-card-overlay"></div>
         <div class="lenda-card-body">
           <span class="lenda-card-rank ${posClass}">${posLabel}</span>
-          ${f.faccao ? `<span class="lenda-card-faccao-badge">${f.faccao}</span>` : ''}
+          ${f.faccao ? `<span class="lenda-card-faccao-badge">${_escHtml(f.faccao)}</span>` : ''}
           <div class="lenda-avatar-wrap">${avatarHtml}</div>
-          <div class="lenda-nome">${f.nome}</div>
-          ${f.alcunha ? `<div class="lenda-alcunha">"${f.alcunha}"</div>` : ''}
-          ${f.classe ? `<div class="lenda-classe">${f.classe}</div>` : ''}
-          ${tituloPrincipal ? `<div class="lenda-titulo">${icone('crown','ic-sm')} ${tituloPrincipal}</div>` : ''}
-          ${f.poder && f.poder !== '—' ? `<div class="lenda-poder">${icone('prism','ic-sm')} ${f.poder}</div>` : ''}
+          <div class="lenda-nome">${_escHtml(f.nome)}</div>
+          ${f.alcunha ? `<div class="lenda-alcunha">"${_escHtml(f.alcunha)}"</div>` : ''}
+          ${f.classe ? `<div class="lenda-classe">${_escHtml(f.classe)}</div>` : ''}
+          ${tituloPrincipal ? `<div class="lenda-titulo">${icone('crown','ic-sm')} ${_escHtml(tituloPrincipal)}</div>` : ''}
+          ${f.poder && f.poder !== '—' ? `<div class="lenda-poder">${icone('prism','ic-sm')} ${_escHtml(f.poder)}</div>` : ''}
           <div class="lenda-meta">
             <span class="lenda-meta-chip nivel">Nv. ${f.nivel}</span>
-            ${f.rank ? `<span class="lenda-meta-chip rank">${f.rank}</span>` : ''}
-            ${f.cidade ? `<span class="lenda-meta-chip">${icone('eye','ic-sm')} ${f.cidade}</span>` : ''}
+            ${f.rank ? `<span class="lenda-meta-chip rank">${_escHtml(f.rank)}</span>` : ''}
+            ${f.cidade ? `<span class="lenda-meta-chip">${icone('eye','ic-sm')} ${_escHtml(f.cidade)}</span>` : ''}
             <span class="lenda-meta-chip">${icone('core','ic-sm')} ${f.nucleos}</span>
           </div>
           <div class="lenda-power-bar">
@@ -6059,12 +6074,12 @@ function _renderPostItem(id, post, pid) {
         ? `<img src="${post.authorFoto}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
         : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg class="ic ic-sm"><use href="#ic-ficha"/></svg></div>`}
       <div style="flex:1;min-width:0">
-        <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:.9rem">${post.authorPersonagem}</div>
+        <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:.9rem">${_escHtml(post.authorPersonagem)}</div>
         <div style="font-size:.72rem;color:var(--text-muted)">${_fmtDataPost(post.ts)}</div>
       </div>
       ${podeExcluir ? `<button onclick="excluirPost('${id}','${pid}')" title="Excluir publicação" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.95rem;min-width:44px;min-height:44px;flex-shrink:0">✕</button>` : ''}
     </div>
-    ${post.conteudo ? `<div class="livro-descricao" style="margin-bottom:.5rem">${post.conteudo.replace(/\n/g,'<br>')}</div>` : ''}
+    ${post.conteudo ? `<div class="livro-descricao" style="margin-bottom:.5rem">${_escHtml(post.conteudo).replace(/\n/g,'<br>')}</div>` : ''}
     ${post.imagem ? `<img src="${post.imagem}" onclick="abrirLightbox('${post.imagem.replace(/'/g,"\\'")}')" style="width:100%;max-height:320px;object-fit:cover;cursor:pointer;border:1px solid var(--border);margin-bottom:.5rem">` : ''}
     <div style="display:flex;gap:.5rem;align-items:center;padding-top:.2rem;border-top:1px solid var(--border)">
       <button id="btn-curtir-post-${id}" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">🤍 …</button>
@@ -6151,9 +6166,9 @@ async function _carregarComentarios(postId) {
           ? `<img src="${c.authorFoto}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0">`
           : `<div style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);flex-shrink:0"></div>`}
         <div style="flex:1">
-          <span style="font-weight:600;color:var(--gold-light);font-size:.8rem">${c.authorPersonagem}</span>
+          <span style="font-weight:600;color:var(--gold-light);font-size:.8rem">${_escHtml(c.authorPersonagem)}</span>
           <span style="font-size:.7rem;color:var(--text-muted);margin-left:.4rem">${_fmtDataPost(c.ts)}</span>
-          <div style="font-size:.82rem;color:var(--text)">${(c.conteudo||'').replace(/\n/g,'<br>')}</div>
+          <div style="font-size:.82rem;color:var(--text)">${_escHtml(c.conteudo||'').replace(/\n/g,'<br>')}</div>
         </div>
       </div>`).join('');
   } catch(e) {
@@ -6226,12 +6241,12 @@ async function _renderPerfilUsuario(targetUser) {
         ? `<img src="${dados.foto}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
         : `<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg class="ic ic-lg"><use href="#ic-ficha"/></svg></div>`}
       <div style="flex:1;min-width:160px">
-        <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:1.1rem">${nomeReal}</div>
-        <div style="font-size:.75rem;color:var(--text-muted)">@${_normUser(targetUser)}</div>
+        <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:1.1rem">${_escHtml(nomeReal)}</div>
+        <div style="font-size:.75rem;color:var(--text-muted)">@${_escHtml(_normUser(targetUser))}</div>
       </div>
     </div>
     <div style="margin-top:.75rem;font-size:.85rem;color:var(--text)">
-      ${dados.bio ? dados.bio.replace(/\n/g,'<br>') : `<span class="livro-area-empty">Este jogador ainda não escreveu uma descrição.</span>`}
+      ${dados.bio ? _escHtml(dados.bio).replace(/\n/g,'<br>') : `<span class="livro-area-empty">Este jogador ainda não escreveu uma descrição.</span>`}
     </div>
     ${ehProprioUsuario ? `
     <button onclick="abrirEditarPerfilUsuario()" style="margin-top:.75rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.55rem 1rem;font-family:inherit;font-size:.8rem;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:.4rem">
@@ -6317,7 +6332,7 @@ async function _carregarPersonagensVinculados(targetUser) {
     container.innerHTML = lista.map(nome => `
       <button onclick="_abrirPersonagemVinculado('${_normUser(targetUser)}','${nome.replace(/'/g,"\\'")}')"
         style="display:flex;align-items:center;gap:.5rem;width:100%;text-align:left;cursor:pointer;background:rgba(255,255,255,.02);border:1px solid var(--border);padding:.7rem;margin-bottom:.5rem;min-height:44px;color:var(--text);font-family:inherit;font-size:.85rem">
-        <svg class="ic ic-sm"><use href="#ic-ficha"/></svg> ${nome}
+        <svg class="ic ic-sm"><use href="#ic-ficha"/></svg> ${_escHtml(nome)}
       </button>
     `).join('');
   } catch(e) {
@@ -6412,7 +6427,7 @@ function abrirPerfilPublico(f) {
   function linhas(str) { return (str||'').split('\n').map(s=>s.trim()).filter(Boolean); }
   function listaHTML(arr, vazio='Nenhum registro.') {
     if (!arr.length) return `<span class="livro-area-empty">${vazio}</span>`;
-    return `<ul class="livro-area-list">${arr.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+    return `<ul class="livro-area-list">${arr.map(i=>`<li>${_escHtml(i)}</li>`).join('')}</ul>`;
   }
 
   const pid = _fsDocId(f.user, f.nomePersonagem || f.nome);
@@ -6426,23 +6441,27 @@ function abrirPerfilPublico(f) {
   const _perfilEhProprio = (f.user === usuarioAtual && (f.nomePersonagem||f.nome) === personagemAtual);
   const _nomePersonagemEscapado = (f.nomePersonagem||f.nome||'').replace(/'/g,"\\'");
   const titulosHtml = titulosArr.length
-    ? titulosArr.map(t=>`<span class="livro-badge">${t}</span>`).join('')
+    ? titulosArr.map(t=>`<span class="livro-badge">${_escHtml(t)}</span>`).join('')
     : '<span style="color:#444;font-size:.8rem;font-style:italic">Nenhum título ostentado.</span>';
 
   // Avatar com lightbox ao clicar
   const avatarHtml = f.foto
-    ? `<img class="livro-avatar" src="${f.foto}" alt="${f.nome}" onclick="abrirLightbox('${f.foto}')" title="Ampliar foto" onerror="this.outerHTML='<div class=\\'livro-avatar-placeholder\\'>${icone('sword','ic-xl')}</div>'">`
+    ? `<img class="livro-avatar" src="${f.foto}" alt="${_escHtml(f.nome)}" onclick="abrirLightbox('${f.foto}')" title="Ampliar foto" onerror="this.outerHTML='<div class=\\'livro-avatar-placeholder\\'>${icone('sword','ic-xl')}</div>'">`
     : `<div class="livro-avatar-placeholder">${icone('sword','ic-xl')}</div>`;
 
   // Tags — exibidas no header do perfil.
   // Qualquer campo ausente (ficha antiga) simplesmente não gera tag.
+  // _escHtml() é essencial aqui: sem ele, um campo com "<" ou ">" (ex:
+  // alguém escrevendo "Facção <Sombria>") é interpretado como tag HTML de
+  // verdade pelo navegador, quebrando a estrutura da página — só pra
+  // aquele personagem especificamente, sempre do mesmo jeito.
   const tags = [];
-  if (f.despertar) tags.push(`<span class="livro-tag">${f.despertar}</span>`);
-  if (f.rank)      tags.push(`<span class="livro-tag rank">◆ ${f.rank}</span>`);
-  if (f.faccao)    tags.push(`<span class="livro-tag faccao">${f.faccao}</span>`);
-  if (f.cidade)    tags.push(`<span class="livro-tag"><svg class="ic ic-sm"><use href="#ic-eye"/></svg> ${f.cidade}</span>`);
-  if (f.genero)    tags.push(`<span class="livro-tag">${f.genero}</span>`);
-  if (f.idade)     tags.push(`<span class="livro-tag">${f.idade}</span>`);
+  if (f.despertar) tags.push(`<span class="livro-tag">${_escHtml(f.despertar)}</span>`);
+  if (f.rank)      tags.push(`<span class="livro-tag rank">◆ ${_escHtml(f.rank)}</span>`);
+  if (f.faccao)    tags.push(`<span class="livro-tag faccao">${_escHtml(f.faccao)}</span>`);
+  if (f.cidade)    tags.push(`<span class="livro-tag"><svg class="ic ic-sm"><use href="#ic-eye"/></svg> ${_escHtml(f.cidade)}</span>`);
+  if (f.genero)    tags.push(`<span class="livro-tag">${_escHtml(f.genero)}</span>`);
+  if (f.idade)     tags.push(`<span class="livro-tag">${_escHtml(f.idade)}</span>`);
   tags.push(`<span class="livro-tag nivel">Nível ${f.nivel}</span>`);
   if (f.nucleos)   tags.push(`<span class="livro-tag">◆ ${f.nucleos} núcleos</span>`);
 
@@ -6451,8 +6470,8 @@ function abrirPerfilPublico(f) {
   const timelineHtml = timelineArr.length
     ? timelineArr.map(ev => {
         const parts = ev.split('—');
-        const titulo = parts[0].trim();
-        const resto = parts.slice(1).join('—').trim();
+        const titulo = _escHtml(parts[0].trim());
+        const resto = _escHtml(parts.slice(1).join('—').trim());
         return `<div class="livro-timeline-item"><div class="livro-timeline-dot"></div><div class="livro-timeline-text"><strong>${titulo}</strong>${resto ? ' — ' + resto : ''}</div></div>`;
       }).join('')
     : '<span class="livro-area-empty">Nenhum evento registrado.</span>';
@@ -6460,7 +6479,7 @@ function abrirPerfilPublico(f) {
   // Conquistas
   const conquistasArr = linhas(f.socConquistas);
   const conquistasHtml = conquistasArr.length
-    ? `<div class="livro-badges">${conquistasArr.map(c=>`<span class="livro-badge"><svg class="ic ic-sm"><use href="#ic-moon"/></svg> ${c}</span>`).join('')}</div>`
+    ? `<div class="livro-badges">${conquistasArr.map(c=>`<span class="livro-badge"><svg class="ic ic-sm"><use href="#ic-moon"/></svg> ${_escHtml(c)}</span>`).join('')}</div>`
     : '<span class="livro-area-empty">Nenhuma conquista registrada.</span>';
 
   // Tema visual
@@ -6493,20 +6512,20 @@ function abrirPerfilPublico(f) {
         ${wallpaperUrl ? `<div class="livro-banner-bg" style="background-image:url('${wallpaperUrl}')"></div>` : ''}
         ${(p.gifPoder || p.gifTransformacao) ? `<div class="livro-banner-gif"><img src="${p.gifTransformacao || p.gifPoder}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
         <div class="livro-banner-gradient"></div>
-        ${f.rank ? `<div class="livro-banner-rank-seal">${icone('crown','ic-sm')} ${f.rank}</div>` : ''}
+        ${f.rank ? `<div class="livro-banner-rank-seal">${icone('crown','ic-sm')} ${_escHtml(f.rank)}</div>` : ''}
         <button class="livro-close" onclick="document.getElementById('livro-overlay').remove()" title="Fechar">${icone('close')}</button>
       </div>
 
       <!-- ═══ HEADER: FOTO + IDENTIDADE ═══ -->
       <div class="livro-profile-header">
-        <div class="livro-avatar-wrap" ${f.rank ? `data-pos="${f.rank}"` : ''}>
+        <div class="livro-avatar-wrap" ${f.rank ? `data-pos="${_escHtml(f.rank)}"` : ''}>
           ${avatarHtml}
         </div>
         <div class="livro-profile-info">
 
           <!-- Nome + Alcunha -->
-          <div class="livro-nome">${f.nome}</div>
-          ${f.alcunha ? `<div class="livro-alcunha">"${f.alcunha}"</div>` : ''}
+          <div class="livro-nome">${_escHtml(f.nome)}</div>
+          ${f.alcunha ? `<div class="livro-alcunha">"${_escHtml(f.alcunha)}"</div>` : ''}
 
           <!-- Poder Principal — bloco épico com ícone de prisma -->
           ${f.poder && f.poder !== '—' ? `
@@ -6514,21 +6533,21 @@ function abrirPerfilPublico(f) {
             ${p.gifPoder
               ? `<img class="livro-poder-gif" src="${p.gifPoder}" alt="" onerror="this.style.display='none'">`
               : `<svg class="ic" style="color:var(--accent-light);opacity:.85"><use href="#ic-prism"/></svg>`}
-            <span>${f.poder}</span>
+            <span>${_escHtml(f.poder)}</span>
           </div>` : ''}
 
           <!-- Título — só exibe se o personagem tiver pelo menos um -->
           ${titulosArr.length ? `
           <div class="livro-titulo-portador" style="margin-top:.35rem;font-size:.78rem;color:var(--text-muted);letter-spacing:.5px">
             Portador do Título:
-            <strong style="color:var(--gold-light);font-family:'Playfair Display',serif;font-weight:600;display:block;font-size:.95rem;margin-top:.1rem">${titulosArr[0]}</strong>
+            <strong style="color:var(--gold-light);font-family:'Playfair Display',serif;font-weight:600;display:block;font-size:.95rem;margin-top:.1rem">${_escHtml(titulosArr[0])}</strong>
           </div>` : ''}
 
           <!-- Tags: despertar, rank, facção, cidade, gênero, nível, núcleos -->
           <div class="livro-tags">${tags.join('')}</div>
 
           <!-- Frase marcante -->
-          ${f.frase ? `<div class="livro-frase">"${f.frase}"</div>` : ''}
+          ${f.frase ? `<div class="livro-frase">"${_escHtml(f.frase)}"</div>` : ''}
 
           <!-- Sistema de Likes -->
           <div class="livro-likes-row" style="display:flex;flex-direction:column;align-items:center;gap:.2rem;margin-top:.85rem">
@@ -6561,7 +6580,7 @@ function abrirPerfilPublico(f) {
           ${f.descricaoPublica ? `
           <div class="livro-section">
             <div class="livro-section-title">${icone('scroll','ic-sm')} Descrição</div>
-            <div class="livro-descricao">${f.descricaoPublica.replace(/\n/g,'<br>')}</div>
+            <div class="livro-descricao">${_escHtml(f.descricaoPublica).replace(/\n/g,'<br>')}</div>
           </div>` : `
           <div class="livro-section">
             <div class="livro-section-title">${icone('scroll','ic-sm')} Descrição</div>
@@ -6587,7 +6606,7 @@ function abrirPerfilPublico(f) {
           ${f.poderDescricao ? `
           <div class="livro-section">
             <div class="livro-section-title">${icone('bolt','ic-sm')} Descrição do Poder</div>
-            <div class="livro-descricao">${f.poderDescricao.replace(/\n/g,'<br>')}</div>
+            <div class="livro-descricao">${_escHtml(f.poderDescricao).replace(/\n/g,'<br>')}</div>
           </div>` : `
           <div class="livro-section">
             <div class="livro-section-title">${icone('bolt','ic-sm')} Descrição do Poder</div>
@@ -6601,11 +6620,11 @@ function abrirPerfilPublico(f) {
               ${f.tecnicas.map(t => `
                 <div class="livro-tecnica-card">
                   <div class="livro-tecnica-header">
-                    <span class="livro-tecnica-nome">${t.nome || 'Técnica sem nome'}</span>
-                    ${t.custo ? `<span class="livro-tecnica-custo">${t.custo} PE</span>` : ''}
+                    <span class="livro-tecnica-nome">${_escHtml(t.nome) || 'Técnica sem nome'}</span>
+                    ${t.custo ? `<span class="livro-tecnica-custo">${_escHtml(t.custo)} PE</span>` : ''}
                   </div>
-                  ${t.desc ? `<div class="livro-tecnica-desc">${t.desc.replace(/\n/g,'<br>')}</div>` : ''}
-                  ${t.efei ? `<div class="livro-tecnica-efeito"><strong>Efeitos:</strong> ${t.efei.replace(/\n/g,'<br>')}</div>` : ''}
+                  ${t.desc ? `<div class="livro-tecnica-desc">${_escHtml(t.desc).replace(/\n/g,'<br>')}</div>` : ''}
+                  ${t.efei ? `<div class="livro-tecnica-efeito"><strong>Efeitos:</strong> ${_escHtml(t.efei).replace(/\n/g,'<br>')}</div>` : ''}
                 </div>`).join('')}
             </div>` : `<span class="livro-area-empty">Nenhuma técnica registrada.</span>`}
           </div>
@@ -6613,7 +6632,7 @@ function abrirPerfilPublico(f) {
           ${f.poderSuprema ? `
           <div class="livro-section">
             <div class="livro-section-title">${icone('crown','ic-sm')} Técnica Suprema</div>
-            <div class="livro-descricao livro-suprema">${f.poderSuprema.replace(/\n/g,'<br>')}</div>
+            <div class="livro-descricao livro-suprema">${_escHtml(f.poderSuprema).replace(/\n/g,'<br>')}</div>
           </div>` : `
           <div class="livro-section">
             <div class="livro-section-title">${icone('crown','ic-sm')} Técnica Suprema</div>
@@ -6626,7 +6645,7 @@ function abrirPerfilPublico(f) {
           <div class="livro-section">
             <div class="livro-section-title">${icone('scroll','ic-sm')} História</div>
             ${f.socHistoria
-              ? `<div class="livro-descricao">${f.socHistoria.replace(/\n/g,'<br>')}</div>`
+              ? `<div class="livro-descricao">${_escHtml(f.socHistoria).replace(/\n/g,'<br>')}</div>`
               : `<span class="livro-area-empty">Nenhuma história registrada.</span>`}
           </div>
 
@@ -6636,13 +6655,13 @@ function abrirPerfilPublico(f) {
               <div class="livro-area-card">
                 <div class="livro-area-title">${icone('moon','ic-sm')} Objetivos Atuais</div>
                 ${f.socObjetivos
-                  ? `<div class="livro-descricao">${f.socObjetivos.replace(/\n/g,'<br>')}</div>`
+                  ? `<div class="livro-descricao">${_escHtml(f.socObjetivos).replace(/\n/g,'<br>')}</div>`
                   : `<span class="livro-area-empty">Nenhum objetivo registrado.</span>`}
               </div>
               <div class="livro-area-card">
                 <div class="livro-area-title">${icone('prism','ic-sm')} Filosofia de Vida</div>
                 ${f.socFilosofia
-                  ? `<div class="livro-descricao">${f.socFilosofia.replace(/\n/g,'<br>')}</div>`
+                  ? `<div class="livro-descricao">${_escHtml(f.socFilosofia).replace(/\n/g,'<br>')}</div>`
                   : `<span class="livro-area-empty">Nenhuma filosofia registrada.</span>`}
               </div>
             </div>
@@ -6651,7 +6670,7 @@ function abrirPerfilPublico(f) {
           <div class="livro-section">
             <div class="livro-section-title">${icone('bolt','ic-sm')} Feitos em Batalha — Torres &amp; Chefes</div>
             ${f.socFeitos
-              ? `<div class="livro-descricao">${f.socFeitos.replace(/\n/g,'<br>')}</div>`
+              ? `<div class="livro-descricao">${_escHtml(f.socFeitos).replace(/\n/g,'<br>')}</div>`
               : `<span class="livro-area-empty">Nenhum feito registrado.</span>`}
           </div>
 
