@@ -5574,10 +5574,49 @@ let _rankingCarregando = false;
 // tamanho da base de jogadores — agora só roda uma vez por sessão.
 let _fallbackScanFeito = false;
 
+// ── Cache instantâneo do ranking ──────────────────────────────────────
+// Guarda os 5 primeiros personagens (já ordenados pela aba "Lendas das
+// Torres") no localStorage. Na próxima vez que o ranking for aberto,
+// esses 5 aparecem NA HORA (leitura local, síncrona) enquanto a busca
+// completa no Firestore roda em segundo plano e substitui pelo dado
+// fresco quando estiver pronta. Resolve a demora perceptível de abrir
+// o ranking — sem isso, a tela ficava em "Carregando..." por alguns
+// segundos até a primeira leitura do Firestore voltar.
+const RANKING_CACHE_KEY = 'tp_ranking_cache_v1';
+const RANKING_CACHE_VALIDADE_MS = 60 * 60 * 1000; // 1 hora
+
+function _salvarCacheRanking(fichas) {
+  try {
+    const top5 = _ordenarFichas(fichas, 'geral').slice(0, 5);
+    localStorage.setItem(RANKING_CACHE_KEY, JSON.stringify({ fichas: top5, ts: Date.now() }));
+  } catch(e) { /* localStorage pode estar cheio/indisponível — não é crítico */ }
+}
+
+function _carregarCacheRanking() {
+  try {
+    const raw = localStorage.getItem(RANKING_CACHE_KEY);
+    if (!raw) return null;
+    const { fichas, ts } = JSON.parse(raw);
+    if (!Array.isArray(fichas) || !fichas.length) return null;
+    if (Date.now() - ts > RANKING_CACHE_VALIDADE_MS) return null; // muito velho, espera dado fresco
+    return fichas;
+  } catch(e) { return null; }
+}
+
 async function carregarRanking() {
   const grid = document.getElementById('ranking-grid');
   if (!grid) return;
   if (_rankingCarregando) return;
+
+  // Mostra o cache instantaneamente (síncrono) na primeira renderização
+  // desta sessão, antes de qualquer espera por rede.
+  if (!_fallbackScanFeito) {
+    const cache = _carregarCacheRanking();
+    if (cache && cache.length) {
+      renderizarCartoes(cache, _abaAtual);
+    }
+  }
+
   _rankingCarregando = true;
   try {
     if (!window.db || !window.doc || !window.getDoc) {
@@ -5585,10 +5624,11 @@ async function carregarRanking() {
       return;
     }
 
-    // Só mostra a tela de "carregando" na primeira vez — em atualizações
-    // automáticas seguintes, evita o "flash" que jogava a tela de volta
-    // pro estado de loading toda hora.
-    if (!_fallbackScanFeito) {
+    // Só mostra a tela de "carregando" se não tivermos NADA pra mostrar
+    // ainda (nem cache, nem carga anterior) — em atualizações automáticas
+    // seguintes, evita o "flash" que jogava a tela de volta pro estado de
+    // loading toda hora.
+    if (!_fallbackScanFeito && !_carregarCacheRanking()) {
       grid.innerHTML = `<div class="lendas-loading"><div class="lendas-loading-rune"><svg class="ic"><use href="#ic-moon"/></svg></div><p>Invocando os registros do Abismo...</p></div>`;
     }
 
@@ -5737,6 +5777,7 @@ async function carregarRanking() {
 
     _lendasFichas = visiveis;
     renderizarCartoes(visiveis, _abaAtual);
+    _salvarCacheRanking(visiveis);
 
     if (!_rankingInterval) {
       _rankingInterval = setInterval(() => {
@@ -6080,7 +6121,7 @@ function _renderPostItem(id, post, pid) {
   <div class="livro-area-card" style="margin-bottom:1rem" id="post-${id}">
     <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;min-height:44px">
       ${post.authorFoto
-        ? `<img src="${post.authorFoto}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
+        ? `<img src="${post.authorFoto}" loading="lazy" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
         : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg class="ic ic-sm"><use href="#ic-ficha"/></svg></div>`}
       <div style="flex:1;min-width:0">
         <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:.9rem">${_escHtml(post.authorPersonagem)}</div>
@@ -6089,7 +6130,7 @@ function _renderPostItem(id, post, pid) {
       ${podeExcluir ? `<button onclick="excluirPost('${id}','${pid}')" title="Excluir publicação" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.95rem;min-width:44px;min-height:44px;flex-shrink:0">✕</button>` : ''}
     </div>
     ${post.conteudo ? `<div class="livro-descricao" style="margin-bottom:.5rem">${_escHtml(post.conteudo).replace(/\n/g,'<br>')}</div>` : ''}
-    ${post.imagem ? `<img src="${post.imagem}" onclick="abrirLightbox('${post.imagem.replace(/'/g,"\\'")}')" style="width:100%;max-height:320px;object-fit:cover;cursor:pointer;border:1px solid var(--border);margin-bottom:.5rem">` : ''}
+    ${post.imagem ? `<img src="${post.imagem}" loading="lazy" onclick="abrirLightbox('${post.imagem.replace(/'/g,"\\'")}')" style="width:100%;max-height:320px;object-fit:cover;cursor:pointer;border:1px solid var(--border);margin-bottom:.5rem">` : ''}
     <div style="display:flex;gap:.5rem;align-items:center;padding-top:.2rem;border-top:1px solid var(--border)">
       <button id="btn-curtir-post-${id}" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">🤍 …</button>
       <button onclick="alternarComentarios('${id}')" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">💬 Comentários</button>
@@ -6172,7 +6213,7 @@ async function _carregarComentarios(postId) {
     itensHtml = itens.map(c => `
       <div style="display:flex;gap:.5rem;padding:.4rem 0;border-bottom:1px solid var(--border)">
         ${c.authorFoto
-          ? `<img src="${c.authorFoto}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+          ? `<img src="${c.authorFoto}" loading="lazy" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0">`
           : `<div style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);flex-shrink:0"></div>`}
         <div style="flex:1">
           <span style="font-weight:600;color:var(--gold-light);font-size:.8rem">${_escHtml(c.authorPersonagem)}</span>
@@ -6504,9 +6545,9 @@ function abrirPerfilPublico(f) {
     <div class="livro-section">
       <div class="livro-section-title">${icone('bolt','ic-sm')} Manifestações de Poder</div>
       <div class="livro-gif-section">
-        ${p.gifPoder ? `<div class="livro-gif-item" onclick="abrirLightbox('${p.gifPoder}')"><img src="${p.gifPoder}" alt="Poder" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Poder</div></div>` : ''}
-        ${p.gifTransformacao ? `<div class="livro-gif-item" onclick="abrirLightbox('${p.gifTransformacao}')"><img src="${p.gifTransformacao}" alt="Transformação" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Transformação</div></div>` : ''}
-        ${p.gifSuprema ? `<div class="livro-gif-item" onclick="abrirLightbox('${p.gifSuprema}')"><img src="${p.gifSuprema}" alt="Suprema" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Habilidade Suprema</div></div>` : ''}
+        ${p.gifPoder ? `<div class="livro-gif-item" onclick="abrirLightbox('${p.gifPoder}')"><img src="${p.gifPoder}" alt="Poder" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Poder</div></div>` : ''}
+        ${p.gifTransformacao ? `<div class="livro-gif-item" onclick="abrirLightbox('${p.gifTransformacao}')"><img src="${p.gifTransformacao}" alt="Transformação" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Transformação</div></div>` : ''}
+        ${p.gifSuprema ? `<div class="livro-gif-item" onclick="abrirLightbox('${p.gifSuprema}')"><img src="${p.gifSuprema}" alt="Suprema" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Habilidade Suprema</div></div>` : ''}
       </div>
     </div>` : '';
 
@@ -6837,8 +6878,8 @@ function _carregarGaleriaLivro(user, personagem) {
       if (!src) return '';
       const srcEsc = src.replace(/'/g, "\\'");
       return ehDono
-        ? `<img src="${src}" alt="foto" onclick="abrirAcoesMiniatura(${i},'${srcEsc}')" title="Clique para gerenciar foto">`
-        : `<img src="${src}" alt="foto" onclick="abrirLightbox('${srcEsc}')">`;
+        ? `<img src="${src}" alt="foto" loading="lazy" onclick="abrirAcoesMiniatura(${i},'${srcEsc}')" title="Clique para gerenciar foto">`
+        : `<img src="${src}" alt="foto" loading="lazy" onclick="abrirLightbox('${srcEsc}')">`;
     }).join('');
   }).catch(()=>{});
 }
@@ -7507,7 +7548,7 @@ function renderFotoPersonagem() {
   const minis = _galeriaFotos.slice(0, slotsVisiveis).map((src, i) => {
     if (src) {
       return `<div class="foto-miniatura-item">
-        <img src="${src.replace(/'/g,"&apos;")}" onclick="abrirAcoesMiniatura(${i},'${src.replace(/'/g,"\\'")}');" title="Clique para gerenciar foto">
+        <img src="${src.replace(/'/g,"&apos;")}" loading="lazy" onclick="abrirAcoesMiniatura(${i},'${src.replace(/'/g,"\\'")}');" title="Clique para gerenciar foto">
         <button class="btn-remove-mini" onclick="event.stopPropagation();removerFotoGaleria(${i})">✕</button>
       </div>`;
     }
