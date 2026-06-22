@@ -5113,6 +5113,19 @@ function getDespertar(dados) {
 // chamado "Lâmina <Sombria>") é interpretado pelo navegador como uma tag
 // HTML de verdade, quebrando a estrutura da página pra aquele personagem
 // especificamente — sempre do mesmo jeito, já que o dado não muda.
+// Remove aspas de uma URL antes de inserir em src="..."/style="...". Uma
+// URL de imagem de verdade nunca contém aspas — mas um campo de capa/gif
+// colado manualmente (ou um dado antigo malformado) pode ter. Sem isso,
+// uma aspas dentro da URL quebra o atributo HTML inteiro: tudo que vem
+// depois dela passa a ser interpretado como conteúdo solto da página,
+// corrompendo a estrutura de tudo que vem a seguir (foi a causa de
+// personagens com capa/avatar customizado aparecerem com a tela toda
+// distorcida, enquanto os sem foto ficavam perfeitos).
+function _escUrl(url) {
+  if (!url) return '';
+  return String(url).replace(/["']/g, '');
+}
+
 function _escHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str)
@@ -5342,7 +5355,7 @@ function renderizarCartoes(fichas, aba) {
     const wp = WALLPAPERS.find(w => w.id === p.wallpaper);
 
     const avatarHtml = f.foto
-      ? `<div class="lenda-avatar-frame"><img class="lenda-avatar" src="${f.foto}" alt="${_escHtml(f.nome)}" onerror="this.parentElement.innerHTML='<div class=\\'lenda-avatar-placeholder\\'>⚔</div>'"></div>`
+      ? `<div class="lenda-avatar-frame"><img class="lenda-avatar" src="${_escUrl(f.foto)}" alt="${_escHtml(f.nome)}" onerror="this.parentElement.innerHTML='<div class=\\'lenda-avatar-placeholder\\'>⚔</div>'"></div>`
       : `<div class="lenda-avatar-placeholder">⚔</div>`;
 
     // Título principal: primeiro item da lista de títulos do Grimório social
@@ -5356,7 +5369,7 @@ function renderizarCartoes(fichas, aba) {
     card.innerHTML = `
       <div class="lenda-card" role="button" tabindex="0">
         ${wp ? `<div class="lenda-card-wallpaper" style="background-image:url('${wp.url}')"></div>` : ''}
-        ${p.gifPoder ? `<div class="lenda-card-gif"><img src="${p.gifPoder}" alt="" onerror="this.style.display='none'"></div>` : ''}
+        ${p.gifPoder ? `<div class="lenda-card-gif"><img src="${_escUrl(p.gifPoder)}" alt="" onerror="this.style.display='none'"></div>` : ''}
         <div class="lenda-card-overlay"></div>
         <div class="lenda-card-body">
           <span class="lenda-card-rank ${posClass}">${posLabel}</span>
@@ -5881,8 +5894,8 @@ async function renderGMRankingVisibilidade() {
     return `
     <div class="gm-ranking-row ${oculto ? 'oculto-row' : ''}" id="row-${docId}">
       <div class="gm-ranking-row-info">
-        <div class="gm-ranking-row-nome">${nome}</div>
-        <div class="gm-ranking-row-meta">Jogador: <strong>${jogador}</strong> · Nível ${nivel}</div>
+        <div class="gm-ranking-row-nome">${_escHtml(nome)}</div>
+        <div class="gm-ranking-row-meta">Jogador: <strong>${_escHtml(jogador)}</strong> · Nível ${_escHtml(String(nivel))}</div>
         ${oculto ? '<span class="oculto-badge">Oculto do ranking</span>' : ''}
       </div>
       <button class="gm-vis-btn ${oculto ? 'oculto-ativo' : ''}"
@@ -6121,7 +6134,7 @@ function _renderPostItem(id, post, pid) {
   <div class="livro-area-card" style="margin-bottom:1rem" id="post-${id}">
     <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;min-height:44px">
       ${post.authorFoto
-        ? `<img src="${post.authorFoto}" loading="lazy" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
+        ? `<img src="${_escUrl(post.authorFoto)}" loading="lazy" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
         : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg class="ic ic-sm"><use href="#ic-ficha"/></svg></div>`}
       <div style="flex:1;min-width:0">
         <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:.9rem">${_escHtml(post.authorPersonagem)}</div>
@@ -6130,7 +6143,7 @@ function _renderPostItem(id, post, pid) {
       ${podeExcluir ? `<button onclick="excluirPost('${id}','${pid}')" title="Excluir publicação" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.95rem;min-width:44px;min-height:44px;flex-shrink:0">✕</button>` : ''}
     </div>
     ${post.conteudo ? `<div class="livro-descricao" style="margin-bottom:.5rem">${_escHtml(post.conteudo).replace(/\n/g,'<br>')}</div>` : ''}
-    ${post.imagem ? `<img src="${post.imagem}" loading="lazy" onclick="abrirLightbox('${post.imagem.replace(/'/g,"\\'")}')" style="width:100%;max-height:320px;object-fit:cover;cursor:pointer;border:1px solid var(--border);margin-bottom:.5rem">` : ''}
+    ${post.imagem ? `<img src="${_escUrl(post.imagem)}" loading="lazy" onclick="abrirLightbox('${_escUrl(post.imagem)}')" style="width:100%;max-height:320px;object-fit:cover;cursor:pointer;border:1px solid var(--border);margin-bottom:.5rem">` : ''}
     <div style="display:flex;gap:.5rem;align-items:center;padding-top:.2rem;border-top:1px solid var(--border)">
       <button id="btn-curtir-post-${id}" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">🤍 …</button>
       <button onclick="alternarComentarios('${id}')" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">💬 Comentários</button>
@@ -6213,7 +6226,7 @@ async function _carregarComentarios(postId) {
     itensHtml = itens.map(c => `
       <div style="display:flex;gap:.5rem;padding:.4rem 0;border-bottom:1px solid var(--border)">
         ${c.authorFoto
-          ? `<img src="${c.authorFoto}" loading="lazy" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+          ? `<img src="${_escUrl(c.authorFoto)}" loading="lazy" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0">`
           : `<div style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);flex-shrink:0"></div>`}
         <div style="flex:1">
           <span style="font-weight:600;color:var(--gold-light);font-size:.8rem">${_escHtml(c.authorPersonagem)}</span>
@@ -6288,7 +6301,7 @@ async function _renderPerfilUsuario(targetUser) {
   area.innerHTML = `
     <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
       ${dados.foto
-        ? `<img src="${dados.foto}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
+        ? `<img src="${_escUrl(dados.foto)}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`
         : `<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg class="ic ic-lg"><use href="#ic-ficha"/></svg></div>`}
       <div style="flex:1;min-width:160px">
         <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:1.1rem">${_escHtml(nomeReal)}</div>
@@ -6496,7 +6509,7 @@ function abrirPerfilPublico(f) {
 
   // Avatar com lightbox ao clicar
   const avatarHtml = f.foto
-    ? `<img class="livro-avatar" src="${f.foto}" alt="${_escHtml(f.nome)}" onclick="abrirLightbox('${f.foto}')" title="Ampliar foto" onerror="this.outerHTML='<div class=\\'livro-avatar-placeholder\\'>${icone('sword','ic-xl')}</div>'">`
+    ? `<img class="livro-avatar" src="${_escUrl(f.foto)}" alt="${_escHtml(f.nome)}" onclick="abrirLightbox('${_escUrl(f.foto)}')" title="Ampliar foto" onerror="this.outerHTML='<div class=\\'livro-avatar-placeholder\\'>${icone('sword','ic-xl')}</div>'">`
     : `<div class="livro-avatar-placeholder">${icone('sword','ic-xl')}</div>`;
 
   // Tags — exibidas no header do perfil.
@@ -6545,9 +6558,9 @@ function abrirPerfilPublico(f) {
     <div class="livro-section">
       <div class="livro-section-title">${icone('bolt','ic-sm')} Manifestações de Poder</div>
       <div class="livro-gif-section">
-        ${p.gifPoder ? `<div class="livro-gif-item" onclick="abrirLightbox('${p.gifPoder}')"><img src="${p.gifPoder}" alt="Poder" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Poder</div></div>` : ''}
-        ${p.gifTransformacao ? `<div class="livro-gif-item" onclick="abrirLightbox('${p.gifTransformacao}')"><img src="${p.gifTransformacao}" alt="Transformação" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Transformação</div></div>` : ''}
-        ${p.gifSuprema ? `<div class="livro-gif-item" onclick="abrirLightbox('${p.gifSuprema}')"><img src="${p.gifSuprema}" alt="Suprema" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Habilidade Suprema</div></div>` : ''}
+        ${p.gifPoder ? `<div class="livro-gif-item" onclick="abrirLightbox('${_escUrl(p.gifPoder)}')"><img src="${_escUrl(p.gifPoder)}" alt="Poder" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Poder</div></div>` : ''}
+        ${p.gifTransformacao ? `<div class="livro-gif-item" onclick="abrirLightbox('${_escUrl(p.gifTransformacao)}')"><img src="${_escUrl(p.gifTransformacao)}" alt="Transformação" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Transformação</div></div>` : ''}
+        ${p.gifSuprema ? `<div class="livro-gif-item" onclick="abrirLightbox('${_escUrl(p.gifSuprema)}')"><img src="${_escUrl(p.gifSuprema)}" alt="Suprema" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="livro-gif-label">Habilidade Suprema</div></div>` : ''}
       </div>
     </div>` : '';
 
@@ -6559,8 +6572,8 @@ function abrirPerfilPublico(f) {
 
       <!-- ═══ BANNER ÉPICO ═══ -->
       <div class="livro-banner">
-        ${wallpaperUrl ? `<div class="livro-banner-bg" style="background-image:url('${wallpaperUrl}')"></div>` : ''}
-        ${(p.gifPoder || p.gifTransformacao) ? `<div class="livro-banner-gif"><img src="${p.gifTransformacao || p.gifPoder}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
+        ${wallpaperUrl ? `<div class="livro-banner-bg" style="background-image:url('${_escUrl(wallpaperUrl)}')"></div>` : ''}
+        ${(p.gifPoder || p.gifTransformacao) ? `<div class="livro-banner-gif"><img src="${_escUrl(p.gifTransformacao || p.gifPoder)}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
         <div class="livro-banner-gradient"></div>
         ${f.rank ? `<div class="livro-banner-rank-seal">${icone('crown','ic-sm')} ${_escHtml(f.rank)}</div>` : ''}
         <button class="livro-close" onclick="document.getElementById('livro-overlay').remove()" title="Fechar">${icone('close')}</button>
@@ -6581,7 +6594,7 @@ function abrirPerfilPublico(f) {
           ${f.poder && f.poder !== '—' ? `
           <div class="livro-poder-badge">
             ${p.gifPoder
-              ? `<img class="livro-poder-gif" src="${p.gifPoder}" alt="" onerror="this.style.display='none'">`
+              ? `<img class="livro-poder-gif" src="${_escUrl(p.gifPoder)}" alt="" onerror="this.style.display='none'">`
               : `<svg class="ic" style="color:var(--accent-light);opacity:.85"><use href="#ic-prism"/></svg>`}
             <span>${_escHtml(f.poder)}</span>
           </div>` : ''}
@@ -6876,10 +6889,10 @@ function _carregarGaleriaLivro(user, personagem) {
     section.style.display = '';
     container.innerHTML = gal.map((src, i) => {
       if (!src) return '';
-      const srcEsc = src.replace(/'/g, "\\'");
+      const srcSeguro = _escUrl(src);
       return ehDono
-        ? `<img src="${src}" alt="foto" loading="lazy" onclick="abrirAcoesMiniatura(${i},'${srcEsc}')" title="Clique para gerenciar foto">`
-        : `<img src="${src}" alt="foto" loading="lazy" onclick="abrirLightbox('${srcEsc}')">`;
+        ? `<img src="${srcSeguro}" alt="foto" loading="lazy" onclick="abrirAcoesMiniatura(${i},'${srcSeguro}')" title="Clique para gerenciar foto">`
+        : `<img src="${srcSeguro}" alt="foto" loading="lazy" onclick="abrirLightbox('${srcSeguro}')">`;
     }).join('');
   }).catch(()=>{});
 }
@@ -6937,7 +6950,7 @@ function abrirPersonalizacao() {
           <button onclick="abrirSeletorCapaPersonalizacao()" style="width:100%;padding:.65rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);font-family:inherit;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s" onmouseover="this.style.background='rgba(156,42,42,.22)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
             <svg class="ic"><use href="#ic-camera"/></svg> Enviar Foto de Capa da Galeria
           </button>
-          <img id="capa-preview-img" src="${p.wallpaperUrl||''}" style="width:100%;max-height:80px;object-fit:cover;border:1px solid rgba(60,40,60,.5);border-radius:2px;display:${p.wallpaperUrl?'block':'none'};" onerror="this.style.display='none'">
+          <img id="capa-preview-img" src="${_escUrl(p.wallpaperUrl||'')}" style="width:100%;max-height:80px;object-fit:cover;border:1px solid rgba(60,40,60,.5);border-radius:2px;display:${p.wallpaperUrl?'block':'none'};" onerror="this.style.display='none'">
           <button type="button" onclick="removerCapaPersonalizacao()" style="width:100%;padding:.4rem;min-height:44px;background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;font-family:inherit;font-size:.78rem;cursor:pointer" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">✕ Remover Capa</button>
         </div>
 
@@ -6946,7 +6959,7 @@ function abrirPersonalizacao() {
         <div class="wallpapers-grid">${wpsBtns}</div>
         <div style="margin-top:.6rem;display:flex;gap:.5rem;align-items:center">
           <input type="text" id="wp-custom-url" placeholder="Cole URL de imagem (https://...)"
-            value="${(!p.wallpaperUrl || p.wallpaperUrl.startsWith('data:')) ? '' : (p.wallpaperUrl||'')}"
+            value="${_escHtml((!p.wallpaperUrl || p.wallpaperUrl.startsWith('data:')) ? '' : (p.wallpaperUrl||''))}"
             style="flex:1;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.45rem .65rem;font-family:inherit;font-size:.82rem;outline:none">
           <button onclick="usarWallpaperCustom()" style="background:none;border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.45rem .85rem;font-family:inherit;font-size:.8rem;cursor:pointer">Usar</button>
         </div>
@@ -6961,31 +6974,31 @@ function abrirPersonalizacao() {
             <div class="gif-input-row">
               <div>
                 <label><svg class="ic"><use href="#ic-prism"/></svg> GIF — Poder Principal</label>
-                <input type="text" id="gif-poder" placeholder="https://... (ou envie da galeria)" value="${p.gifPoder||''}" oninput="previewGif('gif-poder','prev-poder')">
+                <input type="text" id="gif-poder" placeholder="https://... (ou envie da galeria)" value="${_escHtml(p.gifPoder||'')}" oninput="previewGif('gif-poder','prev-poder')">
                 <button type="button" onclick="abrirSeletorGifPoder()" style="margin-top:.35rem;width:100%;padding:.45rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);font-family:inherit;font-size:.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem" onmouseover="this.style.background='rgba(156,42,42,.22)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
                   <svg class="ic ic-sm"><use href="#ic-camera"/></svg> Enviar GIF da Galeria
                 </button>
                 <button type="button" onclick="removerGifPoderPersonalizacao()" style="margin-top:.3rem;width:100%;padding:.35rem;min-height:44px;background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;font-family:inherit;font-size:.72rem;cursor:pointer" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">✕ Remover GIF</button>
               </div>
-              <img id="prev-poder" class="gif-preview-sm" src="${p.gifPoder||''}" onerror="this.style.display='none'" style="${p.gifPoder?'display:block':''}">
+              <img id="prev-poder" class="gif-preview-sm" src="${_escUrl(p.gifPoder||'')}" onerror="this.style.display='none'" style="${p.gifPoder?'display:block':''}">
             </div>
           </div>
           <div>
             <div class="gif-input-row">
               <div>
                 <label><svg class="ic"><use href="#ic-flame"/></svg> GIF — Transformação</label>
-                <input type="text" id="gif-transformacao" placeholder="https://storage.googleapis.com/..." value="${p.gifTransformacao||''}" oninput="previewGif('gif-transformacao','prev-trans')">
+                <input type="text" id="gif-transformacao" placeholder="https://storage.googleapis.com/..." value="${_escHtml(p.gifTransformacao||'')}" oninput="previewGif('gif-transformacao','prev-trans')">
               </div>
-              <img id="prev-trans" class="gif-preview-sm" src="${p.gifTransformacao||''}" onerror="this.style.display='none'" style="${p.gifTransformacao?'display:block':''}">
+              <img id="prev-trans" class="gif-preview-sm" src="${_escUrl(p.gifTransformacao||'')}" onerror="this.style.display='none'" style="${p.gifTransformacao?'display:block':''}">
             </div>
           </div>
           <div>
             <div class="gif-input-row">
               <div>
                 <label><svg class="ic"><use href="#ic-bolt"/></svg> GIF — Habilidade Suprema</label>
-                <input type="text" id="gif-suprema" placeholder="https://storage.googleapis.com/..." value="${p.gifSuprema||''}" oninput="previewGif('gif-suprema','prev-suprema')">
+                <input type="text" id="gif-suprema" placeholder="https://storage.googleapis.com/..." value="${_escHtml(p.gifSuprema||'')}" oninput="previewGif('gif-suprema','prev-suprema')">
               </div>
-              <img id="prev-suprema" class="gif-preview-sm" src="${p.gifSuprema||''}" onerror="this.style.display='none'" style="${p.gifSuprema?'display:block':''}">
+              <img id="prev-suprema" class="gif-preview-sm" src="${_escUrl(p.gifSuprema||'')}" onerror="this.style.display='none'" style="${p.gifSuprema?'display:block':''}">
             </div>
           </div>
         </div>
@@ -7429,7 +7442,7 @@ function abrirLightbox(src) {
   const ov = document.createElement('div');
   ov.className = 'foto-lightbox-overlay';
   ov.onclick = () => ov.remove();
-  ov.innerHTML = `<img src="${src}" alt="Foto ampliada">`;
+  ov.innerHTML = `<img src="${_escUrl(src)}" alt="Foto ampliada">`;
   document.body.appendChild(ov);
 }
 
@@ -7447,7 +7460,7 @@ function abrirAcoesMiniatura(slot, src) {
   ov.innerHTML = `
     <div style="background:linear-gradient(160deg,#131118,#0e0c13);border:1px solid rgba(60,40,60,.7);padding:1.5rem 1.75rem;width:min(94vw,340px);position:relative;box-shadow:0 8px 40px rgba(0,0,0,.8)">
       <div style="font-family:'Playfair Display',serif;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent-light);margin-bottom:1rem">Foto ${slot+1}</div>
-      <img src="${src}" style="width:100%;max-height:180px;object-fit:contain;border:1px solid rgba(60,40,60,.5);margin-bottom:1rem;display:block;">
+      <img src="${_escUrl(src)}" style="width:100%;max-height:180px;object-fit:contain;border:1px solid rgba(60,40,60,.5);margin-bottom:1rem;display:block;">
       <div style="display:flex;flex-direction:column;gap:.6rem">
         <button onclick="document.getElementById('modal-mini-acao').remove();adicionarFotoGaleria(${slot})"
           style="width:100%;padding:.6rem;background:var(--accent);border:none;color:#fff;font-family:'Playfair Display',serif;font-size:.9rem;letter-spacing:1px;cursor:pointer;transition:background .2s"
@@ -7534,7 +7547,7 @@ function renderFotoPersonagem() {
   // Foto principal com botão de remover
   const principal = _fotoPrincipal
     ? `<div style="position:relative;display:inline-block">
-        <img src="${_fotoPrincipal}" class="personagem-foto-display" onclick="abrirSeletorFotoPrincipal()" title="Clique para trocar">
+        <img src="${_escUrl(_fotoPrincipal)}" class="personagem-foto-display" onclick="abrirSeletorFotoPrincipal()" title="Clique para trocar">
         <button onclick="event.stopPropagation();removerFotoPrincipal()" title="Remover foto principal" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.75);border:none;color:#f5a0a0;font-size:.65rem;cursor:pointer;padding:.15rem .35rem;border-radius:2px;line-height:1.4">✕</button>
        </div>`
     : `<div class="personagem-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><svg class="ic ic-xl"><use href="#ic-camera"/></svg><span>Foto Principal</span></div>`;
@@ -7548,7 +7561,7 @@ function renderFotoPersonagem() {
   const minis = _galeriaFotos.slice(0, slotsVisiveis).map((src, i) => {
     if (src) {
       return `<div class="foto-miniatura-item">
-        <img src="${src.replace(/'/g,"&apos;")}" loading="lazy" onclick="abrirAcoesMiniatura(${i},'${src.replace(/'/g,"\\'")}');" title="Clique para gerenciar foto">
+        <img src="${_escUrl(src)}" loading="lazy" onclick="abrirAcoesMiniatura(${i},'${_escUrl(src)}');" title="Clique para gerenciar foto">
         <button class="btn-remove-mini" onclick="event.stopPropagation();removerFotoGaleria(${i})">✕</button>
       </div>`;
     }
@@ -7674,7 +7687,7 @@ function atualizarFichaHero() {
   }
 
   const fotoEl = _fotoPrincipal
-    ? `<img src="${_fotoPrincipal}" class="ficha-hero-foto-img" onclick="abrirSeletorFotoPrincipal()" title="Trocar foto">`
+    ? `<img src="${_escUrl(_fotoPrincipal)}" class="ficha-hero-foto-img" onclick="abrirSeletorFotoPrincipal()" title="Trocar foto">`
     : `<div class="ficha-hero-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><svg class="ic ic-xl"><use href="#ic-camera"/></svg><span>Foto</span></div>`;
 
   // Miniaturas no hero — clique abre painel de ação
@@ -8372,14 +8385,14 @@ function renderizarPersonagensNaSidebar() {
 
     // Avatar: foto se existir, ou ícone
     const avatarContent = fotoCache
-      ? `<img src="${fotoCache}" alt="${nome}" style="width:100%;height:100%;object-fit:cover">`
+      ? `<img src="${_escUrl(fotoCache)}" alt="${_escHtml(nome)}" style="width:100%;height:100%;object-fit:cover">`
       : `<span>${icone('sword')}</span>`;
 
     card.innerHTML = `
       <div class="sb-char-avatar">${avatarContent}</div>
       <div class="sb-char-info">
-        <div class="sb-char-name">${nome}</div>
-        ${poderNome ? `<div class="sb-char-poder">${poderNome}</div>` : ''}
+        <div class="sb-char-name">${_escHtml(nome)}</div>
+        ${poderNome ? `<div class="sb-char-poder">${_escHtml(poderNome)}</div>` : ''}
       </div>
       ${ativo ? '<div class="sb-char-indicator"></div>' : ''}
     `;
@@ -10421,7 +10434,7 @@ function _mostrarBarraGmAssumindo(targetUser, nomePersonagem) {
   `;
   bar.innerHTML = `
     <span style="font-size:.82rem;color:var(--gold-light);display:flex;align-items:center;gap:.5rem">
-      ${icone('gear','ic-sm')} Editando como GM: <strong>${nomePersonagem}</strong> (jogador: ${info.nome})
+      ${icone('gear','ic-sm')} Editando como GM: <strong>${_escHtml(nomePersonagem)}</strong> (jogador: ${_escHtml(info.nome)})
     </span>
     <button onclick="gmVoltarParaPropriaFicha()" style="background:var(--gold);border:none;color:#1a1200;padding:.4rem 1rem;font-family:inherit;font-size:.8rem;cursor:pointer;font-weight:600;border-radius:3px">
       ${icone('arrow-left','ic-sm')} Voltar à minha ficha
