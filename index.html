@@ -1848,6 +1848,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   display: flex; align-items: flex-start; justify-content: center;
   padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   backdrop-filter: blur(8px);
 }
@@ -2103,10 +2104,13 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
     align-items: flex-start;
   }
 
-  /* Modal preenche 100% da tela */
+  /* Modal preenche 100% da tela — usa só a regra base (width:100%),
+     não largura em vw. "100vw" é um clássico problema em navegadores
+     mobile (especialmente iOS Safari): pode resolver pra uma largura
+     ligeiramente MAIOR que a área visível de verdade, o que quebra a
+     centralização do flexbox do overlay e empurra o conteúdo pra fora
+     da tela de forma inconsistente. */
   .livro-modal {
-    width: 100vw;
-    max-width: 100vw;
     min-height: 100vh;
     border-radius: 0;
     box-shadow: none;
@@ -4619,14 +4623,15 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
       <!-- ABAS DE RANKING -->
       <div class="lendas-tabs-wrap">
         <div class="lendas-tabs" id="lendas-tabs">
-          <button class="lendas-tab active" onclick="mudarAbaRanking(&#39;geral&#39;,this)"><svg class="ic"><use href="#ic-crown"></use></svg> Mais Temidos</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;vitorias&#39;,this)"><svg class="ic"><use href="#ic-sword"></use></svg> Mais Vitórias</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;antigos&#39;,this)"><svg class="ic"><use href="#ic-scroll"></use></svg> Mais Antigos</button>
+          <button class="lendas-tab active" onclick="mudarAbaRanking('geral',this)"><svg class="ic"><use href="#ic-crown"></use></svg> Lendas das Torres</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('nivel',this)"><svg class="ic"><use href="#ic-star"></use></svg> Nível</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('abismo',this)"><svg class="ic"><use href="#ic-core"></use></svg> Núcleo</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('feitos',this)"><svg class="ic"><use href="#ic-sword"></use></svg> Feitos</button>
           <button class="lendas-tab" onclick="mudarAbaRanking(&#39;nivel&#39;,this)"><svg class="ic"><use href="#ic-prism"></use></svg> Maiores Níveis</button>
           <button class="lendas-tab" onclick="mudarAbaRanking(&#39;abismo&#39;,this)"><svg class="ic"><use href="#ic-moon"></use></svg> Lendas do Abismo</button>
           <button class="lendas-tab" onclick="mudarAbaRanking(&#39;semana&#39;,this)"><svg class="ic"><use href="#ic-flame"></use></svg> Destaques da Semana</button>
         </div>
-        <div class="lendas-tab-label" id="lendas-tab-label">Classificação por poder e núcleos absorvidos</div>
+        <div class="lendas-tab-label" id="lendas-tab-label">Lendas das Torres — classificação geral por poder e núcleos absorvidos</div>
       </div>
 
       <!-- GRID DE CARTÕES -->
@@ -5264,11 +5269,12 @@ const WALLPAPERS = [
 ];
 
 const ABA_LABELS = {
-  geral:    'Classificação por poder e núcleos absorvidos',
+  geral:    'Lendas das Torres — classificação geral por poder e núcleos absorvidos',
   vitorias: 'Personagens com mais vitórias registradas',
   antigos:  'Os Despertos mais antigos do sistema',
   nivel:    'Classificação por nível de progressão',
-  abismo:   'Lendas que tocaram o fundo do Abismo',
+  abismo:   'Classificação por núcleos absorvidos do Abismo',
+  feitos:   'Classificação por feitos registrados em batalha',
   semana:   'Destaques das últimas sessões desta semana',
 };
 
@@ -5281,6 +5287,8 @@ function mudarAbaRanking(aba, btn) {
   renderizarCartoes(_lendasFichas, aba);
 }
 
+function _contarLinhas(str) { return (str||'').split('\n').map(s=>s.trim()).filter(Boolean).length; }
+
 function _ordenarFichas(fichas, aba) {
   const now = Date.now();
   const semana = 7 * 24 * 3600 * 1000;
@@ -5292,8 +5300,9 @@ function _ordenarFichas(fichas, aba) {
     case 'nivel':
       return [...fichas].sort((a,b) => (parseInt(b.nivel)||0) - (parseInt(a.nivel)||0));
     case 'abismo':
-      return [...fichas].filter(f => (parseInt(f.nucleos)||0) >= 1)
-                        .sort((a,b) => (parseInt(b.nucleos)||0) - (parseInt(a.nucleos)||0));
+      return [...fichas].sort((a,b) => (parseInt(b.nucleos)||0) - (parseInt(a.nucleos)||0));
+    case 'feitos':
+      return [...fichas].sort((a,b) => _contarLinhas(b.socFeitos) - _contarLinhas(a.socFeitos));
     case 'semana':
       return [...fichas].filter(f => f.ts && (now - f.ts) < semana)
                         .sort((a,b) => (parseInt(b.nivel)||0) - (parseInt(a.nivel)||0));
