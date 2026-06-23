@@ -890,6 +890,7 @@ section { padding-top:1rem; }
 
 .gm-tab-content { display:none; }
 .gm-tab-content.active { display:block; }
+#painel-adm .gm-tab.active { color:var(--accent-light); border-bottom-color:var(--accent-light); }
 
 /* lista de fichas */
 .player-card { background:var(--bg-surface); border:1px solid var(--border); margin-bottom:.75rem; cursor:pointer; transition:border-color .2s; }
@@ -4546,10 +4547,33 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
         <div class="gm-title" style="color:var(--accent-light)">Painel do Administrador</div>
         <div class="gm-subtitle" style="color:var(--accent)">Acesso a campos mecânicos de todas as fichas</div>
       </div>
-      <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:1.5rem">
-        Como ADM, você pode editar atributos, recursos, técnicas e campos mecânicos. Campos narrativos (história, aparência, personalidade) são protegidos e só o próprio player pode alterar.
-      </p>
-      <div id="adm-players-list"></div>
+
+      <div class="gm-tabs">
+        <button class="gm-tab active" id="tab-adm-fichas" onclick="mostrarTab(&#39;tab-adm-fichas&#39;)">Fichas dos Players</button>
+        <button class="gm-tab" id="tab-adm-visibilidade" onclick="mostrarTab(&#39;tab-adm-visibilidade&#39;);renderGMRankingVisibilidade(&#39;adm-ranking-visibilidade&#39;)">
+          <svg class="ic ic-sm"><use href="#ic-eye"></use></svg> Visibilidade
+        </button>
+      </div>
+
+      <!-- TAB: FICHAS -->
+      <div class="gm-tab-content active" id="content-tab-adm-fichas">
+        <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:1.5rem">
+          Como ADM, você pode editar atributos, recursos, técnicas e campos mecânicos. Campos narrativos (história, aparência, personalidade) são protegidos e só o próprio player pode alterar.
+        </p>
+        <div id="adm-players-list"></div>
+      </div>
+
+      <!-- TAB: VISIBILIDADE DO RANKING -->
+      <div class="gm-tab-content" id="content-tab-adm-visibilidade">
+        <div class="lore-box" style="margin-bottom:1.5rem;border-color:rgba(110,147,232,.35)">
+          <strong style="color:var(--arcane-light)"><svg class="ic ic-sm"><use href="#ic-eye"></use></svg> Controle de Visibilidade do Ranking</strong><br>
+          Escolha quais personagens aparecem publicamente no <strong>Livro das Lendas</strong>.
+          Personagens ocultos <strong>continuam normais</strong> no login e na ficha do jogador — apenas não aparecem no ranking público.
+        </div>
+        <div id="adm-ranking-visibilidade" style="display:flex;flex-direction:column;gap:.5rem">
+          <p style="color:var(--text-muted);font-size:.85rem">Clique na aba para carregar a lista.</p>
+        </div>
+      </div>
     </section>
 
     <!-- FICHA DO PLAYER -->
@@ -5899,8 +5923,8 @@ async function toggleOcultarPersonagem(docId, btn) {
   renderizarCartoes(visiveis, _abaAtual);
 }
 
-async function renderGMRankingVisibilidade() {
-  const container = document.getElementById('gm-ranking-visibilidade');
+async function renderGMRankingVisibilidade(containerId = 'gm-ranking-visibilidade') {
+  const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">Carregando personagens...</p>';
 
@@ -10803,11 +10827,15 @@ async function salvarFichaPlayer(user) {
 }
 
 // ─── ADM: lista players (só mecânico) ───
+// Inclui TODOS os roles (player, adm, gm) — ADM tem acesso a todas as
+// fichas do sistema, inclusive as de outros ADMs e do próprio GM.
+// Exclui o próprio usuário logado (ele já acessa a própria ficha
+// normalmente por "Minha Ficha", sem precisar passar por esta lista).
 async function renderADMPlayers() {
   const lista = document.getElementById('adm-players-list');
   if(!lista) return;
   lista.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">'+icone('cloud','ic-sm')+' Carregando...</p>';
-  const players = Object.entries(USUARIOS).filter(([u,d])=>d.role==='player');
+  const players = Object.entries(USUARIOS).filter(([u,d]) => u !== usuarioAtual && (d.role==='player'||d.role==='adm'||d.role==='gm'));
   lista.innerHTML = '';
   for (const [user, info] of players) {
     let dados = {};
@@ -10834,7 +10862,7 @@ async function renderADMPlayers() {
     card.innerHTML = `
       <div class="player-card-header" onclick="toggleADMCard('adm-body-${user}', '${user}')">
         <div>
-          <div class="player-card-name">${info.nome} <span class="role-badge badge-player">player</span></div>
+          <div class="player-card-name">${info.nome} <span class="role-badge badge-${info.role}">${info.role}</span></div>
           <div class="player-card-meta">@${user} • ${nome} • Nível ${nivel}</div>
         </div>
         <span style="color:var(--text-muted);font-size:.8rem">▼ Editar mecânico</span>
@@ -10966,18 +10994,20 @@ async function _migrarCapitalizacaoAntiga(userDigitadoOriginal, userNormalizado)
   }
 }
 
-// ─── OVERRIDE DE ACESSO GM ───────────────────────────────────────────────
-// O usuário "rauron" é o criador/dono do sistema e deve SEMPRE entrar como
-// GM, independente do que estiver salvo no campo "role" do documento
-// usuarios_extras/rauron no Firestore. Isso corrige o caso em que esse
-// cadastro está ausente, desatualizado ou com o role errado — em vez de
-// depender de corrigir o banco manualmente (frágil, fácil de esquecer
-// numa migração futura), a garantia fica fixa aqui no código.
-// Lista em array para já deixar pronto caso outro super-usuário precise
-// do mesmo no futuro, sem precisar duplicar a lógica.
-const USUARIOS_FORCAR_GM = ['rauron'];
+// ─── OVERRIDE DE ACESSO GM/ADM ───────────────────────────────────────────
+// Estes usuários devem SEMPRE entrar com o role abaixo, independente do
+// que estiver salvo no campo "role" do Firestore (usuarios_extras/{user}).
+// Isso corrige o caso em que o cadastro está ausente, desatualizado ou com
+// o role errado — em vez de depender de corrigir o banco manualmente
+// (frágil, fácil de esquecer numa migração futura), a garantia fica fixa
+// aqui no código.
+const USUARIOS_FORCAR_GM  = ['rauron', 'pratesz'];
+const USUARIOS_FORCAR_ADM = ['tortuga', 'herick', 'sec', 'melpe'];
 function _roleEfetiva(user, roleOriginal) {
-  return USUARIOS_FORCAR_GM.includes(_normUser(user)) ? 'gm' : (roleOriginal || 'player');
+  const u = _normUser(user);
+  if (USUARIOS_FORCAR_GM.includes(u))  return 'gm';
+  if (USUARIOS_FORCAR_ADM.includes(u)) return 'adm';
+  return roleOriginal || 'player';
 }
 
 // ─── LOGIN / LOGOUT ───
