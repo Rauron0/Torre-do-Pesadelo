@@ -1898,13 +1898,6 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
     radial-gradient(ellipse at 85% 20%, rgba(60,20,100,.18), transparent 55%);
   pointer-events: none; z-index: 1;
 }
-.livro-banner-gif {
-  position: absolute; inset: 0; overflow: hidden; z-index: 0;
-}
-.livro-banner-gif img {
-  width: 100%; height: 100%; object-fit: cover;
-  opacity: .35; mix-blend-mode: screen;
-}
 /* Gradiente bottom-fade para fusão suave banner→body */
 .livro-banner-gradient {
   position: absolute; inset: 0; z-index: 2;
@@ -4637,9 +4630,6 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
           <button class="lendas-tab" onclick="mudarAbaRanking('nivel',this)"><svg class="ic"><use href="#ic-star"></use></svg> Nível</button>
           <button class="lendas-tab" onclick="mudarAbaRanking('abismo',this)"><svg class="ic"><use href="#ic-core"></use></svg> Núcleo</button>
           <button class="lendas-tab" onclick="mudarAbaRanking('feitos',this)"><svg class="ic"><use href="#ic-sword"></use></svg> Feitos</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;nivel&#39;,this)"><svg class="ic"><use href="#ic-prism"></use></svg> Maiores Níveis</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;abismo&#39;,this)"><svg class="ic"><use href="#ic-moon"></use></svg> Lendas do Abismo</button>
-          <button class="lendas-tab" onclick="mudarAbaRanking(&#39;semana&#39;,this)"><svg class="ic"><use href="#ic-flame"></use></svg> Destaques da Semana</button>
         </div>
         <div class="lendas-tab-label" id="lendas-tab-label">Lendas das Torres — classificação geral por poder e núcleos absorvidos</div>
       </div>
@@ -5339,13 +5329,10 @@ const WALLPAPERS = [
 ];
 
 const ABA_LABELS = {
-  geral:    'Lendas das Torres — classificação geral por poder e núcleos absorvidos',
-  vitorias: 'Personagens com mais vitórias registradas',
-  antigos:  'Os Despertos mais antigos do sistema',
-  nivel:    'Classificação por nível de progressão',
-  abismo:   'Classificação por núcleos absorvidos do Abismo',
-  feitos:   'Classificação por feitos registrados em batalha',
-  semana:   'Destaques das últimas sessões desta semana',
+  geral:  'Lendas das Torres — classificação geral por poder e núcleos absorvidos',
+  nivel:  'Classificação por nível de progressão',
+  abismo: 'Classificação por núcleos absorvidos do Abismo',
+  feitos: 'Classificação por feitos registrados em batalha',
 };
 
 function mudarAbaRanking(aba, btn) {
@@ -5360,22 +5347,13 @@ function mudarAbaRanking(aba, btn) {
 function _contarLinhas(str) { return (str||'').split('\n').map(s=>s.trim()).filter(Boolean).length; }
 
 function _ordenarFichas(fichas, aba) {
-  const now = Date.now();
-  const semana = 7 * 24 * 3600 * 1000;
   switch(aba) {
-    case 'vitorias':
-      return [...fichas].sort((a,b) => (parseInt(b.vitorias)||0) - (parseInt(a.vitorias)||0));
-    case 'antigos':
-      return [...fichas].sort((a,b) => (a.ts||9e15) - (b.ts||9e15));
     case 'nivel':
       return [...fichas].sort((a,b) => (parseInt(b.nivel)||0) - (parseInt(a.nivel)||0));
     case 'abismo':
       return [...fichas].sort((a,b) => (parseInt(b.nucleos)||0) - (parseInt(a.nucleos)||0));
     case 'feitos':
       return [...fichas].sort((a,b) => _contarLinhas(b.socFeitos) - _contarLinhas(a.socFeitos));
-    case 'semana':
-      return [...fichas].filter(f => f.ts && (now - f.ts) < semana)
-                        .sort((a,b) => (parseInt(b.nivel)||0) - (parseInt(a.nivel)||0));
     default: // geral
       return [...fichas].sort((a,b) => b.score - a.score || b.nucleos - a.nucleos || b.nivel - a.nivel);
   }
@@ -5390,7 +5368,6 @@ function renderizarCartoes(fichas, aba) {
   if (!ordenados.length) {
     const msgs = {
       abismo: 'Nenhum Desperto tocou o Abismo ainda.',
-      semana: 'Nenhuma atividade registrada esta semana.',
     };
     grid.innerHTML = `<div class="lendas-loading"><div class="lendas-loading-rune"><svg class="ic"><use href="#ic-moon"/></svg></div><p style="color:var(--text-muted);font-size:.85rem">${msgs[aba] || 'Nenhum personagem encontrado.'}</p></div>`;
     return;
@@ -6635,7 +6612,6 @@ function abrirPerfilPublico(f) {
       <!-- ═══ BANNER ÉPICO ═══ -->
       <div class="livro-banner">
         ${wallpaperUrl ? `<div class="livro-banner-bg" style="background-image:url('${_escUrl(wallpaperUrl)}')"></div>` : ''}
-        ${(p.gifPoder || p.gifTransformacao) ? `<div class="livro-banner-gif"><img src="${_escUrl(p.gifTransformacao || p.gifPoder)}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
         <div class="livro-banner-gradient"></div>
         ${f.rank ? `<div class="livro-banner-rank-seal">${icone('crown','ic-sm')} ${_escHtml(f.rank)}</div>` : ''}
         <button class="livro-close" onclick="document.getElementById('livro-overlay').remove()" title="Fechar">${icone('close')}</button>
