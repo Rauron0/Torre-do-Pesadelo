@@ -4630,6 +4630,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
           <button class="lendas-tab" onclick="mudarAbaRanking('nivel',this)"><svg class="ic"><use href="#ic-star"></use></svg> Nível</button>
           <button class="lendas-tab" onclick="mudarAbaRanking('abismo',this)"><svg class="ic"><use href="#ic-core"></use></svg> Núcleo</button>
           <button class="lendas-tab" onclick="mudarAbaRanking('feitos',this)"><svg class="ic"><use href="#ic-sword"></use></svg> Feitos</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('curtidas',this)"><svg class="ic"><use href="#ic-heart"></use></svg> Curtidas</button>
         </div>
         <div class="lendas-tab-label" id="lendas-tab-label">Lendas das Torres — classificação geral por poder e núcleos absorvidos</div>
       </div>
@@ -5329,10 +5330,11 @@ const WALLPAPERS = [
 ];
 
 const ABA_LABELS = {
-  geral:  'Lendas das Torres — classificação geral por poder e núcleos absorvidos',
-  nivel:  'Classificação por nível de progressão',
-  abismo: 'Classificação por núcleos absorvidos do Abismo',
-  feitos: 'Classificação por feitos registrados em batalha',
+  geral:    'Lendas das Torres — classificação geral por poder e núcleos absorvidos',
+  nivel:    'Classificação por nível de progressão',
+  abismo:   'Classificação por núcleos absorvidos do Abismo',
+  feitos:   'Classificação por feitos registrados em batalha',
+  curtidas: 'Os personagens mais curtidos pela comunidade',
 };
 
 function mudarAbaRanking(aba, btn) {
@@ -5354,6 +5356,8 @@ function _ordenarFichas(fichas, aba) {
       return [...fichas].sort((a,b) => (parseInt(b.nucleos)||0) - (parseInt(a.nucleos)||0));
     case 'feitos':
       return [...fichas].sort((a,b) => _contarLinhas(b.socFeitos) - _contarLinhas(a.socFeitos));
+    case 'curtidas':
+      return [...fichas].sort((a,b) => (parseInt(b.curtidas)||0) - (parseInt(a.curtidas)||0));
     default: // geral
       return [...fichas].sort((a,b) => b.score - a.score || b.nucleos - a.nucleos || b.nivel - a.nivel);
   }
@@ -5419,6 +5423,7 @@ function renderizarCartoes(fichas, aba) {
             ${f.rank ? `<span class="lenda-meta-chip rank">${_escHtml(f.rank)}</span>` : ''}
             ${f.cidade ? `<span class="lenda-meta-chip">${icone('eye','ic-sm')} ${_escHtml(f.cidade)}</span>` : ''}
             <span class="lenda-meta-chip">${icone('core','ic-sm')} ${f.nucleos}</span>
+            ${f.curtidas > 0 ? `<span class="lenda-meta-chip">${icone('heart','ic-sm')} ${f.curtidas}</span>` : ''}
           </div>
           <div class="lenda-power-bar">
             <div class="lenda-power-fill" style="width:${pct}%"></div>
@@ -5452,6 +5457,11 @@ function _fichaFromRankingGlobal(docId, d) {
     nivel: nivel.toString(),
     poder: d.poder || '—',
     nucleos,
+    // Math.max(0, ...) só por segurança: curtidas nunca deveria ficar
+    // negativa, mas se algum doc antigo tiver entrado fora da contagem
+    // (ex: like apagado manualmente direto no Firestore), não queremos
+    // exibir um número negativo no ranking.
+    curtidas: Math.max(0, parseInt(d.curtidas) || 0),
     score: (typeof d.score === 'number') ? d.score : (nivel * 10 + nucleos),
     ts: d.ts || 0,
     vitorias: parseInt(d.vitorias) || 0,
@@ -5486,6 +5496,7 @@ function _fichaFromRankingGlobal(docId, d) {
     // ─ Grimório — Aba Poder ─
     poderDescricao: d.poderDescricao || '',
     poderSuprema:   d.poderSuprema   || '',
+    poderConceito:  d.poderConceito  || '',
     tecnicas:       Array.isArray(d.tecnicas) ? d.tecnicas : [],
     // Flag interna: indica origem do registro (para migração automática)
     _fromRankingGlobal: true,
@@ -5523,6 +5534,7 @@ async function _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId) 
     nivel: nivel.toString(),
     poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
     nucleos, score, ts,
+    curtidas: 0, // personagem ainda fora do rankingGlobal — sem curtidas registradas ainda
     vitorias: parseInt(dados['f-vitorias'] || '0') || 0,
     foto: fotoPrincipal,
     despertar: getDespertar(dados),
@@ -5551,6 +5563,7 @@ async function _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId) 
     // ─ Grimório — Aba Poder ─
     poderDescricao: dados['p-descricao'] || '',
     poderSuprema:   dados['p-suprema']   || '',
+    poderConceito:  dados['p-conceito']  || '',
     tecnicas:       Array.isArray(dados.tecnicas) ? dados.tecnicas.filter(t => t && (t.nome || t.desc)) : [],
   };
 }
@@ -5994,10 +6007,12 @@ async function alternarCurtida(targetPid, targetUser, targetNome) {
   const docId = _likeDocId(targetPid, sourcePid);
   const btn = document.getElementById('btn-curtir');
   if (btn) btn.style.opacity = '.6';
+  let _curtiuAgora = null; // true = acabou de curtir, false = acabou de descurtir, null = falhou
   try {
     const snap = await window.getDoc(window.doc(window.db, 'likes', docId));
     if (snap.exists()) {
       await window.deleteDoc(window.doc(window.db, 'likes', docId));
+      _curtiuAgora = false;
     } else {
       await window.setDoc(window.doc(window.db, 'likes', docId), {
         target: targetPid,
@@ -6007,10 +6022,27 @@ async function alternarCurtida(targetPid, targetUser, targetNome) {
         sourceNome: personagemAtual,
         ts: Date.now()
       });
+      _curtiuAgora = true;
     }
   } catch(e) {
     console.warn('[Likes] Erro ao curtir/descurtir:', e);
     _diag('alternarCurtida(' + docId + ')', e);
+  }
+  // Mantém um contador "curtidas" direto no rankingGlobal do personagem
+  // curtido — mesmo padrão já usado para nivel/nucleos/score: tudo que o
+  // ranking precisa pra ordenar já vem pronto no doc, sem precisar de uma
+  // consulta de contagem por personagem a cada troca de aba. Usa updateDoc
+  // (não setDoc) de propósito: se o personagem curtido ainda não tem doc
+  // em rankingGlobal (nunca salvou a ficha), updateDoc falha e cai no
+  // catch — evita criar um doc "fantasma" incompleto que apareceria como
+  // um card quebrado no grid geral do ranking. O contador passa a existir
+  // normalmente na primeira vez que esse personagem salvar a ficha.
+  if (_curtiuAgora !== null && window.updateDoc && window.increment) {
+    try {
+      await window.updateDoc(window.doc(window.db, 'rankingGlobal', targetPid), {
+        curtidas: window.increment(_curtiuAgora ? 1 : -1)
+      });
+    } catch(e) { /* personagem ainda fora do rankingGlobal — sem problema */ }
   }
   await _atualizarUiCurtidas(targetPid);
   const btnFinal = document.getElementById('btn-curtir');
@@ -6509,6 +6541,7 @@ function abrirPerfilPublico(f) {
           f.socTimeline = d['soc-timeline'] || f.socTimeline || '';
           f.poderDescricao = d['p-descricao'] || f.poderDescricao || '';
           f.poderSuprema = d['p-suprema'] || f.poderSuprema || '';
+          f.poderConceito = d['p-conceito'] || f.poderConceito || '';
           f.tecnicas = (Array.isArray(d.tecnicas) ? d.tecnicas.filter(t => t && (t.nome || t.desc)) : null) || f.tecnicas || [];
         }
       } catch(e) { /* silencioso — não interrompe a abertura do perfil */ }
@@ -6714,31 +6747,30 @@ function abrirPerfilPublico(f) {
             <span class="livro-area-empty">Nenhuma descrição de poder registrada.</span>
           </div>`}
 
+          <!-- Conceito do Poder: a explicação NARRATIVA de por que o personagem
+               tem esse poder (base na personalidade) — substitui Técnicas e
+               Técnica Suprema aqui no perfil público. Mecânicas de combate
+               são informação privada do próprio personagem/GM; expor técnicas
+               revelaria de antemão o que ele pode fazer numa luta para
+               qualquer outro jogador que abrir este Grimório. -->
+          ${f.poderConceito ? `
           <div class="livro-section">
-            <div class="livro-section-title">${icone('sword','ic-sm')} Técnicas</div>
-            ${(f.tecnicas && f.tecnicas.length) ? `
-            <div class="livro-tecnicas-lista">
-              ${f.tecnicas.map(t => `
-                <div class="livro-tecnica-card">
-                  <div class="livro-tecnica-header">
-                    <span class="livro-tecnica-nome">${_escHtml(t.nome) || 'Técnica sem nome'}</span>
-                    ${t.custo ? `<span class="livro-tecnica-custo">${_escHtml(t.custo)} PE</span>` : ''}
-                  </div>
-                  ${t.desc ? `<div class="livro-tecnica-desc">${_escHtml(t.desc).replace(/\n/g,'<br>')}</div>` : ''}
-                  ${t.efei ? `<div class="livro-tecnica-efeito"><strong>Efeitos:</strong> ${_escHtml(t.efei).replace(/\n/g,'<br>')}</div>` : ''}
-                </div>`).join('')}
-            </div>` : `<span class="livro-area-empty">Nenhuma técnica registrada.</span>`}
-          </div>
-
-          ${f.poderSuprema ? `
-          <div class="livro-section">
-            <div class="livro-section-title">${icone('crown','ic-sm')} Técnica Suprema</div>
-            <div class="livro-descricao livro-suprema">${_escHtml(f.poderSuprema).replace(/\n/g,'<br>')}</div>
+            <div class="livro-section-title">${icone('prism','ic-sm')} Conceito do Poder</div>
+            <div class="livro-descricao">${_escHtml(f.poderConceito).replace(/\n/g,'<br>')}</div>
           </div>` : `
           <div class="livro-section">
-            <div class="livro-section-title">${icone('crown','ic-sm')} Técnica Suprema</div>
-            <span class="livro-area-empty">Nenhuma técnica suprema registrada.</span>
+            <div class="livro-section-title">${icone('prism','ic-sm')} Conceito do Poder</div>
+            <span class="livro-area-empty">Nenhum conceito registrado.</span>
           </div>`}
+
+          <!-- Núcleos Absorvidos: mesmo dado usado para ordenar a aba "Núcleo"
+               do ranking (f-nucleo da ficha) — aqui só exibido, não editável. -->
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('core','ic-sm')} Núcleos Absorvidos</div>
+            ${f.nucleos > 0
+              ? `<div class="livro-descricao">Este personagem já absorveu <strong style="color:var(--gold-light)">${f.nucleos}</strong> núcleo${f.nucleos === 1 ? '' : 's'} do Abismo — parâmetro usado na aba "Núcleo" do ranking.</div>`
+              : `<span class="livro-area-empty">Nenhum núcleo absorvido até o momento.</span>`}
+          </div>
         </div>
 
         <!-- ═══ ABA: SOBRE — História, Objetivos, Filosofia, Feitos, Conquistas, Relações ═══ -->
@@ -8949,6 +8981,9 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       ${fieldGroup('Descrição do Poder','p-descricao','textarea')}
       ${fieldGroup('Técnica Final / Suprema','p-suprema','textarea')}
     </div>
+    <div class="field-row">
+      ${fieldGroup('Conceito do Poder — por que seu personagem tem esse poder?','p-conceito','textarea')}
+    </div>
 
     <!-- PASSIVAS -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;margin-bottom:.5rem">
@@ -9759,7 +9794,7 @@ function coletarDados() {
     'pv-extra','pv-gasto','sta-extra','sta-gasto','pe-gasto','pe-custo',
     'f-mov','f-mov-voo','f-mov-nado','f-mt','f-es','f-nucleo',
     // poder
-    'p-principal','p-attr','p-max','p-descricao','p-suprema',
+    'p-principal','p-attr','p-max','p-descricao','p-suprema','p-conceito',
     // registro
     'r-personalidade','r-mentalidade','r-comportamento',
     'r-tracos','r-defeitos','r-ideais','r-ligacoes','r-antecedentes','r-historia','r-eventos','r-npcs',
@@ -9956,6 +9991,10 @@ async function updateRankingEntry(user, personagem, dados, foto, silencioso) {
     // REGRA: qualquer campo exibido em abrirPerfilPublico() DEVE ser salvo aqui.
     // Campos ausentes em fichas antigas recebem string vazia (nunca undefined/null
     // para strings, para não quebrar o layout de nenhum personagem).
+    // merge:true é necessário aqui: o campo "curtidas" é mantido por fora deste
+    // fluxo (incrementado/decrementado direto em alternarCurtida, a cada like).
+    // Sem merge, este setDoc reescreveria o documento inteiro a cada vez que o
+    // jogador salvasse a ficha, apagando a contagem de curtidas acumulada.
     await window.setDoc(window.doc(window.db, 'rankingGlobal', docId), {
       user: userNorm,
       personagem,                                              // necessário para galeria e lookup
@@ -9995,8 +10034,9 @@ async function updateRankingEntry(user, personagem, dados, foto, silencioso) {
       // ─── Grimório — Aba Poder (necessário para abrirPerfilPublico) ───
       poderDescricao: dados['p-descricao'] || '',
       poderSuprema:   dados['p-suprema']   || '',
+      poderConceito:  dados['p-conceito']  || '',
       tecnicas:       Array.isArray(dados.tecnicas) ? dados.tecnicas.filter(t => t && (t.nome || t.desc)) : [],
-    });
+    }, { merge: true });
   } catch(e) {
     if (!silencioso) _diag('updateRankingEntry(' + docId + ')', e);
     console.warn('[Ranking] Erro ao atualizar rankingGlobal:', e);
@@ -10926,6 +10966,20 @@ async function _migrarCapitalizacaoAntiga(userDigitadoOriginal, userNormalizado)
   }
 }
 
+// ─── OVERRIDE DE ACESSO GM ───────────────────────────────────────────────
+// O usuário "rauron" é o criador/dono do sistema e deve SEMPRE entrar como
+// GM, independente do que estiver salvo no campo "role" do documento
+// usuarios_extras/rauron no Firestore. Isso corrige o caso em que esse
+// cadastro está ausente, desatualizado ou com o role errado — em vez de
+// depender de corrigir o banco manualmente (frágil, fácil de esquecer
+// numa migração futura), a garantia fica fixa aqui no código.
+// Lista em array para já deixar pronto caso outro super-usuário precise
+// do mesmo no futuro, sem precisar duplicar a lógica.
+const USUARIOS_FORCAR_GM = ['rauron'];
+function _roleEfetiva(user, roleOriginal) {
+  return USUARIOS_FORCAR_GM.includes(_normUser(user)) ? 'gm' : (roleOriginal || 'player');
+}
+
 // ─── LOGIN / LOGOUT ───
 async function tentarLogin() {
   const userOriginal = document.getElementById('login-user').value.trim();
@@ -10953,9 +11007,10 @@ async function tentarLogin() {
       return;
     }
     const perfil = snap.data();
+    perfil.role = _roleEfetiva(user, perfil.role);
     USUARIOS[user] = perfil;
     usuarioAtual = user;
-    roleAtual    = perfil.role || 'player';
+    roleAtual    = perfil.role;
 
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
@@ -11128,7 +11183,7 @@ async function carregarUsuariosExtras() {
     snap.forEach(docSnap => {
       const d = docSnap.data();
       // Armazena apenas role e nome — NUNCA senha
-      USUARIOS[docSnap.id] = { role: d.role || 'player', nome: d.nome || docSnap.id };
+      USUARIOS[docSnap.id] = { role: _roleEfetiva(docSnap.id, d.role), nome: d.nome || docSnap.id };
     });
     console.log('[Firestore] Perfis carregados:', Object.keys(USUARIOS).length);
   } catch(e) { console.warn('[Firestore] Erro ao carregar perfis:', e); }
@@ -11925,13 +11980,15 @@ document.addEventListener('DOMContentLoaded', () => {
     doc,
     getDoc,
     setDoc,
+    updateDoc,
     deleteDoc,
     addDoc,
     collection,
     getDocs,
     query,
     where,
-    getCountFromServer
+    getCountFromServer,
+    increment
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import {
     getAuth,
@@ -11963,6 +12020,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.doc         = doc;
   window.getDoc      = getDoc;
   window.setDoc      = setDoc;
+  window.updateDoc   = updateDoc;
   window.deleteDoc   = deleteDoc;
   window.addDoc      = addDoc;
   window.collection  = collection;
@@ -11970,6 +12028,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.query        = query;
   window.where        = where;
   window.getCountFromServer = getCountFromServer;
+  window.increment    = increment;
 
   // ── Firebase Auth helpers expostos para o script principal ──
   window._fbSignIn   = (email, pass) => signInWithEmailAndPassword(auth, email, pass);
