@@ -1467,6 +1467,72 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   .lendas-grid { grid-template-columns: 1fr; }
 }
 
+/* ═══ RANKING DE ATRIBUTOS — 6 pódios independentes (Top 3 cada) ═══ */
+.atributos-rank-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin: .5rem 0 2rem;
+}
+@media (max-width: 640px) {
+  .atributos-rank-grid { grid-template-columns: 1fr 1fr; gap: .7rem; }
+}
+@media (max-width: 400px) {
+  .atributos-rank-grid { grid-template-columns: 1fr; }
+}
+.attr-rank-panel {
+  background: linear-gradient(160deg, #131118 0%, #0d0b12 100%);
+  border: 1px solid rgba(60,40,60,.6);
+  border-top: 2px solid var(--accent);
+  border-radius: 6px;
+  padding: 1rem 1.1rem 1.2rem;
+}
+.attr-rank-header {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: var(--gold-light);
+  letter-spacing: 1px;
+  display: flex; align-items: center; gap: .5rem;
+  border-bottom: 1px solid rgba(60,40,60,.6);
+  padding-bottom: .6rem;
+  margin-bottom: .7rem;
+}
+.attr-rank-header .ic { opacity: .85; }
+.attr-rank-list { display: flex; flex-direction: column; gap: .45rem; }
+.attr-rank-row {
+  display: flex; align-items: center; gap: .6rem;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 4px;
+  padding: .4rem .6rem;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+.attr-rank-row:hover { background: rgba(255,255,255,.05); border-color: rgba(193,63,63,.4); }
+.attr-rank-pos {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  width: 1.4rem; flex-shrink: 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+.attr-rank-row.ouro .attr-rank-pos   { color: var(--gold-light); text-shadow: 0 0 12px rgba(180,140,30,.6); }
+.attr-rank-row.prata .attr-rank-pos  { color: #d0d0e0; text-shadow: 0 0 8px rgba(200,200,220,.3); }
+.attr-rank-row.bronze .attr-rank-pos { color: #c88a4a; text-shadow: 0 0 8px rgba(200,140,74,.3); }
+.attr-rank-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.attr-rank-nome {
+  font-size: .85rem; color: var(--silver);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.attr-rank-jogador { font-size: .68rem; color: var(--text-muted); }
+.attr-rank-valor {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700; font-size: 1.05rem;
+  color: var(--accent-light);
+  flex-shrink: 0;
+}
+
 /* CARTÃO base */
 .lenda-card {
   position: relative;
@@ -4655,6 +4721,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
           <button class="lendas-tab" onclick="mudarAbaRanking('abismo',this)"><svg class="ic"><use href="#ic-core"></use></svg> Núcleo</button>
           <button class="lendas-tab" onclick="mudarAbaRanking('feitos',this)"><svg class="ic"><use href="#ic-sword"></use></svg> Feitos</button>
           <button class="lendas-tab" onclick="mudarAbaRanking('curtidas',this)"><svg class="ic"><use href="#ic-heart"></use></svg> Curtidas</button>
+          <button class="lendas-tab" onclick="mudarAbaRanking('atributos',this)"><svg class="ic"><use href="#ic-star"></use></svg> Atributos</button>
         </div>
         <div class="lendas-tab-label" id="lendas-tab-label">Lendas das Torres — classificação geral por poder e núcleos absorvidos</div>
       </div>
@@ -5354,11 +5421,12 @@ const WALLPAPERS = [
 ];
 
 const ABA_LABELS = {
-  geral:    'Lendas das Torres — classificação geral por poder e núcleos absorvidos',
-  nivel:    'Classificação por nível de progressão',
-  abismo:   'Classificação por núcleos absorvidos do Abismo',
-  feitos:   'Classificação por feitos registrados em batalha',
-  curtidas: 'Os personagens mais curtidos pela comunidade',
+  geral:     'Lendas das Torres — classificação geral por poder e núcleos absorvidos',
+  nivel:     'Classificação por nível de progressão',
+  abismo:    'Classificação por núcleos absorvidos do Abismo',
+  feitos:    'Classificação por feitos registrados em batalha',
+  curtidas:  'Os personagens mais curtidos pela comunidade',
+  atributos: 'Top 3 de cada atributo entre todos os personagens das Torres',
 };
 
 function mudarAbaRanking(aba, btn) {
@@ -5387,9 +5455,82 @@ function _ordenarFichas(fichas, aba) {
   }
 }
 
+// Ícone temático de cada atributo no Ranking de Atributos.
+function _attrIconeRanking(sigla) {
+  return ({ for:'sword', des:'bolt', vig:'shield', int:'scroll', alm:'flame', car:'handshake' })[sigla] || 'star';
+}
+
+// ─── RANKING DE ATRIBUTOS ───────────────────────────────────────────────
+// Diferente das outras abas (uma lista única ordenada): aqui cada um dos
+// 6 atributos tem seu próprio pódio independente, mostrando só o Top 3 —
+// quem fica abaixo do 3º lugar simplesmente não aparece naquele atributo
+// (pode aparecer no pódio de outro). Os dados vêm direto da ficha
+// (campos a-for/a-des/a-vig/a-int/a-alm/a-car, espelhados no rankingGlobal
+// por updateRankingEntry como "atributos").
+// Critério de empate: atributosTotal (soma dos 6 atributos) — quando dois
+// personagens têm o mesmo valor num atributo isolado, quem investiu mais
+// pontos no total geral fica na posição melhor. Resolve o empate de forma
+// objetiva sem favorecer arbitrariamente um personagem sobre outro.
+function _calcularTopAtributos(fichas) {
+  return ATRIBUTOS_BASE.map(({ sigla, nome }) => {
+    const candidatos = fichas.filter(f => f.atributos && typeof f.atributos[sigla] === 'number');
+    const top = [...candidatos].sort((a, b) =>
+      (b.atributos[sigla] - a.atributos[sigla]) || ((b.atributosTotal||0) - (a.atributosTotal||0))
+    ).slice(0, 3);
+    return { sigla, nome, top };
+  });
+}
+
+function renderRankingAtributos(grid, fichas) {
+  const paineis = _calcularTopAtributos(fichas);
+  const medalhas = ['ouro', 'prata', 'bronze'];
+  grid.innerHTML = '';
+
+  paineis.forEach(({ sigla, nome, top }) => {
+    const card = document.createElement('div');
+    card.className = 'attr-rank-panel';
+    card.innerHTML = `
+      <div class="attr-rank-header">${icone(_attrIconeRanking(sigla),'ic-sm')} ${nome}</div>
+      <div class="attr-rank-list"></div>
+      ${!top.length ? '<span class="livro-area-empty">Nenhum registro ainda.</span>' : ''}
+    `;
+    const lista = card.querySelector('.attr-rank-list');
+    top.forEach((f, i) => {
+      const row = document.createElement('div');
+      row.className = `attr-rank-row ${medalhas[i] || ''}`;
+      row.innerHTML = `
+        <span class="attr-rank-pos">${i+1}</span>
+        <span class="attr-rank-info">
+          <span class="attr-rank-nome">${_escHtml(f.nome)}</span>
+          <span class="attr-rank-jogador">${_escHtml(USUARIOS[f.user]?.nome || f.user)}</span>
+        </span>
+        <span class="attr-rank-valor">${f.atributos[sigla]}</span>
+      `;
+      // onclick via closure (não string interpolada) — mesmo padrão já
+      // usado nos cards normais do ranking, evita qualquer risco de
+      // nome de personagem com aspas quebrando um atributo onclick="...".
+      row.onclick = () => abrirPerfilPublico(f);
+      lista.appendChild(row);
+    });
+    grid.appendChild(card);
+  });
+}
+
 function renderizarCartoes(fichas, aba) {
   const grid = document.getElementById('ranking-grid');
   if (!grid) return;
+
+  // O Ranking de Atributos usa um layout totalmente diferente (6 pódios
+  // independentes, não uma lista única ordenada) — troca a classe do
+  // grid e delega para a função própria. Qualquer outra aba reaplica a
+  // classe normal de cards (necessário para o caso de o usuário ir e
+  // voltar entre "Atributos" e qualquer outra aba).
+  if (aba === 'atributos') {
+    grid.className = 'atributos-rank-grid';
+    renderRankingAtributos(grid, fichas);
+    return;
+  }
+  grid.className = 'lendas-grid';
 
   const ordenados = _ordenarFichas(fichas, aba);
 
@@ -5486,6 +5627,12 @@ function _fichaFromRankingGlobal(docId, d) {
     // (ex: like apagado manualmente direto no Firestore), não queremos
     // exibir um número negativo no ranking.
     curtidas: Math.max(0, parseInt(d.curtidas) || 0),
+    // null (não 10 padrão) quando ausente: personagens cuja ficha ainda
+    // não foi salva desde que este recurso foi criado simplesmente não
+    // entram no Ranking de Atributos até salvarem de novo — em vez de
+    // aparecerem "empatados em 10" por um valor que nunca foi real.
+    atributos: d.atributos || null,
+    atributosTotal: (typeof d.atributosTotal === 'number') ? d.atributosTotal : null,
     score: (typeof d.score === 'number') ? d.score : (nivel * 10 + nucleos),
     ts: d.ts || 0,
     vitorias: parseInt(d.vitorias) || 0,
@@ -5550,6 +5697,15 @@ async function _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId) 
   const nomeExibido = dados['f-nome'] || nomePersonagem;
   const score = nivel * 10 + nucleos;
   const ts = fichaSnap.data().ts || 0;
+  const atributos = {
+    for: parseInt(dados['a-for']) || 10,
+    des: parseInt(dados['a-des']) || 10,
+    vig: parseInt(dados['a-vig']) || 10,
+    int: parseInt(dados['a-int']) || 10,
+    alm: parseInt(dados['a-alm']) || 10,
+    car: parseInt(dados['a-car']) || 10,
+  };
+  const atributosTotal = Object.values(atributos).reduce((s, v) => s + v, 0);
 
   return {
     user, info,
@@ -5558,6 +5714,7 @@ async function _fichaFallbackIndividual(user, info, nomePersonagem, fichaDocId) 
     nivel: nivel.toString(),
     poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
     nucleos, score, ts,
+    atributos, atributosTotal,
     curtidas: 0, // personagem ainda fora do rankingGlobal — sem curtidas registradas ainda
     vitorias: parseInt(dados['f-vitorias'] || '0') || 0,
     foto: fotoPrincipal,
@@ -5859,6 +6016,17 @@ async function carregarRanking() {
       return !_rankingOcultos.has(docId);
     });
 
+    // Sobrescreve "curtidas" com a contagem REAL, vinda direto da coleção
+    // 'likes' (ver _carregarMapaCurtidas) — não confiamos no que estiver
+    // salvo em rankingGlobal.curtidas, porque esse campo não é mais
+    // mantido por lá (ver explicação em alternarCurtida).
+    try {
+      const mapaCurtidas = await _carregarMapaCurtidas();
+      visiveis.forEach(f => {
+        f.curtidas = mapaCurtidas[_fsDocId(f.user, f.nomePersonagem)] || 0;
+      });
+    } catch(e) { console.warn('[Ranking] Erro ao aplicar mapa de curtidas:', e); }
+
     _lendasFichas = visiveis;
     renderizarCartoes(visiveis, _abaAtual);
     _salvarCacheRanking(visiveis);
@@ -5996,6 +6164,31 @@ async function contarCurtidas(targetPid) {
   } catch(e) { console.warn('[Likes] Erro ao contar curtidas:', e); return 0; }
 }
 
+// Soma TODAS as curtidas de TODOS os personagens de uma vez só (1 leitura
+// da coleção 'likes' inteira), devolvendo um mapa { targetPid: total }.
+// Usado para alimentar a aba "Curtidas" do ranking para QUALQUER pessoa
+// que abrir o Livro das Lendas — em vez de uma consulta de contagem por
+// personagem a cada carregamento (N consultas), ou de depender de um
+// contador salvo no rankingGlobal (que exigiria permissão de escrita no
+// doc de outro personagem — ver explicação em alternarCurtida).
+// A coleção 'likes' também guarda curtidas de POSTS (target = id do
+// post, não de personagem) — essas entram no mapa sob a chave do post,
+// mas nunca colidem com um pid de personagem, então ficam só ali sem uso,
+// sem problema nenhum.
+async function _carregarMapaCurtidas() {
+  const mapa = {};
+  if (!window.db || !window.collection || !window.getDocs) return mapa;
+  try {
+    const snap = await window.getDocs(window.collection(window.db, 'likes'));
+    snap.forEach(docSnap => {
+      const target = (docSnap.data() || {}).target;
+      if (!target) return;
+      mapa[target] = (mapa[target] || 0) + 1;
+    });
+  } catch(e) { console.warn('[Likes] Erro ao carregar mapa de curtidas:', e); }
+  return mapa;
+}
+
 async function jaCurtiu(targetPid, sourcePid) {
   if (!window.db || !window.doc || !window.getDoc) return false;
   try {
@@ -6052,21 +6245,26 @@ async function alternarCurtida(targetPid, targetUser, targetNome) {
     console.warn('[Likes] Erro ao curtir/descurtir:', e);
     _diag('alternarCurtida(' + docId + ')', e);
   }
-  // Mantém um contador "curtidas" direto no rankingGlobal do personagem
-  // curtido — mesmo padrão já usado para nivel/nucleos/score: tudo que o
-  // ranking precisa pra ordenar já vem pronto no doc, sem precisar de uma
-  // consulta de contagem por personagem a cada troca de aba. Usa updateDoc
-  // (não setDoc) de propósito: se o personagem curtido ainda não tem doc
-  // em rankingGlobal (nunca salvou a ficha), updateDoc falha e cai no
-  // catch — evita criar um doc "fantasma" incompleto que apareceria como
-  // um card quebrado no grid geral do ranking. O contador passa a existir
-  // normalmente na primeira vez que esse personagem salvar a ficha.
-  if (_curtiuAgora !== null && window.updateDoc && window.increment) {
-    try {
-      await window.updateDoc(window.doc(window.db, 'rankingGlobal', targetPid), {
-        curtidas: window.increment(_curtiuAgora ? 1 : -1)
-      });
-    } catch(e) { /* personagem ainda fora do rankingGlobal — sem problema */ }
+  // Atualiza a contagem em memória na hora (resposta instantânea na tela,
+  // sem esperar nova consulta). A contagem REAL e definitiva — usada
+  // sempre que o ranking é (re)carregado por QUALQUER pessoa — vem de
+  // _carregarMapaCurtidas(), que soma a coleção 'likes' inteira de uma vez.
+  //
+  // BUG CORRIGIDO: a versão anterior tentava manter um contador "curtidas"
+  // incremental direto no rankingGlobal do personagem CURTIDO. Isso só
+  // funciona se quem está curtindo tiver permissão de escrever no
+  // rankingGlobal de OUTRO personagem — e as regras do Firestore
+  // corretamente bloqueiam isso para jogadores comuns (só o próprio dono,
+  // ou GM/ADM, pode escrever lá — mesma razão documentada em
+  // podeMigrarOutros, algumas funções acima). Por isso curtir o
+  // personagem de outra pessoa nunca refletia no ranking: o updateDoc
+  // falhava silenciosamente e caía no catch. Contar direto da coleção
+  // 'likes' (onde cada usuário só cria/apaga o PRÓPRIO registro de
+  // curtida) é o único jeito que realmente funciona para qualquer jogador.
+  if (_curtiuAgora !== null) {
+    const alvo = _lendasFichas.find(f => _fsDocId(f.user, f.nomePersonagem) === targetPid);
+    if (alvo) alvo.curtidas = Math.max(0, (alvo.curtidas || 0) + (_curtiuAgora ? 1 : -1));
+    if (_abaAtual === 'curtidas') renderizarCartoes(_lendasFichas, _abaAtual);
   }
   await _atualizarUiCurtidas(targetPid);
   const btnFinal = document.getElementById('btn-curtir');
@@ -8692,6 +8890,25 @@ function getMod(val) {
 }
 function fmtMod(m) { return (m>=0?'+':'')+m; }
 
+// Nome completo do atributo a partir da sigla — reaproveita ATRIBUTOS_BASE
+// (já usado no card de atributos da própria ficha) para que o painel
+// inline do GM/ADM mostre "Força", "Destreza" etc. em vez de FOR/DES.
+function _attrNomeCompleto(sigla) {
+  const found = ATRIBUTOS_BASE.find(a => a.sigla === sigla);
+  return found ? found.nome : sigla.toUpperCase();
+}
+
+// Recalcula e exibe o modificador de UM atributo no painel inline do
+// GM/ADM (gerarCamposInline) — chamado ao digitar e ao carregar os dados.
+// Esse painel é uma versão simplificada que não passa pelo motor de
+// fórmulas completo da ficha (calcularTudo); por isso o modificador
+// precisa ser calculado aqui também, e não só lido de outro lugar.
+function _atualizarModInline(user, sigla) {
+  const input = document.getElementById(`${user}-a-${sigla}`);
+  const modEl = document.getElementById(`${user}-m-${sigla}`);
+  if (input && modEl) modEl.textContent = fmtMod(getMod(input.value));
+}
+
 function avaliarFormula(expr, ctx) {
   // Parser seguro: substitui variáveis e funções math whitelisted, executa via Function.
   // Chaves mais longas são substituídas PRIMEIRO para evitar matches parciais.
@@ -8957,10 +9174,9 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       ${fieldGroup('Poder','f-poder-nome')}
       ${fieldGroup('Antecedente','f-antecedente')}
     </div>
-    <div class="field-row cols-4">
+    <div class="field-row cols-3">
       ${fieldGroup('Raça','f-raca')}
       ${fieldGroup('Nível','f-nivel','number',{min:1,max:20,default:1})}
-      ${fieldGroup('Progressão do Núcleo','f-nucleo-prog')}
       <div class="field-group">
         <label>Despertar <span style="font-size:.6rem;color:#555;letter-spacing:0">(configurável)</span></label>
         <select id="f-despertar" oninput="salvarLocal()" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.55rem .7rem;font-family:inherit;font-size:.9rem;outline:none;transition:border-color .2s;width:100%">
@@ -9000,6 +9216,10 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       ${fieldGroup('Poder Principal','p-principal')}
       ${fieldGroup('Atributo Principal','p-attr')}
       ${fieldGroup('Técnicas Máximas','p-max','number',{default:0})}
+    </div>
+    <div class="field-row cols-2">
+      ${fieldGroup('Núcleo Absorvido (atual/máx)','f-nucleo')}
+      ${fieldGroup('Progressão do Núcleo','f-nucleo-prog')}
     </div>
     <div class="field-row cols-2">
       ${fieldGroup('Descrição do Poder','p-descricao','textarea')}
@@ -9221,11 +9441,10 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
           </div>
         </div>
 
-        <!-- Maestrias/Es + Núcleo -->
-        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin-bottom:.75rem">
+        <!-- Maestrias/Es -->
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;margin-bottom:.75rem">
           ${fieldGroup('Mt. disponíveis','f-mt','number',{default:5,min:0})}
           ${fieldGroup('Es. disponíveis','f-es','number',{default:3,min:0})}
-          ${fieldGroup('Núcleo (atual/máx)','f-nucleo')}
         </div>
 
         <!-- Testes de Morte -->
@@ -10011,6 +10230,16 @@ async function updateRankingEntry(user, personagem, dados, foto, silencioso) {
     const nucleoRaw = dados['f-nucleo'] || '0';
     const nucleos = parseInt(nucleoRaw.toString().split('/')[0]) || 0;
     const nivel = parseInt(dados['f-nivel'] || '1') || 1;
+    // ─── Atributos — necessários para o Ranking de Atributos (top 3 por atributo) ───
+    const atributos = {
+      for: parseInt(dados['a-for']) || 10,
+      des: parseInt(dados['a-des']) || 10,
+      vig: parseInt(dados['a-vig']) || 10,
+      int: parseInt(dados['a-int']) || 10,
+      alm: parseInt(dados['a-alm']) || 10,
+      car: parseInt(dados['a-car']) || 10,
+    };
+    const atributosTotal = Object.values(atributos).reduce((s, v) => s + v, 0);
     // ─── CAMPOS COMPLETOS — toda informação necessária para o Perfil Público ───
     // REGRA: qualquer campo exibido em abrirPerfilPublico() DEVE ser salvo aqui.
     // Campos ausentes em fichas antigas recebem string vazia (nunca undefined/null
@@ -10024,6 +10253,8 @@ async function updateRankingEntry(user, personagem, dados, foto, silencioso) {
       personagem,                                              // necessário para galeria e lookup
       nome: dados['f-nome'] || personagem,
       nivel,
+      atributos,
+      atributosTotal,
       poder: dados['p-principal'] || dados['f-poder-nome'] || '—',
       classe: dados['f-classe'] || '',
       nucleos,
@@ -10686,7 +10917,12 @@ function gerarCamposInline(user, role) {
   html += `<div style="margin-bottom:1rem"><div style="font-size:.7rem;letter-spacing:2px;color:var(--accent-light);text-transform:uppercase;margin-bottom:.5rem">Atributos</div><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:.5rem">`;
   ['for','des','vig','int','alm','car'].forEach(a => {
     const v = d[`a-${a}`] || 10;
-    html += `<div style="text-align:center;background:var(--bg-input);border:1px solid var(--border);padding:.5rem"><div style="font-size:.6rem;color:var(--accent-light);letter-spacing:1px;text-transform:uppercase">${a.toUpperCase()}</div><input type="number" id="${user}-a-${a}" value="${v}" min="1" max="30" style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);text-align:center;font-size:1.1rem;font-family:'Playfair Display',serif;outline:none"></div>`;
+    const nome = _attrNomeCompleto(a);
+    html += `<div style="text-align:center;background:var(--bg-input);border:1px solid var(--border);padding:.5rem">
+      <div style="font-size:.6rem;color:var(--accent-light);letter-spacing:1px;text-transform:uppercase" title="${nome}">${nome}</div>
+      <input type="number" id="${user}-a-${a}" value="${v}" min="1" max="30" oninput="_atualizarModInline('${user}','${a}')" style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);text-align:center;font-size:1.1rem;font-family:'Playfair Display',serif;outline:none">
+      <div class="atributo-mod" id="${user}-m-${a}" style="font-size:.85rem;min-height:1.1em;margin-top:.35rem;padding:.1rem 0">${fmtMod(getMod(v))}</div>
+    </div>`;
   });
   html += `</div></div>`;
 
@@ -10757,6 +10993,9 @@ async function carregarDadosInline(user, container) {
         if (el) el.value = val;
       });
     }
+    // .value via JS não dispara oninput — recalcula os modificadores
+    // manualmente agora que os atributos reais já estão nos campos.
+    ['for','des','vig','int','alm','car'].forEach(a => _atualizarModInline(user, a));
   } catch(e) {
     console.warn('[carregarDadosInline] Erro ao carregar dados do Firestore para', user, e);
   }
