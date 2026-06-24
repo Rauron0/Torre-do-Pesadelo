@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a090d">
 <title>Torre do Pesadelo • Portal do Jogador</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,9 +22,34 @@
   --text-ghost: #5c596b;
 
   /* ─── ACENTO: SANGUE ─── */
-  --accent: #a82b2b;
-  --accent-light: #d24a4a;
+  /* Paleta de vermelho unificada. Antes o código misturava três vermelhos
+     distintos (#a82b2b declarado aqui mas quase nunca usado, #c13f3f e
+     #9c2a2a espalhados em centenas de lugares). Os tokens agora refletem
+     as DUAS cores que de fato dominam a interface, mais um conjunto de
+     tons translúcidos reutilizáveis — uma única fonte de verdade. */
+  --accent: #c13f3f;          /* vermelho-sangue vivo — cor de ação principal (era 193,63,63) */
+  --accent-light: #d24a4a;    /* realce / hover */
+  --accent-deep: #9c2a2a;     /* vermelho profundo — bordas, fundos, selos (era 156,42,42) */
   --accent-glow: rgba(210,74,74,.35);
+  /* Componentes RGB da paleta — permitem qualquer opacidade a partir da
+     MESMA cor base, via rgba(var(--accent-rgb), X). É a forma moderna de
+     ter uma fonte única de verdade sem precisar de um token por alfa. */
+  --accent-rgb: 193,63,63;    /* = #c13f3f */
+  --deep-rgb: 156,42,42;      /* = #9c2a2a */
+  /* Tints translúcidos do acento vivo (#c13f3f = 193,63,63) */
+  --accent-t08: rgba(193,63,63,.08);
+  --accent-t15: rgba(193,63,63,.15);
+  --accent-t25: rgba(193,63,63,.25);
+  --accent-t35: rgba(193,63,63,.35);
+  --accent-t40: rgba(193,63,63,.40);
+  --accent-t50: rgba(193,63,63,.50);
+  /* Tints translúcidos do acento profundo (#9c2a2a = 156,42,42) */
+  --deep-t08: rgba(156,42,42,.08);
+  --deep-t12: rgba(156,42,42,.12);
+  --deep-t20: rgba(156,42,42,.20);
+  --deep-t30: rgba(156,42,42,.30);
+  /* Vermelho claro de texto de alerta/erro (muito usado: #f5a0a0) */
+  --accent-text: #f5a0a0;
 
   /* ─── DOURADO ENVELHECIDO ─── */
   --gold: #b8972a;
@@ -131,29 +156,29 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 }
 .grimorio-modal {
   background: linear-gradient(160deg, #131118 0%, #0d0b12 100%);
-  border: 1px solid rgba(193,63,63,.35);
+  border: 1px solid var(--accent-t35);
   width: 100%; max-width: 760px;
   margin: auto;
   position: relative;
-  box-shadow: 0 12px 60px rgba(0,0,0,.9), 0 0 80px rgba(156,42,42,.07);
+  box-shadow: 0 12px 60px rgba(0,0,0,.9), 0 0 80px rgba(var(--deep-rgb), .07);
   scrollbar-width: thin;
-  scrollbar-color: rgba(193,63,63,.35) transparent;
+  scrollbar-color: var(--accent-t35) transparent;
 }
 .grimorio-modal::-webkit-scrollbar { width: 4px; }
-.grimorio-modal::-webkit-scrollbar-thumb { background: rgba(193,63,63,.4); border-radius: 2px; }
+.grimorio-modal::-webkit-scrollbar-thumb { background: var(--accent-t40); border-radius: 2px; }
 
 /* ── CAPA (Facebook-style) ── */
 .grimorio-capa {
   width: 100%; height: 200px; position: relative; overflow: hidden;
   background: linear-gradient(135deg, #1a0505 0%, #0d0b18 50%, #0a0008 100%);
-  border-bottom: 2px solid rgba(193,63,63,.5);
+  border-bottom: 2px solid var(--accent-t50);
   cursor: pointer;
 }
 .grimorio-capa::before {
   content: '';
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(156,42,42,.18), transparent 60%),
+    radial-gradient(ellipse at 20% 50%, rgba(var(--deep-rgb), .18), transparent 60%),
     radial-gradient(ellipse at 80% 50%, rgba(60,20,80,.12), transparent 60%);
   pointer-events: none;
 }
@@ -176,7 +201,7 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 
 .grimorio-close {
   position: absolute; top: .75rem; right: .75rem;
-  background: rgba(0,0,0,.6); border: 1px solid rgba(193,63,63,.3);
+  background: rgba(0,0,0,.6); border: 1px solid rgba(var(--accent-rgb), .3);
   color: #aaa; width: 30px; height: 30px; border-radius: 50%;
   cursor: pointer; font-size: 1rem; z-index: 10;
   display: flex; align-items: center; justify-content: center;
@@ -204,7 +229,7 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
   width: 120px; height: 120px; border-radius: 10px;
   object-fit: cover; border: 3px solid var(--accent);
   background: var(--bg-input); display: block;
-  box-shadow: 0 4px 24px rgba(0,0,0,.7), 0 0 20px rgba(193,63,63,.25);
+  box-shadow: 0 4px 24px rgba(0,0,0,.7), 0 0 20px var(--accent-t25);
   cursor: pointer;
 }
 .grimorio-avatar-placeholder {
@@ -213,7 +238,7 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
   background: linear-gradient(160deg, #1a0a0a, #0d0b12);
   display: flex; align-items: center; justify-content: center;
   font-size: 2.8rem; color: var(--accent);
-  box-shadow: 0 4px 24px rgba(0,0,0,.7), 0 0 20px rgba(193,63,63,.2);
+  box-shadow: 0 4px 24px rgba(0,0,0,.7), 0 0 20px rgba(var(--accent-rgb), .2);
   cursor: pointer;
 }
 .grimorio-profile-info {
@@ -238,11 +263,11 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 }
 .grimorio-poder-principal {
   display: inline-flex; align-items: center; gap: .4rem;
-  background: rgba(156,42,42,.12); border: 1px solid rgba(193,63,63,.3);
+  background: var(--deep-t12); border: 1px solid rgba(var(--accent-rgb), .3);
   padding: .4rem 1.1rem; font-size: .88rem;
   color: var(--accent-light); letter-spacing: 1.5px;
   text-transform: uppercase; font-weight: 600; margin-bottom: .9rem;
-  box-shadow: 0 0 20px rgba(193,63,63,.08);
+  box-shadow: 0 0 20px var(--accent-t08);
 }
 .grimorio-tags {
   display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center;
@@ -258,14 +283,14 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
   background: rgba(180,140,30,.07);
 }
 .grimorio-tag.faccao-tag {
-  border-color: rgba(193,63,63,.35); color: var(--accent-light);
-  background: rgba(156,42,42,.07);
+  border-color: var(--accent-t35); color: var(--accent-light);
+  background: rgba(var(--deep-rgb), .07);
 }
 .grimorio-frase {
   font-family: 'Playfair Display', serif;
   font-size: .95rem; color: var(--silver); font-style: italic;
   line-height: 1.55; margin: .5rem 1rem 0;
-  padding: .6rem 1rem; border-left: 2px solid rgba(193,63,63,.35);
+  padding: .6rem 1rem; border-left: 2px solid var(--accent-t35);
   background: rgba(255,255,255,.02); text-align: left;
 }
 
@@ -286,14 +311,14 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 }
 .grimorio-section-title::after {
   content: ''; flex: 1; height: 1px;
-  background: linear-gradient(to right, rgba(193,63,63,.35), transparent);
+  background: linear-gradient(to right, var(--accent-t35), transparent);
 }
 
 /* Descrição pública */
 .grimorio-descricao {
   font-size: .88rem; color: #c8c8d4; line-height: 1.7;
   background: rgba(255,255,255,.02); border: 1px solid rgba(60,40,60,.4);
-  border-left: 3px solid rgba(193,63,63,.3);
+  border-left: 3px solid rgba(var(--accent-rgb), .3);
   padding: .9rem 1rem;
 }
 .grimorio-descricao:empty::before { content: 'Nenhuma descrição registrada.'; color: #555; font-style: italic; }
@@ -303,21 +328,21 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
   display: grid; grid-template-columns: 1fr 1fr;
   gap: .6rem;
 }
-@media (max-width: 500px) {
+@media (max-width:640px) {
   .grimorio-areas-grid { grid-template-columns: 1fr; }
 }
 
 .grimorio-area-card {
   background: linear-gradient(160deg, #17141f, #0f0d14);
   border: 1px solid rgba(60,40,60,.5);
-  border-top: 2px solid rgba(156,42,42,.4);
+  border-top: 2px solid rgba(var(--deep-rgb), .4);
   padding: .85rem 1rem; cursor: default;
   transition: border-color .2s, box-shadow .2s;
   min-height: 80px;
 }
 .grimorio-area-card:hover {
-  border-color: rgba(193,63,63,.5);
-  box-shadow: 0 0 16px rgba(156,42,42,.1);
+  border-color: var(--accent-t50);
+  box-shadow: 0 0 16px rgba(var(--deep-rgb), .1);
 }
 .grimorio-area-title {
   font-size: .67rem; letter-spacing: 2px; text-transform: uppercase;
@@ -351,7 +376,7 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 .grimorio-timeline-dot {
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--accent); flex-shrink: 0; margin-top: .4rem;
-  box-shadow: 0 0 8px rgba(193,63,63,.5);
+  box-shadow: 0 0 8px var(--accent-t50);
 }
 .grimorio-timeline-text { font-size: .8rem; color: #b0b0c4; line-height: 1.5; }
 .grimorio-timeline-text strong { color: var(--silver); font-family: 'Playfair Display', serif; }
@@ -390,18 +415,26 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 .grimorio-edit-btn:hover { background: var(--gold-light); }
 
 /* LOGIN */
-#login-screen { position:fixed; inset:0; z-index:1000; background:radial-gradient(ellipse at 30% 40%,#1a0a0a 0%,#0c0c0f 60%); display:flex; align-items:center; justify-content:center; flex-direction:column; }
+#login-screen { position:fixed; inset:0; z-index:1000; background:radial-gradient(ellipse at 30% 40%,#1a0a0a 0%,#0c0c0f 60%); display:flex; align-items:center; justify-content:center; flex-direction:column; padding:1.5rem; }
 .login-ornament { font-family:'Playfair Display',serif; font-size:.75rem; letter-spacing:5px; text-transform:uppercase; color:var(--accent-light); margin-bottom:.5rem; }
 .login-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,6vw,3.2rem); color:#f0f0f5; letter-spacing:-1px; text-align:center; margin-bottom:.25rem; }
 .login-subtitle { font-size:.85rem; color:var(--text-muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:2.5rem; }
-.login-box { background:var(--bg-surface); border:1px solid var(--border); padding:2rem 2.5rem; width:100%; max-width:380px; position:relative; }
+.login-box {
+  background:linear-gradient(165deg, var(--bg-elevated) 0%, var(--bg-surface) 100%);
+  border:1px solid var(--border-strong);
+  padding:2.25rem 2.5rem; width:100%; max-width:380px; position:relative;
+  border-radius:var(--r-lg);
+  box-shadow:var(--sh-lg), 0 0 60px rgba(var(--deep-rgb), .12);
+  animation:loginIn .5s var(--ease-out);
+}
+@keyframes loginIn { from { opacity:0; transform:translateY(12px) scale(.98); } to { opacity:1; transform:none; } }
 .login-box::before { content:''; position:absolute; top:-1px; left:20px; right:20px; height:2px; background:linear-gradient(to right,transparent,var(--accent-light),transparent); }
 .login-box label { display:block; font-size:.78rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:.4rem; }
-.login-box input { width:100%; background:var(--bg-input); border:1px solid var(--border); color:var(--text); padding:.65rem .9rem; font-size:.95rem; font-family:inherit; outline:none; margin-bottom:1.2rem; transition:border-color .2s; }
+.login-box input { width:100%; background:var(--bg-input); border:1px solid var(--border); color:var(--text); padding:.7rem .9rem; font-size:16px; font-family:inherit; outline:none; margin-bottom:1.2rem; transition:border-color var(--dur), box-shadow var(--dur); border-radius:var(--r-sm); }
 .login-box input:focus { border-color:var(--accent-light); }
-.login-btn { width:100%; background:var(--accent); border:none; color:#fff; padding:.75rem; font-family:'Playfair Display',serif; font-size:1rem; cursor:pointer; letter-spacing:1px; transition:background .2s; }
+.login-btn { width:100%; background:var(--accent); border:none; color:#fff; padding:.8rem; font-family:'Playfair Display',serif; font-size:1rem; cursor:pointer; letter-spacing:1px; transition:background .2s; border-radius:var(--r-sm); }
 .login-btn:hover { background:var(--accent-light); }
-.login-error { color:#f5a0a0; font-size:.85rem; margin-top:.75rem; text-align:center; display:none; }
+.login-error { color:var(--accent-text); font-size:.85rem; margin-top:.75rem; text-align:center; display:none; }
 .login-footer { margin-top:1.5rem; font-size:.78rem; color:#555; text-align:center; letter-spacing:1px; }
 .login-obs-btn { margin-top:1rem; background:none; border:1px solid var(--border); color:var(--text-muted); padding:.5rem 1.5rem; font-family:inherit; font-size:.82rem; cursor:pointer; transition:all .2s; letter-spacing:1px; }
 .login-obs-btn:hover { border-color:var(--accent-light); color:var(--accent-light); }
@@ -459,13 +492,13 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 .sidebar a .ic { font-size:.95rem; vertical-align:-.15em; margin-right:.15rem; opacity:.7; }
 .sidebar ul { list-style:none; }
 .sidebar a { color:var(--text-muted); text-decoration:none; display:block; padding:.35rem .5rem; border-radius:3px; font-size:.88rem; transition:color .2s,background .2s; cursor:pointer; }
-.sidebar a:hover { color:var(--text); background:rgba(156,42,42,.1); }
+.sidebar a:hover { color:var(--text); background:rgba(var(--deep-rgb), .1); }
 .sidebar a.active { color:#fff; background:var(--accent); font-weight:600; }
 
 /* BADGE DE NÍVEL */
 .role-badge { display:inline-block; font-size:.6rem; letter-spacing:1.5px; text-transform:uppercase; padding:.15rem .5rem; border-radius:2px; margin-left:.4rem; vertical-align:middle; }
 .badge-gm { background:rgba(180,140,30,.2); color:var(--gold-light); border:1px solid var(--gold); }
-.badge-adm { background:rgba(156,42,42,.2); color:var(--accent-light); border:1px solid var(--accent); }
+.badge-adm { background:var(--deep-t20); color:var(--accent-light); border:1px solid var(--accent); }
 .badge-player { background:rgba(100,100,120,.2); color:var(--silver); border:1px solid var(--border); }
 
 /* SIDEBAR PLAYER */
@@ -479,7 +512,7 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 main { margin-left:260px; padding:2rem 2rem 6rem; max-width:100%; box-sizing:border-box; overflow-x:hidden; }
 
 /* HERO */
-.hero { min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3rem 1rem; border-bottom:1px solid var(--border); background:radial-gradient(ellipse at 50% 0%,rgba(156,42,42,.08) 0%,transparent 60%); }
+.hero { min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3rem 1rem; border-bottom:1px solid var(--border); background:radial-gradient(ellipse at 50% 0%,var(--deep-t08) 0%,transparent 60%); }
 .hero-eyebrow { font-size:.72rem; letter-spacing:5px; text-transform:uppercase; color:var(--accent-light); margin-bottom:1rem; }
 .hero-title { font-family:'Playfair Display',serif; font-size:clamp(2.8rem,8vw,5rem); letter-spacing:-2px; color:#f5f5f7; line-height:1.05; margin-bottom:.5rem; }
 .hero-subtitle { font-size:1rem; color:var(--silver); letter-spacing:3px; text-transform:uppercase; margin-bottom:2rem; }
@@ -512,11 +545,11 @@ p { color:#d4d4dc; margin-bottom:1rem; }
 .formula-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
 .formula-chip {
   font-family: 'Courier New', monospace; font-size: .78rem;
-  background: rgba(156,42,42,.08); border: 1px solid rgba(193,63,63,.25);
+  background: var(--deep-t08); border: 1px solid var(--accent-t25);
   color: var(--silver); padding: .25rem .65rem; border-radius: var(--r-pill);
   transition: border-color .2s, background .2s;
 }
-.formula-chip:hover { border-color: var(--accent-light); background: rgba(156,42,42,.16); }
+.formula-chip:hover { border-color: var(--accent-light); background: rgba(var(--deep-rgb), .16); }
 .formula-chip.op { color: var(--gold-light); border-color: rgba(180,140,30,.3); background: rgba(180,140,30,.08); }
 .formula-chip.fn { color: #a8e6b8; border-color: rgba(120,200,150,.3); background: rgba(120,200,150,.08); }
 .formula-chip.mod { color: var(--arcane-light); border-color: rgba(110,147,232,.3); background: rgba(110,147,232,.08); }
@@ -532,16 +565,16 @@ p { color:#d4d4dc; margin-bottom:1rem; }
 table { width:100%; border-collapse:collapse; background:var(--bg-surface); font-size:.9rem; }
 th { background:#1f1f26; color:var(--silver); padding:.6rem .9rem; text-align:left; font-size:.75rem; letter-spacing:1px; text-transform:uppercase; border-bottom:2px solid var(--accent); }
 td { padding:.55rem .9rem; border-bottom:1px solid var(--border); color:#d4d4dc; }
-tr:hover td { background:rgba(156,42,42,.05); }
+tr:hover td { background:rgba(var(--deep-rgb), .05); }
 
 /* FICHA */
 .ficha-panel { background:var(--bg-surface); border:1px solid var(--border); margin-bottom:1.5rem; position:relative; }
 .ficha-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(to right,var(--accent),transparent); }
-.ficha-panel-title { font-family:'Playfair Display',serif; font-size:.8rem; letter-spacing:3px; text-transform:uppercase; color:var(--accent-light); padding:.8rem 1.2rem; border-bottom:1px solid var(--border); background:rgba(156,42,42,.06); }
+.ficha-panel-title { font-family:'Playfair Display',serif; font-size:.8rem; letter-spacing:3px; text-transform:uppercase; color:var(--accent-light); padding:.8rem 1.2rem; border-bottom:1px solid var(--border); background:rgba(var(--deep-rgb), .06); }
 
 /* ═══ SEÇÕES EXPANSÍVEIS (Poder / Lore) ═══ */
 .ficha-expand-toggle { cursor:pointer; user-select:none; display:flex; align-items:center; gap:.6rem; transition:background .2s; }
-.ficha-expand-toggle:hover { background:rgba(156,42,42,.12); }
+.ficha-expand-toggle:hover { background:var(--deep-t12); }
 .ficha-expand-seta { display:inline-block; font-size:.75rem; transition:transform .25s; flex-shrink:0; }
 .ficha-expand-seta.aberta { transform:rotate(90deg); }
 .ficha-expand-resumo { font-family:'Source Sans 3',sans-serif; text-transform:none; letter-spacing:normal; font-size:.78rem; color:var(--text-muted); font-weight:400; margin-left:.25rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
@@ -578,18 +611,18 @@ tr:hover td { background:rgba(156,42,42,.05); }
 }
 .atributo-box:hover {
   border-top-color:var(--accent-light);
-  box-shadow:0 0 24px rgba(156,42,42,.22), inset 0 1px 0 rgba(255,255,255,.03);
+  box-shadow:0 0 24px rgba(var(--deep-rgb), .22), inset 0 1px 0 rgba(255,255,255,.03);
   transform:translateY(-2px);
 }
 .atributo-box label {
   font-size:.62rem; letter-spacing:1.5px; text-transform:uppercase;
   color:var(--accent-light); display:block; margin-bottom:.7rem; font-weight:700;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  text-shadow: 0 0 8px rgba(193,63,63,.35);
+  text-shadow: 0 0 8px var(--accent-t35);
 }
 .atributo-box input {
   width:100%; background:transparent; border:none;
-  border-bottom:1px solid rgba(156,42,42,.4);
+  border-bottom:1px solid rgba(var(--deep-rgb), .4);
   color:#f5f5f7; text-align:center; font-size:2.2rem;
   font-family:'Playfair Display',serif; padding:.25rem 0; outline:none;
   line-height:1; min-width:0;
@@ -620,7 +653,7 @@ tr:hover td { background:rgba(156,42,42,.05); }
   font-size:1.05rem; color:var(--silver); margin-top:.55rem;
   font-weight:700; min-height:1.3em;
   font-family:'Playfair Display',serif;
-  background: rgba(156,42,42,.1);
+  background: rgba(var(--deep-rgb), .1);
   border-radius:2px;
   padding:.15rem 0;
   letter-spacing:1px;
@@ -713,7 +746,7 @@ tr:hover td { background:rgba(156,42,42,.05); }
   display:flex; align-items:center; gap:.75rem; padding:.65rem .9rem;
   cursor:pointer; transition:border-color .2s, background .2s; position:relative;
 }
-.pericias-slot:hover { border-color:var(--accent-light); background:rgba(156,42,42,.07); }
+.pericias-slot:hover { border-color:var(--accent-light); background:rgba(var(--deep-rgb), .07); }
 .pericias-slot.preenchido { border-left:3px solid var(--accent-light); }
 .pericias-slot-num {
   font-family:'Playfair Display',serif; font-size:.75rem;
@@ -735,7 +768,7 @@ tr:hover td { background:rgba(156,42,42,.05); }
   background:none; border:none; color:#555; font-size:.8rem; cursor:pointer;
   padding:.15rem .35rem; transition:color .2s; flex-shrink:0;
 }
-.pericias-slot-clear:hover { color:#f5a0a0; }
+.pericias-slot-clear:hover { color:var(--accent-text); }
 
 /* dropdown de seleção de perícia */
 .pericias-dropdown-overlay {
@@ -769,7 +802,7 @@ tr:hover td { background:rgba(156,42,42,.05); }
   display:flex; align-items:center; gap:.75rem; padding:.6rem .75rem;
   cursor:pointer; border-radius:2px; transition:background .15s;
 }
-.pericias-dropdown-item:hover { background:rgba(156,42,42,.12); }
+.pericias-dropdown-item:hover { background:var(--deep-t12); }
 .pericias-dropdown-item-attr { font-size:.65rem; color:var(--accent-light); min-width:30px; }
 .pericias-dropdown-item-nome { flex:1; font-size:.88rem; color:var(--text); }
 .pericias-dropdown-item-bonus { font-family:'Playfair Display',serif; font-size:.95rem; color:var(--silver); font-weight:700; }
@@ -782,7 +815,7 @@ tr:hover td { background:rgba(156,42,42,.05); }
 .save-status.saved { color:#5cad7a; }
 
 /* TOOLTIP */
-.info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:rgba(156,42,42,.2); border:1px solid var(--accent); color:var(--accent-light); font-size:.62rem; cursor:pointer; vertical-align:middle; margin-left:4px; font-style:normal; font-family:serif; position:relative; }
+.info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:var(--deep-t20); border:1px solid var(--accent); color:var(--accent-light); font-size:.62rem; cursor:pointer; vertical-align:middle; margin-left:4px; font-style:normal; font-family:serif; position:relative; }
 .info-btn:hover .tooltip { opacity:1; pointer-events:auto; }
 .tooltip { position:absolute; bottom:125%; left:50%; transform:translateX(-50%); background:#1a1a22; border:1px solid var(--border); color:var(--text-muted); font-size:.78rem; padding:.5rem .7rem; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .2s; z-index:999; font-family:'Source Sans 3',sans-serif; font-style:normal; min-width:200px; text-align:left; line-height:1.5; }
 
@@ -799,9 +832,9 @@ tr:hover td { background:rgba(156,42,42,.05); }
   margin-bottom: .2rem;
   position: relative;
 }
-.sb-char-card:hover { background: rgba(156,42,42,.1); border-color: rgba(156,42,42,.25); }
+.sb-char-card:hover { background: rgba(var(--deep-rgb), .1); border-color: rgba(var(--deep-rgb), .25); }
 .sb-char-card.ativo {
-  background: rgba(156,42,42,.18);
+  background: rgba(var(--deep-rgb), .18);
   border-color: var(--accent);
 }
 .sb-char-avatar {
@@ -836,8 +869,8 @@ tr:hover td { background:rgba(156,42,42,.05); }
   display: inline-block;
   font-size: .62rem; letter-spacing: 1px; text-transform: uppercase;
   padding: .15rem .55rem; border-radius: 2px;
-  background: rgba(156,42,42,.2); color: var(--accent-light);
-  border: 1px solid rgba(156,42,42,.4);
+  background: var(--deep-t20); color: var(--accent-light);
+  border: 1px solid rgba(var(--deep-rgb), .4);
   font-weight: 600;
 }
 
@@ -865,12 +898,12 @@ section { padding-top:1rem; }
   transition:background var(--dur), border-color var(--dur);
 }
 .gm-ranking-row:hover { background:var(--bg-elevated); }
-.gm-ranking-row.oculto-row { border-left-color:rgba(193,63,63,.5); opacity:.75; }
+.gm-ranking-row.oculto-row { border-left-color:var(--accent-t50); opacity:.75; }
 .gm-ranking-row-info { display:flex; flex-direction:column; gap:.15rem; min-width:0; }
 .gm-ranking-row-nome { font-family:'Playfair Display',serif; font-size:1rem; color:var(--silver); font-weight:600; }
 .gm-ranking-row-meta { font-size:.76rem; color:var(--text-muted); }
 .oculto-badge { display:inline-block; font-size:.62rem; letter-spacing:.8px; text-transform:uppercase;
-  color:var(--accent-light); border:1px solid rgba(193,63,63,.35); padding:.1rem .45rem; margin-top:.15rem; background:rgba(156,42,42,.1); border-radius:var(--r-sm); }
+  color:var(--accent-light); border:1px solid var(--accent-t35); padding:.1rem .45rem; margin-top:.15rem; background:rgba(var(--deep-rgb), .1); border-radius:var(--r-sm); }
 .gm-vis-btn {
   flex-shrink:0; background:none; border:1px solid var(--border-strong);
   color:var(--text-muted); padding:.35rem .9rem; cursor:pointer; font-family:inherit; font-size:.8rem;
@@ -878,8 +911,8 @@ section { padding-top:1rem; }
   white-space:nowrap;
 }
 .gm-vis-btn:hover { border-color:var(--arcane-light); color:var(--arcane-light); }
-.gm-vis-btn.oculto-ativo { border-color:rgba(193,63,63,.5); color:var(--accent-light); background:rgba(156,42,42,.08); }
-.gm-vis-btn.oculto-ativo:hover { background:rgba(156,42,42,.18); }
+.gm-vis-btn.oculto-ativo { border-color:var(--accent-t50); color:var(--accent-light); background:var(--deep-t08); }
+.gm-vis-btn.oculto-ativo:hover { background:rgba(var(--deep-rgb), .18); }
 .gm-subtitle { font-size:.8rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
 
 /* tabs GM */
@@ -898,7 +931,7 @@ section { padding-top:1rem; }
 .player-card-header { display:flex; align-items:center; justify-content:space-between; padding:.9rem 1.2rem; }
 .player-card-name { font-family:'Playfair Display',serif; font-size:1.05rem; color:#f0f0f5; }
 .player-card-meta { font-size:.78rem; color:var(--text-muted); }
-.player-card-badge { font-size:.65rem; padding:.2rem .6rem; background:rgba(156,42,42,.2); border:1px solid var(--accent); color:var(--accent-light); letter-spacing:1px; }
+.player-card-badge { font-size:.65rem; padding:.2rem .6rem; background:var(--deep-t20); border:1px solid var(--accent); color:var(--accent-light); letter-spacing:1px; }
 .player-card-body { padding:0 1.2rem 1.2rem; display:none; }
 .player-card-body.open { display:block; }
 
@@ -972,7 +1005,7 @@ section { padding-top:1rem; }
   /* Tabelas roláveis horizontalmente com dica visual */
   .table-wrapper { -webkit-overflow-scrolling:touch; }
 }
-@media (max-width:380px) {
+@media (max-width:400px) {
   .atributos-grid { grid-template-columns:repeat(2,1fr); }
 }
 
@@ -1034,7 +1067,7 @@ section { padding-top:1rem; }
 .table-wrapper td input[type="number"]:focus,
 .table-wrapper td textarea:focus {
   border-bottom-color: var(--accent-light);
-  background: rgba(156,42,42,.06);
+  background: rgba(var(--deep-rgb), .06);
 }
 .table-wrapper td textarea {
   resize: vertical;
@@ -1043,7 +1076,7 @@ section { padding-top:1rem; }
 
 /* TECNICAS */
 .poder-tecnica { background:var(--bg-elevated); border:1px solid var(--border); margin-bottom:.75rem; }
-.poder-tecnica-header { display:flex; align-items:center; gap:.75rem; padding:.6rem .9rem; border-bottom:1px solid var(--border); background:rgba(156,42,42,.05); }
+.poder-tecnica-header { display:flex; align-items:center; gap:.75rem; padding:.6rem .9rem; border-bottom:1px solid var(--border); background:rgba(var(--deep-rgb), .05); }
 .poder-tecnica-num { font-family:'Playfair Display',serif; color:var(--accent-light); font-size:.9rem; min-width:24px; }
 .poder-tecnica-body { padding:.8rem .9rem; display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
 
@@ -1053,14 +1086,14 @@ section { padding-top:1rem; }
 .personagem-item { border:1px solid var(--border); margin-bottom:.5rem; background:var(--bg-elevated); transition:border-color .2s; }
 .personagem-item.ativo { border-color:var(--accent-light); }
 .personagem-header { display:flex; align-items:center; justify-content:space-between; padding:.65rem 1rem; cursor:pointer; user-select:none; }
-.personagem-header:hover { background:rgba(156,42,42,.08); }
+.personagem-header:hover { background:var(--deep-t08); }
 .personagem-nome-display { font-family:'Playfair Display',serif; font-size:1rem; color:#f0f0f5; flex:1; }
 .personagem-seta { color:var(--accent-light); font-size:.75rem; transition:transform .25s; flex-shrink: 0; }
 .personagem-seta.aberta { transform:rotate(90deg); }
 .personagem-body { display:none; border-top:1px solid var(--border); padding:1rem; }
 .personagem-body.aberto { display:block; }
 .personagem-deletar { background:none; border:none; color:#555; font-size:.8rem; cursor:pointer; padding:.2rem .5rem; transition:color .2s; margin-left:.5rem; }
-.personagem-deletar:hover { color:#f5a0a0; }
+.personagem-deletar:hover { color:var(--accent-text); }
 
 /* SIDEBAR FLUTUANTE (ícone de scroll) */
 #sidebar-float-btn {
@@ -1126,9 +1159,9 @@ section { padding-top:1rem; }
   cursor: pointer;
   transition: background .15s, color .15s;
 }
-.personagem-dropdown button:hover { background: rgba(156,42,42,.12); color: var(--text); }
-.personagem-dropdown button.danger { color: #f5a0a0; }
-.personagem-dropdown button.danger:hover { background: rgba(220,60,60,.12); color: #f5a0a0; }
+.personagem-dropdown button:hover { background: var(--deep-t12); color: var(--text); }
+.personagem-dropdown button.danger { color: var(--accent-text); }
+.personagem-dropdown button.danger:hover { background: rgba(220,60,60,.12); color: var(--accent-text); }
 .personagem-header-actions { position: relative; display: flex; align-items: center; gap: .3rem; }
 
 /* EDITOR INLINE DE BLOCOS (GM) */
@@ -1259,14 +1292,14 @@ body.modo-inserindo-bloco .bloco-dropzone:hover::after { opacity: 1; }
   box-shadow: 0 8px 30px rgba(0,0,0,.5);
 }
 #bloco-insercao-aviso button {
-  background: none; border: 1px solid rgba(193,63,63,.5); color: var(--accent-light);
+  background: none; border: 1px solid var(--accent-t50); color: var(--accent-light);
   padding: .25rem .7rem; font-size: .72rem; border-radius: 4px; cursor: pointer;
   font-family: inherit;
 }
 
 /* Blocos de construtor: Card, Lista, Título, Subtítulo */
 .bloco-card-gm {
-  background: rgba(255,255,255,.02); border: 1px solid rgba(193,63,63,.25);
+  background: rgba(255,255,255,.02); border: 1px solid var(--accent-t25);
   border-left: 3px solid var(--accent-light); border-radius: 4px;
   padding: 1rem 1.25rem; margin: 1rem 0;
 }
@@ -1306,7 +1339,7 @@ body.modo-inserindo-bloco .bloco-dropzone:hover::after { opacity: 1; }
    completo enquanto o modo editor estivesse ativo.
    Correção: uma única linha com scroll horizontal, altura fixa e
    compacta, posicionada ACIMA da tab bar (não sobre ela). */
-@media (max-width: 1024px) {
+@media (max-width:1024px) {
   #editor-bar {
     left: 0;
     flex-wrap: nowrap;
@@ -1366,7 +1399,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   position: relative;
 }
 .lendas-runes {
-  font-size: 1rem; letter-spacing: 8px; color: rgba(193,63,63,.3);
+  font-size: 1rem; letter-spacing: 8px; color: rgba(var(--accent-rgb), .3);
   margin-bottom: .5rem; font-family: 'Playfair Display', serif;
 }
 .lendas-title {
@@ -1374,7 +1407,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   font-size: clamp(2rem, 5vw, 3.5rem);
   color: #f5f0f8;
   letter-spacing: -1px; line-height: 1.1;
-  text-shadow: 0 0 40px rgba(156,42,42,.3), 0 2px 20px rgba(0,0,0,.8);
+  text-shadow: 0 0 40px var(--deep-t30), 0 2px 20px rgba(0,0,0,.8);
   margin: .3rem 0 .5rem;
 }
 .lendas-subtitle {
@@ -1386,14 +1419,14 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 }
 .lendas-refresh-btn, .lendas-personalizar-btn {
   background: none;
-  border: 1px solid rgba(156,42,42,.5);
+  border: 1px solid rgba(var(--deep-rgb), .5);
   color: var(--accent-light);
   padding: .45rem 1.2rem;
   font-family: inherit; font-size: .82rem;
   cursor: pointer; letter-spacing: 1px;
   transition: all .25s;
 }
-.lendas-refresh-btn:hover { background: rgba(156,42,42,.15); border-color: var(--accent-light); }
+.lendas-refresh-btn:hover { background: rgba(var(--deep-rgb), .15); border-color: var(--accent-light); }
 .lendas-personalizar-btn {
   border-color: rgba(180,140,30,.4); color: var(--gold);
 }
@@ -1402,7 +1435,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 /* Abas de categoria */
 .lendas-tabs-wrap {
   margin: 1.5rem 0 1.25rem;
-  border-bottom: 1px solid rgba(156,42,42,.2);
+  border-bottom: 1px solid var(--deep-t20);
 }
 .lendas-tabs {
   display: flex; gap: 0; overflow-x: auto;
@@ -1460,10 +1493,10 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   margin: .5rem 0 2rem;
 }
 /* Mobile: 2 colunas compactas estilo "perfil de personagem" */
-@media (max-width: 640px) {
+@media (max-width:640px) {
   .lendas-grid { grid-template-columns: repeat(2, 1fr); gap: .7rem; }
 }
-@media (max-width: 360px) {
+@media (max-width:400px) {
   .lendas-grid { grid-template-columns: 1fr; }
 }
 
@@ -1474,10 +1507,10 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   gap: 1.25rem;
   margin: .5rem 0 2rem;
 }
-@media (max-width: 640px) {
+@media (max-width:640px) {
   .atributos-rank-grid { grid-template-columns: 1fr 1fr; gap: .7rem; }
 }
-@media (max-width: 400px) {
+@media (max-width:400px) {
   .atributos-rank-grid { grid-template-columns: 1fr; }
 }
 .attr-rank-panel {
@@ -1508,7 +1541,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   cursor: pointer;
   transition: background .2s, border-color .2s;
 }
-.attr-rank-row:hover { background: rgba(255,255,255,.05); border-color: rgba(193,63,63,.4); }
+.attr-rank-row:hover { background: rgba(255,255,255,.05); border-color: var(--accent-t40); }
 .attr-rank-pos {
   font-family: 'Playfair Display', serif;
   font-weight: 700;
@@ -1547,8 +1580,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 }
 .lenda-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(193,63,63,.5);
-  box-shadow: 0 12px 40px rgba(0,0,0,.7), 0 0 30px rgba(156,42,42,.12);
+  border-color: var(--accent-t50);
+  box-shadow: 0 12px 40px rgba(0,0,0,.7), 0 0 30px var(--deep-t12);
 }
 
 /* WALLPAPER do cartão */
@@ -1624,8 +1657,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   font-size: .58rem; letter-spacing: 1px;
   text-transform: uppercase;
   padding: .2rem .5rem;
-  background: rgba(156,42,42,.25);
-  border: 1px solid rgba(193,63,63,.35);
+  background: rgba(var(--deep-rgb), .25);
+  border: 1px solid var(--accent-t35);
   color: var(--accent-light);
   backdrop-filter: blur(4px);
   border-radius: var(--r-sm);
@@ -1640,8 +1673,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   min-height: 78px; max-height: 78px;
   border-radius: 6px;
   overflow: hidden;
-  border: 2px solid rgba(193,63,63,.5);
-  box-shadow: 0 4px 20px rgba(0,0,0,.7), 0 0 20px rgba(156,42,42,.15);
+  border: 2px solid var(--accent-t50);
+  box-shadow: 0 4px 20px rgba(0,0,0,.7), 0 0 20px rgba(var(--deep-rgb), .15);
   background: var(--bg-input);
   flex-shrink: 0;
 }
@@ -1668,8 +1701,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   border-radius: 6px;
   object-fit: cover;
   object-position: center top;
-  border: 2px solid rgba(193,63,63,.5);
-  box-shadow: 0 4px 20px rgba(0,0,0,.7), 0 0 20px rgba(156,42,42,.15);
+  border: 2px solid var(--accent-t50);
+  box-shadow: 0 4px 20px rgba(0,0,0,.7), 0 0 20px rgba(var(--deep-rgb), .15);
   background: var(--bg-input);
   display: block;
   flex-shrink: 0;
@@ -1679,9 +1712,9 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   min-width: 78px; max-width: 78px;
   border-radius: 6px;
   background: linear-gradient(160deg, #1a0a0a, #0d0b12);
-  border: 2px solid rgba(193,63,63,.4);
+  border: 2px solid var(--accent-t40);
   display: flex; align-items: center; justify-content: center;
-  font-size: 2rem; color: rgba(193,63,63,.6);
+  font-size: 2rem; color: rgba(var(--accent-rgb), .6);
   box-shadow: 0 4px 20px rgba(0,0,0,.6);
   flex-shrink: 0;
 }
@@ -1717,8 +1750,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   text-align: center; letter-spacing: 1px;
   text-transform: uppercase;
   padding: .2rem .6rem;
-  background: rgba(156,42,42,.1);
-  border: 1px solid rgba(193,63,63,.2);
+  background: rgba(var(--deep-rgb), .1);
+  border: 1px solid rgba(var(--accent-rgb), .2);
   margin: 0 auto .5rem;
   max-width: calc(100% - 1rem);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1731,7 +1764,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
    RANKING — CARDS MOBILE: Layout horizontal imersivo
    Foto grande à esquerda + info à direita
 ══════════════════════════════════════════════════ */
-@media (max-width: 640px) {
+@media (max-width:640px) {
   /* Grid: 1 coluna full-width em mobile para cards horizontais */
   .lendas-grid { grid-template-columns: 1fr; gap: .6rem; }
 
@@ -1743,7 +1776,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
     border-radius: 6px;
     overflow: hidden;
     border: 1px solid rgba(60,40,60,.7);
-    border-left: 3px solid rgba(193,63,63,.5);
+    border-left: 3px solid var(--accent-t50);
   }
 
   /* Foto: coluna esquerda — retrato largo */
@@ -1842,7 +1875,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 
   /* Tema: borda esquerda do card por tema */
   .tema-abismo   .lenda-card { border-left-color: #5a1a5a; }
-  .tema-sangue   .lenda-card { border-left-color: #9c2a2a; }
+  .tema-sangue   .lenda-card { border-left-color: var(--accent-deep); }
   .tema-guerra   .lenda-card { border-left-color: #b87020; }
   .tema-vampirico .lenda-card { border-left-color: #7a0a5a; }
   .tema-soberano .lenda-card { border-left-color: #d4ad3a; }
@@ -1865,7 +1898,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   background: rgba(0,0,0,.3);
 }
 .lenda-meta-chip.nivel { color: var(--gold); border-color: rgba(180,140,30,.3); }
-.lenda-meta-chip.rank { color: var(--accent-light); border-color: rgba(193,63,63,.3); }
+.lenda-meta-chip.rank { color: var(--accent-light); border-color: rgba(var(--accent-rgb), .3); }
 
 /* Barra de poder */
 .lenda-power-bar {
@@ -1884,7 +1917,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 
 /* Tema: estilos de barra */
 .tema-abismo   .lenda-power-fill { background: linear-gradient(to right, #1a0a1a, #5a1a5a); }
-.tema-sangue   .lenda-power-fill { background: linear-gradient(to right, #3a0000, #c13f3f); }
+.tema-sangue   .lenda-power-fill { background: linear-gradient(to right, #3a0000, var(--accent)); }
 .tema-guerra   .lenda-power-fill { background: linear-gradient(to right, #1a0a00, #b87020); }
 .tema-vampirico .lenda-power-fill { background: linear-gradient(to right, #0a0010, #7a0a5a); }
 .tema-soberano .lenda-power-fill { background: linear-gradient(to right, #1a1000, #d4ad3a); }
@@ -1894,7 +1927,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 
 /* Efeitos de tema nas bordas do cartão */
 .tema-abismo   .lenda-card { border-top: 2px solid #5a1a5a; }
-.tema-sangue   .lenda-card { border-top: 2px solid #9c2a2a; }
+.tema-sangue   .lenda-card { border-top: 2px solid var(--accent-deep); }
 .tema-guerra   .lenda-card { border-top: 2px solid #b87020; }
 .tema-vampirico .lenda-card { border-top: 2px solid #7a0a5a; }
 .tema-soberano .lenda-card { border-top: 2px solid #d4ad3a; }
@@ -1926,9 +1959,9 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   min-height: 100vh;
   position: relative;
   scrollbar-width: thin;
-  scrollbar-color: rgba(193,63,63,.35) transparent;
+  scrollbar-color: var(--accent-t35) transparent;
   border: 0;
-  box-shadow: 0 0 0 1px rgba(193,63,63,.2), 0 30px 100px rgba(0,0,0,.98);
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), .2), 0 30px 100px rgba(0,0,0,.98);
   background: #0a080f;
   overflow: hidden;
 }
@@ -1937,7 +1970,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   .livro-modal { min-height: auto; border-radius: 2px; }
 }
 .livro-modal::-webkit-scrollbar { width: 4px; }
-.livro-modal::-webkit-scrollbar-thumb { background: rgba(193,63,63,.4); }
+.livro-modal::-webkit-scrollbar-thumb { background: var(--accent-t40); }
 
 /* ── BANNER ÉPICO (1920×480 landscape) ── */
 .livro-banner {
@@ -1961,7 +1994,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   content: '';
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse at 15% 80%, rgba(156,42,42,.25), transparent 55%),
+    radial-gradient(ellipse at 15% 80%, rgba(var(--deep-rgb), .25), transparent 55%),
     radial-gradient(ellipse at 85% 20%, rgba(60,20,100,.18), transparent 55%);
   pointer-events: none; z-index: 1;
 }
@@ -1995,7 +2028,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 /* ── BOTÃO FECHAR ── */
 .livro-close {
   position: absolute; top: .75rem; right: .75rem;
-  background: rgba(0,0,0,.75); border: 1px solid rgba(193,63,63,.4);
+  background: rgba(0,0,0,.75); border: 1px solid var(--accent-t40);
   color: #ccc; width: 34px; height: 34px; border-radius: 50%;
   cursor: pointer; font-size: 1rem; z-index: 30;
   display: flex; align-items: center; justify-content: center;
@@ -2032,11 +2065,11 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   max-width: 130px; max-height: 130px;
   border-radius: 6px;
   object-fit: cover;
-  border: 3px solid rgba(193,63,63,.75);
+  border: 3px solid rgba(var(--accent-rgb), .75);
   box-shadow:
     0 8px 40px rgba(0,0,0,.95),
     0 0 0 1px rgba(60,20,20,.6),
-    0 0 40px rgba(156,42,42,.3);
+    0 0 40px var(--deep-t30);
   background: var(--bg-input);
   display: block;
   cursor: pointer;
@@ -2048,10 +2081,10 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 }
 .livro-avatar-placeholder {
   width: 130px; height: 130px; max-width: 130px; max-height: 130px; border-radius: 6px;
-  border: 3px solid rgba(193,63,63,.5);
+  border: 3px solid var(--accent-t50);
   background: linear-gradient(160deg, #1a0a0a 0%, #0d0b12 100%);
   display: flex; align-items: center; justify-content: center;
-  font-size: 3rem; color: rgba(193,63,63,.55);
+  font-size: 3rem; color: rgba(var(--accent-rgb), .55);
   box-shadow: 0 8px 40px rgba(0,0,0,.9);
 }
 /* Badge de online/posição sobre avatar */
@@ -2082,7 +2115,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   color: #f7f3ff;
   line-height: 1.1;
   margin-bottom: .15rem;
-  text-shadow: 0 2px 24px rgba(0,0,0,.95), 0 0 40px rgba(156,42,42,.15);
+  text-shadow: 0 2px 24px rgba(0,0,0,.95), 0 0 40px rgba(var(--deep-rgb), .15);
   letter-spacing: -.5px;
 }
 .livro-alcunha {
@@ -2094,14 +2127,14 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 /* ── PODER PRINCIPAL — bloco visual épico ── */
 .livro-poder-badge {
   display: inline-flex; align-items: center; gap: .55rem;
-  background: linear-gradient(90deg, rgba(156,42,42,.18) 0%, rgba(156,42,42,.06) 100%);
-  border: 1px solid rgba(193,63,63,.4);
+  background: linear-gradient(90deg, rgba(var(--deep-rgb), .18) 0%, rgba(var(--deep-rgb), .06) 100%);
+  border: 1px solid var(--accent-t40);
   border-left: 3px solid var(--accent-light);
   padding: .4rem 1rem .4rem .75rem;
   font-size: .8rem; color: #f0a0a0;
   letter-spacing: 2px; text-transform: uppercase;
   font-weight: 700; margin-bottom: .8rem;
-  box-shadow: 0 0 30px rgba(193,63,63,.1), inset 0 0 20px rgba(156,42,42,.05);
+  box-shadow: 0 0 30px rgba(var(--accent-rgb), .1), inset 0 0 20px rgba(var(--deep-rgb), .05);
   position: relative; overflow: hidden;
 }
 .livro-poder-badge::before {
@@ -2118,7 +2151,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-poder-gif {
   width: 28px; height: 28px; object-fit: cover;
   border-radius: 3px; vertical-align: middle;
-  border: 1px solid rgba(193,63,63,.35);
+  border: 1px solid var(--accent-t35);
 }
 
 /* ── TAGS ── */
@@ -2134,7 +2167,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   letter-spacing: .5px;
 }
 .livro-tag.rank { border-color: rgba(180,140,30,.45); color: var(--gold-light); background: rgba(180,140,30,.08); }
-.livro-tag.faccao { border-color: rgba(193,63,63,.35); color: var(--accent-light); background: rgba(156,42,42,.08); }
+.livro-tag.faccao { border-color: var(--accent-t35); color: var(--accent-light); background: var(--deep-t08); }
 .livro-tag.nivel { border-color: rgba(100,100,160,.4); color: #a0a0c0; background: rgba(60,60,120,.07); }
 
 /* ── FRASE MARCANTE ── */
@@ -2144,16 +2177,16 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   font-style: italic; line-height: 1.65;
   margin: .5rem 0 0;
   padding: .65rem 1rem;
-  border-left: 2px solid rgba(193,63,63,.4);
+  border-left: 2px solid var(--accent-t40);
   background: rgba(255,255,255,.025);
 }
 
 #btn-curtir.curtido {
-  background: rgba(193,63,63,.22);
+  background: rgba(var(--accent-rgb), .22);
   border-color: rgba(220,90,90,.6);
 }
 #btn-curtir:not([style*="cursor: default"]):hover {
-  background: rgba(156,42,42,.2);
+  background: var(--deep-t20);
 }
 
 /* ══════════════════════════════════════════════════════
@@ -2162,7 +2195,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
    do banner + identidade centralizada abaixo.
    Foto sempre visível e bem posicionada.
 ══════════════════════════════════════════════════════ */
-@media (max-width: 640px) {
+@media (max-width:640px) {
 
   /* Overlay ocupa toda a tela, sem padding */
   .livro-overlay {
@@ -2204,7 +2237,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
     padding: 0 1rem 1.25rem;
     margin-top: -60px;
     gap: 0;
-    border-bottom: 1px solid rgba(193,63,63,.2);
+    border-bottom: 1px solid rgba(var(--accent-rgb), .2);
   }
 
   /* Avatar: centralizado, tamanho generoso */
@@ -2220,11 +2253,11 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
     max-width: 116px;
     max-height: 116px;
     border-radius: 8px;
-    border: 3px solid rgba(193,63,63,.85);
+    border: 3px solid rgba(var(--accent-rgb), .85);
     box-shadow:
       0 8px 32px rgba(0,0,0,.95),
       0 0 0 1px rgba(30,10,10,.8),
-      0 0 36px rgba(156,42,42,.35);
+      0 0 36px rgba(var(--deep-rgb), .35);
     display: block;
     object-fit: cover;
     object-position: center top;
@@ -2235,7 +2268,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
     max-width: 116px;
     max-height: 116px;
     border-radius: 8px;
-    border: 3px solid rgba(193,63,63,.6);
+    border: 3px solid rgba(var(--accent-rgb), .6);
     font-size: 3rem;
   }
 
@@ -2340,7 +2373,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-tabs-nav {
   display: flex; gap: .35rem; overflow-x: auto;
   padding: 0 1.25rem; background: #0a080f;
-  border-bottom: 1px solid rgba(193,63,63,.18);
+  border-bottom: 1px solid rgba(var(--accent-rgb), .18);
   scrollbar-width: none;
 }
 .livro-tabs-nav::-webkit-scrollbar { display: none; }
@@ -2355,7 +2388,8 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   transition: color .2s, border-color .2s;
   white-space: nowrap;
 }
-.livro-tab-btn:hover { color: var(--text); }
+.livro-tab-btn:hover { color: var(--text); background: var(--accent-t08); border-radius: var(--r-sm) var(--r-sm) 0 0; }
+.livro-tab-btn:active { transform: scale(.97); }
 .livro-tab-btn.active { color: var(--livro-accent, var(--accent-light)); border-bottom-color: var(--livro-accent, var(--accent-light)); }
 .livro-tab-pane { display: none; }
 .livro-tab-pane.active { display: block; animation: livroTabFade .25s ease; }
@@ -2375,7 +2409,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-tecnicas-lista { display: flex; flex-direction: column; gap: .75rem; }
 .livro-tecnica-card {
   background: rgba(255,255,255,.02);
-  border: 1px solid rgba(193,63,63,.18);
+  border: 1px solid rgba(var(--accent-rgb), .18);
   border-left: 3px solid var(--accent-light);
   border-radius: 4px; padding: .85rem 1rem;
 }
@@ -2395,7 +2429,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-ranking-score strong { color: var(--accent-light); }
 .livro-section-title::after {
   content: ''; flex: 1; height: 1px;
-  background: linear-gradient(to right, rgba(193,63,63,.4), transparent);
+  background: linear-gradient(to right, var(--accent-t40), transparent);
 }
 
 /* ── DESCRIÇÃO PÚBLICA ── */
@@ -2403,7 +2437,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   font-size: .88rem; color: #c5c2d2; line-height: 1.8;
   background: rgba(255,255,255,.02);
   border: 1px solid rgba(60,40,60,.4);
-  border-left: 3px solid rgba(193,63,63,.35);
+  border-left: 3px solid var(--accent-t35);
   padding: 1rem 1.2rem;
 }
 
@@ -2411,20 +2445,20 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-2col {
   display: grid; grid-template-columns: 1fr 1fr; gap: .75rem;
 }
-@media (max-width: 520px) { .livro-2col { grid-template-columns: 1fr; } }
+@media (max-width:640px) { .livro-2col { grid-template-columns: 1fr; } }
 
 /* ── CARDS DE ÁREA ── */
 .livro-area-card {
   background: linear-gradient(160deg, #14111c, #0e0c14);
   border: 1px solid rgba(60,40,60,.5);
-  border-top: 2px solid rgba(156,42,42,.35);
+  border-top: 2px solid rgba(var(--deep-rgb), .35);
   padding: .9rem 1rem;
   min-height: 80px;
   transition: border-color .2s, box-shadow .2s;
 }
 .livro-area-card:hover {
   border-color: rgba(60,40,60,.7);
-  box-shadow: 0 0 20px rgba(156,42,42,.06);
+  box-shadow: 0 0 20px rgba(var(--deep-rgb), .06);
 }
 .livro-area-title {
   font-size: .63rem; letter-spacing: 2px;
@@ -2451,7 +2485,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-timeline-dot {
   width: 9px; height: 9px; border-radius: 50%;
   background: var(--accent); flex-shrink: 0; margin-top: .35rem;
-  box-shadow: 0 0 12px rgba(193,63,63,.65);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), .65);
 }
 .livro-timeline-text { font-size: .82rem; color: #b0b0c4; line-height: 1.55; }
 .livro-timeline-text strong { color: var(--silver); font-family: 'Playfair Display', serif; }
@@ -2498,7 +2532,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   grid-template-columns: repeat(5, 1fr);
   gap: .4rem; margin-top: .75rem;
 }
-@media (max-width: 480px) { .livro-galeria { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width:640px) { .livro-galeria { grid-template-columns: repeat(4, 1fr); } }
 .livro-galeria img {
   width: 100%; aspect-ratio: 1; object-fit: cover;
   border: 1px solid rgba(60,40,60,.5);
@@ -2561,7 +2595,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .temas-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem;
 }
-@media (max-width: 480px) { .temas-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:640px) { .temas-grid { grid-template-columns: repeat(2, 1fr); } }
 .tema-btn {
   background: var(--bg-elevated);
   border: 2px solid var(--border);
@@ -2572,7 +2606,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   display: flex; flex-direction: column;
   align-items: center; gap: .3rem;
 }
-.tema-btn:hover { border-color: rgba(193,63,63,.5); color: var(--text); }
+.tema-btn:hover { border-color: var(--accent-t50); color: var(--text); }
 .tema-btn.selecionado { border-color: var(--gold); color: var(--gold-light); background: rgba(180,140,30,.08); }
 .tema-btn .tema-icon { font-size: 1.5rem; display: block; }
 .tema-btn .tema-nome { font-size: .7rem; letter-spacing: 1px; }
@@ -2589,7 +2623,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   position: relative;
   background: var(--bg-elevated);
 }
-.wp-btn:hover { border-color: rgba(193,63,63,.5); }
+.wp-btn:hover { border-color: var(--accent-t50); }
 .wp-btn.selecionado { border-color: var(--gold); }
 .wp-btn-label {
   position: absolute; bottom: 0; left: 0; right: 0;
@@ -2760,7 +2794,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .foto-miniatura-vazia:hover { border-color: var(--accent-light); color: var(--accent-light); }
 .foto-miniatura-item .btn-remove-mini {
   display: none; position: absolute; top: 1px; right: 1px;
-  background: rgba(0,0,0,.75); border: none; color: #f5a0a0;
+  background: rgba(0,0,0,.75); border: none; color: var(--accent-text);
   font-size: .6rem; cursor: pointer; padding: .05rem .25rem; border-radius: 2px; line-height: 1.4;
 }
 .foto-miniatura-item:hover .btn-remove-mini { display: block; }
@@ -2778,7 +2812,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .foto-galeria-item img { width: 100%; height: 100%; object-fit: cover; border: 1px solid var(--border); border-radius: 3px; }
 .foto-galeria-item .btn-remove-foto {
   display: none; position: absolute; top: 2px; right: 2px;
-  background: rgba(0,0,0,.7); border: none; color: #f5a0a0;
+  background: rgba(0,0,0,.7); border: none; color: var(--accent-text);
   font-size: .7rem; cursor: pointer; padding: .1rem .3rem; border-radius: 2px;
 }
 .foto-galeria-item:hover .btn-remove-foto { display: block; }
@@ -2809,7 +2843,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   margin-bottom: 1.25rem;
   position: relative; overflow: hidden;
 }
-.ficha-hero::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 50%,rgba(156,42,42,.1),transparent 65%); pointer-events:none; }
+.ficha-hero::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 50%,rgba(var(--deep-rgb), .1),transparent 65%); pointer-events:none; }
 
 /* Hero mobile: foto grande em cima, info abaixo */
 .ficha-hero-inner {
@@ -2923,7 +2957,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 }
 
 /* Telas médias — sidebar + conteúdo ainda cabe */
-@media (max-width: 1200px) {
+@media (max-width:1024px) {
   main { padding: 1.5rem 1.25rem 6rem; }
   .atributos-grid { gap: .5rem; }
   .atributo-box input { font-size: 1.8rem; }
@@ -2931,7 +2965,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 }
 
 /* Telas pequenas (tablet) — sidebar oculta, sem margin-left */
-@media (max-width: 1024px) {
+@media (max-width:1024px) {
   #editor-bar { left: 0; }
   main { margin-left: 0; padding: 1rem 1rem 6rem; }
   .atributos-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
@@ -2939,7 +2973,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 }
 
 /* Mobile */
-@media (max-width: 600px) {
+@media (max-width:640px) {
   .atributos-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .ficha-hero-nome { font-size: 1.5rem; }
 }
@@ -2953,9 +2987,9 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 :root {
   --stone: #1a1820;
   --stone-dark: #0f0e12;
-  --rune-glow: rgba(156,42,42,.55);
+  --rune-glow: rgba(var(--deep-rgb), .55);
   --mist: rgba(80,20,20,.18);
-  --shadow-blood: rgba(156,42,42,.12);
+  --shadow-blood: var(--deep-t12);
 }
 
 /* --- Canvas de partículas (fundo global) --- */
@@ -3042,8 +3076,8 @@ body.livro-aberto::after { display: none !important; }
 /* --- Sidebar: pedra escura com bordas góticas --- */
 .sidebar {
   background: linear-gradient(180deg, #0f0d14 0%, #0c0a10 100%) !important;
-  border-right: 1px solid rgba(156,42,42,.25) !important;
-  box-shadow: 4px 0 20px rgba(0,0,0,.6), inset -1px 0 0 rgba(156,42,42,.08);
+  border-right: 1px solid rgba(var(--deep-rgb), .25) !important;
+  box-shadow: 4px 0 20px rgba(0,0,0,.6), inset -1px 0 0 var(--deep-t08);
 }
 
 .sidebar::before {
@@ -3051,29 +3085,29 @@ body.livro-aberto::after { display: none !important; }
   position: absolute;
   top: 0; right: 0; bottom: 0;
   width: 1px;
-  background: linear-gradient(to bottom, transparent, rgba(156,42,42,.4), rgba(156,42,42,.1), transparent);
+  background: linear-gradient(to bottom, transparent, rgba(var(--deep-rgb), .4), rgba(var(--deep-rgb), .1), transparent);
 }
 
 /* Logo sidebar mais imponente */
 .sidebar-logo {
-  border-bottom: 1px solid rgba(156,42,42,.3) !important;
-  text-shadow: 0 0 12px rgba(193,63,63,.5);
+  border-bottom: 1px solid var(--deep-t30) !important;
+  text-shadow: 0 0 12px var(--accent-t50);
 }
 
 /* Links sidebar com brilho sutil */
 .sidebar a:hover {
-  background: rgba(156,42,42,.14) !important;
+  background: rgba(var(--deep-rgb), .14) !important;
   box-shadow: inset 2px 0 0 var(--accent);
 }
 .sidebar a.active {
-  background: linear-gradient(to right, rgba(156,42,42,.5), rgba(156,42,42,.2)) !important;
+  background: linear-gradient(to right, rgba(var(--deep-rgb), .5), var(--deep-t20)) !important;
   box-shadow: inset 3px 0 0 var(--accent-light);
 }
 
 /* --- Topbar gótica --- */
 .topbar {
   background: rgba(8,6,12,.97) !important;
-  border-bottom: 1px solid rgba(156,42,42,.3) !important;
+  border-bottom: 1px solid var(--deep-t30) !important;
   box-shadow: 0 2px 20px rgba(0,0,0,.8);
 }
 
@@ -3084,7 +3118,7 @@ body.livro-aberto::after { display: none !important; }
   box-shadow: 0 2px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.03);
 }
 .ficha-panel::before {
-  background: linear-gradient(to right, var(--accent), rgba(156,42,42,.3), transparent) !important;
+  background: linear-gradient(to right, var(--accent), var(--deep-t30), transparent) !important;
 }
 
 /* --- Cards de sistema: metal antigo ---
@@ -3105,7 +3139,7 @@ body.livro-aberto::after { display: none !important; }
   background: linear-gradient(145deg, #1e1a28, #18141e) !important;
   border: 1px solid rgba(85,65,105,.6) !important;
   border-left: 3px solid var(--accent) !important;
-  box-shadow: 0 0 20px rgba(156,42,42,.06), inset 0 0 16px rgba(0,0,0,.15);
+  box-shadow: 0 0 20px rgba(var(--deep-rgb), .06), inset 0 0 16px rgba(0,0,0,.15);
 }
 
 /* --- Atributo-box: pedra com runa --- */
@@ -3113,10 +3147,10 @@ body.livro-aberto::after { display: none !important; }
   background: linear-gradient(160deg, #161320, #0e0c14) !important;
   border: 1px solid rgba(50,40,65,.6) !important;
   border-top: 2px solid var(--accent) !important;
-  box-shadow: 0 0 8px rgba(0,0,0,.5), inset 0 -1px 0 rgba(156,42,42,.1);
+  box-shadow: 0 0 8px rgba(0,0,0,.5), inset 0 -1px 0 rgba(var(--deep-rgb), .1);
 }
 .atributo-box:hover {
-  box-shadow: 0 0 22px rgba(156,42,42,.22), inset 0 0 0 1px rgba(156,42,42,.15) !important;
+  box-shadow: 0 0 22px rgba(var(--deep-rgb), .22), inset 0 0 0 1px rgba(var(--deep-rgb), .15) !important;
 }
 /* Favoritos precisam vencer o !important acima — mesma especificidade,
    mas declarados depois, então sobrescrevem corretamente. Sem isso, o
@@ -3135,16 +3169,16 @@ body.livro-aberto::after { display: none !important; }
 table { background: #1c1926 !important; }
 th {
   background: linear-gradient(to right, #29213a, #221c30) !important;
-  border-bottom: 2px solid rgba(156,42,42,.6) !important;
+  border-bottom: 2px solid rgba(var(--deep-rgb), .6) !important;
   letter-spacing: 1.5px;
 }
-tr:hover td { background: rgba(156,42,42,.1) !important; }
+tr:hover td { background: rgba(var(--deep-rgb), .1) !important; }
 .table-wrapper { border: 1px solid rgba(85,65,105,.6) !important; box-shadow: 0 2px 12px rgba(0,0,0,.3); }
 
 /* --- Hero: névoa e glow sangue --- */
 .hero {
-  background: radial-gradient(ellipse at 50% -10%, rgba(156,42,42,.14) 0%, rgba(80,20,40,.06) 50%, transparent 75%) !important;
-  border-bottom: 1px solid rgba(156,42,42,.2) !important;
+  background: radial-gradient(ellipse at 50% -10%, rgba(var(--deep-rgb), .14) 0%, rgba(80,20,40,.06) 50%, transparent 75%) !important;
+  border-bottom: 1px solid var(--deep-t20) !important;
   position: relative;
 }
 
@@ -3155,7 +3189,7 @@ tr:hover td { background: rgba(156,42,42,.1) !important; }
 .login-box {
   background: linear-gradient(160deg, #111018, #0d0b12) !important;
   border: 1px solid rgba(60,45,70,.6) !important;
-  box-shadow: 0 8px 40px rgba(0,0,0,.7), 0 0 60px rgba(156,42,42,.06);
+  box-shadow: 0 8px 40px rgba(0,0,0,.7), 0 0 60px rgba(var(--deep-rgb), .06);
 }
 .login-box::before {
   background: linear-gradient(to right, transparent, var(--accent-light), transparent) !important;
@@ -3182,14 +3216,14 @@ tr:hover td { background: rgba(156,42,42,.1) !important; }
   border: 1px solid rgba(50,40,65,.7) !important;
 }
 .field-group input:focus, .field-group textarea:focus,
-.login-box input:focus { border-color: var(--accent-light) !important; box-shadow: 0 0 8px rgba(193,63,63,.15); }
+.login-box input:focus { border-color: var(--accent-light) !important; box-shadow: 0 0 8px var(--accent-t15); }
 
 /* --- Player cards GM --- */
 .player-card {
   background: linear-gradient(145deg, #111018, #0d0b12) !important;
   border: 1px solid rgba(50,40,65,.5) !important;
 }
-.player-card:hover { border-color: rgba(193,63,63,.5) !important; box-shadow: 0 0 16px rgba(156,42,42,.12); }
+.player-card:hover { border-color: var(--accent-t50) !important; box-shadow: 0 0 16px var(--deep-t12); }
 
 /* --- Ranking cards --- */
 .ranking-card {
@@ -3197,7 +3231,7 @@ tr:hover td { background: rgba(156,42,42,.1) !important; }
   border: 1px solid rgba(50,40,65,.5) !important;
   border-top: 2px solid var(--accent) !important;
 }
-.ranking-card:hover { box-shadow: 0 0 20px rgba(156,42,42,.2) !important; }
+.ranking-card:hover { box-shadow: 0 0 20px var(--deep-t20) !important; }
 
 /* --- GM header dourado --- */
 .gm-header {
@@ -3221,9 +3255,9 @@ main { position: relative; z-index: 1; }
 
 /* --- Runas decorativas (pseudo) em certos painéis --- */
 .ficha-panel-title {
-  background: rgba(156,42,42,.08) !important;
+  background: var(--deep-t08) !important;
   border-bottom: 1px solid rgba(60,40,60,.4) !important;
-  text-shadow: 0 0 10px rgba(193,63,63,.3);
+  text-shadow: 0 0 10px rgba(var(--accent-rgb), .3);
 }
 .ficha-panel-title::after {
   content: none;
@@ -3274,27 +3308,27 @@ main { position: relative; z-index: 1; }
 
 /* --- Divisor temático --- */
 .divider {
-  background: linear-gradient(to right, transparent, var(--accent), rgba(156,42,42,.3), transparent) !important;
+  background: linear-gradient(to right, transparent, var(--accent), var(--deep-t30), transparent) !important;
   opacity: .5 !important;
   height: 1px !important;
 }
 
 /* --- Títulos mais imponentes --- */
 h1, h2 {
-  text-shadow: 0 2px 12px rgba(0,0,0,.8), 0 0 30px rgba(156,42,42,.08);
+  text-shadow: 0 2px 12px rgba(0,0,0,.8), 0 0 30px var(--deep-t08);
 }
 .hero-title {
-  text-shadow: 0 4px 20px rgba(0,0,0,.9), 0 0 40px rgba(156,42,42,.12) !important;
+  text-shadow: 0 4px 20px rgba(0,0,0,.9), 0 0 40px var(--deep-t12) !important;
 }
 .login-title {
-  text-shadow: 0 0 30px rgba(193,63,63,.3), 0 4px 16px rgba(0,0,0,.8) !important;
+  text-shadow: 0 0 30px rgba(var(--accent-rgb), .3), 0 4px 16px rgba(0,0,0,.8) !important;
 }
 
 /* --- Borda gótica nos modais --- */
 .modal-bloco, .pericias-dropdown-modal {
   background: linear-gradient(160deg, #131118, #0e0c13) !important;
   border: 1px solid rgba(60,40,60,.6) !important;
-  box-shadow: 0 8px 40px rgba(0,0,0,.8), 0 0 60px rgba(156,42,42,.07);
+  box-shadow: 0 8px 40px rgba(0,0,0,.8), 0 0 60px rgba(var(--deep-rgb), .07);
 }
 
 /* --- Hover cards de personagem --- */
@@ -3302,13 +3336,13 @@ h1, h2 {
   background: linear-gradient(145deg, #111018, #0d0b12) !important;
   border: 1px solid rgba(50,40,65,.5) !important;
 }
-.personagem-item.ativo { border-color: rgba(193,63,63,.5) !important; }
+.personagem-item.ativo { border-color: var(--accent-t50) !important; }
 
 /* --- Recurso-tracker: ferro enferrujado --- */
 .recurso-tracker {
   background: linear-gradient(160deg, #141220, #0e0c14) !important;
   border: 1px solid rgba(50,40,65,.5) !important;
-  border-top: 2px solid rgba(156,42,42,.6) !important;
+  border-top: 2px solid rgba(var(--deep-rgb), .6) !important;
 }
 
 /* === Compatibilidade: mantém tudo legível === */
@@ -3329,7 +3363,7 @@ main { margin-left: 0 !important; }
   max-width: 86vw;
   background:
     linear-gradient(165deg, rgba(20,18,24,.99) 0%, rgba(12,10,14,.99) 55%, rgba(9,8,11,1) 100%);
-  border-right: 1px solid rgba(193,63,63,.28);
+  border-right: 1px solid rgba(var(--accent-rgb), .28);
   box-shadow: 6px 0 36px rgba(0,0,0,.65), inset -1px 0 0 rgba(255,255,255,.03);
   transform: translateX(-100%);
   transition: transform .38s cubic-bezier(.22,.85,.32,1.1);
@@ -3338,15 +3372,15 @@ main { margin-left: 0 !important; }
 .sidebar.open { transform: translateX(0); }
 .sidebar::after {
   content:''; position:absolute; top:0; right:-1px; bottom:0; width:1px;
-  background: linear-gradient(to bottom, transparent, rgba(193,63,63,.5) 20%, rgba(193,63,63,.5) 80%, transparent);
+  background: linear-gradient(to bottom, transparent, var(--accent-t50) 20%, var(--accent-t50) 80%, transparent);
 }
 
 /* Scrollbar elegante */
-.sidebar { scrollbar-width: thin; scrollbar-color: rgba(193,63,63,.4) transparent; }
+.sidebar { scrollbar-width: thin; scrollbar-color: var(--accent-t40) transparent; }
 .sidebar::-webkit-scrollbar { width: 5px; }
 .sidebar::-webkit-scrollbar-track { background: transparent; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(193,63,63,.4); border-radius: 3px; }
-.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(193,63,63,.65); }
+.sidebar::-webkit-scrollbar-thumb { background: var(--accent-t40); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent-rgb), .65); }
 
 /* Backdrop ao abrir (clique fora fecha) */
 #sidebar-backdrop {
@@ -3360,16 +3394,23 @@ main { margin-left: 0 !important; }
   position: fixed; top: 50%; left: 0; transform: translateY(-50%);
   z-index: 210; width: 30px; height: 68px;
   background: linear-gradient(135deg, rgba(28,26,34,.95), rgba(60,18,18,.85));
-  border: 1px solid rgba(193,63,63,.45); border-left: none;
+  border: 1px solid rgba(var(--accent-rgb), .45); border-left: none;
   border-radius: 0 12px 12px 0;
   display:flex; align-items:center; justify-content:center;
   color: var(--accent-light); font-size: 1.05rem; cursor: pointer;
-  box-shadow: 3px 0 16px rgba(0,0,0,.55), 0 0 14px rgba(193,63,63,.08);
+  box-shadow: 3px 0 16px rgba(0,0,0,.55), 0 0 14px var(--accent-t08);
   transition: left .38s cubic-bezier(.22,.85,.32,1.1), background .25s, color .25s, box-shadow .25s;
 }
-#sidebar-arrow-btn:hover { background: var(--accent); color:#fff; box-shadow: 3px 0 18px rgba(0,0,0,.6), 0 0 20px rgba(193,63,63,.35); }
+#sidebar-arrow-btn:hover { background: var(--accent); color:#fff; box-shadow: 3px 0 18px rgba(0,0,0,.6), 0 0 20px var(--accent-t35); }
 #sidebar-arrow-btn .arrow-ic { display:inline-block; transition: transform .38s cubic-bezier(.22,.85,.32,1.1); }
 #sidebar-arrow-btn.open .arrow-ic { transform: rotate(180deg); }
+/* Em mobile a barra inferior (tabbar) já dá acesso ao menu — a seta
+   lateral flutuante vira ruído redundante e some. Também ocultamos a
+   topbar redundante: a tabbar inferior basta como navegação principal
+   no celular, deixando o topo limpo para o conteúdo. */
+@media (max-width:1024px) {
+  #sidebar-arrow-btn { display:none; }
+}
 
 /* Logo */
 .sidebar-logo { margin-bottom: 1.1rem; }
@@ -3383,7 +3424,7 @@ main { margin-left: 0 !important; }
   transition: border-color .2s, background .2s, box-shadow .2s;
 }
 .sb-search input::placeholder { color:#6a6a76; }
-.sb-search input:focus { border-color: var(--accent-light); background: rgba(255,255,255,.06); box-shadow: 0 0 0 3px rgba(193,63,63,.12); }
+.sb-search input:focus { border-color: var(--accent-light); background: rgba(255,255,255,.06); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .12); }
 .sb-search-icon {
   position:absolute; left:.75rem; top:50%; transform:translateY(-50%);
   font-size:.85rem; opacity:.45; pointer-events:none;
@@ -3392,7 +3433,7 @@ main { margin-left: 0 !important; }
 /* Section labels com leve glow */
 .sidebar-section-label {
   display:flex; align-items:center; gap:.4rem;
-  text-shadow: 0 0 12px rgba(193,63,63,.15);
+  text-shadow: 0 0 12px var(--accent-t15);
 }
 
 /* Links de navegação — estilo "índice de grimório" */
@@ -3403,12 +3444,12 @@ main { margin-left: 0 !important; }
   transition: opacity .2s, transform .2s;
 }
 .sidebar-links a:hover::before { opacity:.85; transform: translateY(-50%) translateX(1px); }
-.sidebar-links a.active { background: linear-gradient(to right, rgba(156,42,42,.28), rgba(156,42,42,.08)); color:#fff; box-shadow: inset 0 0 0 1px rgba(193,63,63,.3); }
+.sidebar-links a.active { background: linear-gradient(to right, rgba(var(--deep-rgb), .28), var(--deep-t08)); color:#fff; box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .3); }
 .sidebar-links a.active::before { opacity:1; color:#fff; }
 
 /* sb-char-card: destaque do personagem ativo */
 .sb-char-card.ativo {
-  box-shadow: 0 0 0 1px var(--accent-light), 0 0 16px rgba(193,63,63,.35);
+  box-shadow: 0 0 0 1px var(--accent-light), 0 0 16px var(--accent-t35);
 }
 .sb-char-card { transition: background .2s, border-color .2s, box-shadow .25s, transform .15s; }
 .sb-char-card:hover { transform: translateX(2px); }
@@ -3417,7 +3458,7 @@ main { margin-left: 0 !important; }
 .sb-hidden { display: none !important; }
 
 /* Mobile */
-@media (max-width: 600px) {
+@media (max-width:640px) {
   .sidebar { width: 86vw; padding: 1.15rem .9rem; padding-top: 3.5rem; }
   .topbar { padding-left: 3rem; }
 }
@@ -3427,7 +3468,7 @@ main { margin-left: 0 !important; }
    Reorganização vertical completa da Ficha, sem scroll horizontal,
    mantendo a identidade visual (dark fantasy, vermelho/dourado).
 ═══════════════════════════════════════════════════════════════ */
-@media (max-width: 860px) {
+@media (max-width:640px) {
 
   html, body { overflow-x: hidden; }
   main { padding: .9rem .65rem 6rem; }
@@ -3673,20 +3714,20 @@ main { margin-left: 0 !important; }
 /* ═══ LIVRO DO JOGADOR — CSS PRÓPRIO ═══ */
 /* Prefixado com #livro-jogador para evitar conflito */
 
-#livro-jogador .highlight { background: rgba(156,42,42,.13); padding: .05em .4em; border-radius: 3px; color: #f5c2c2; }
+#livro-jogador .highlight { background: rgba(var(--deep-rgb), .13); padding: .05em .4em; border-radius: 3px; color: #f5c2c2; }
 #livro-jogador .key-term { color: var(--accent-light); font-weight: 600; border-bottom: 1px dotted var(--accent); }
 #livro-jogador .section-divider { height: 2px; background: linear-gradient(to right, transparent, var(--accent), transparent); margin: 2.8rem 0; opacity: .35; }
 #livro-jogador #sumario a { color: #d4d4dc; text-decoration: none; transition: color .2s; }
-#livro-jogador #sumario a:hover { color: #c13f3f; text-decoration: underline; }
+#livro-jogador #sumario a:hover { color: var(--accent); text-decoration: underline; }
 
 /* Sumário 2 colunas */
 #livro-jogador .sumario-content { display: grid; grid-template-columns: 1fr 320px; gap: 2rem; align-items: start; }
 #livro-jogador .sumario-side-panel { background: #242030; border: 1px solid #3a3548; border-radius: 6px; padding: 1.3rem 1.4rem; font-size: .88rem; color: #c5c5d1; }
-#livro-jogador .sumario-side-panel h4 { color: #c13f3f; font-size: 1rem; margin-bottom: .8rem; padding-bottom: .4rem; border-bottom: 1px solid #2a2a32; }
+#livro-jogador .sumario-side-panel h4 { color: var(--accent); font-size: 1rem; margin-bottom: .8rem; padding-bottom: .4rem; border-bottom: 1px solid #2a2a32; }
 #livro-jogador .sumario-side-panel ul { list-style: none; padding: 0; margin: 0; }
 #livro-jogador .sumario-side-panel li { padding: .3rem 0; border-bottom: 1px solid #222228; font-size: .85rem; line-height: 1.3; }
 #livro-jogador .sumario-side-panel li:last-child { border-bottom: none; }
-#livro-jogador .sumario-side-panel .warning { background: rgba(156,42,42,.12); border-left: 3px solid #c13f3f; padding: .6rem .75rem; margin-top: .9rem; font-size: .82rem; color: #d4a3a3; line-height: 1.35; }
+#livro-jogador .sumario-side-panel .warning { background: var(--deep-t12); border-left: 3px solid var(--accent); padding: .6rem .75rem; margin-top: .9rem; font-size: .82rem; color: #d4a3a3; line-height: 1.35; }
 #livro-jogador .sumario-content a { display: block; padding: .12rem 0; }
 
 /* Conteúdo do livro: tipografia ajustada ao sistema existente */
@@ -3697,11 +3738,11 @@ main { margin-left: 0 !important; }
 #livro-jogador h4 { font-size: 1.2rem; margin: 1.4rem 0 .5rem; color: #d8d8e0; }
 
 /* Responsivo do sumário */
-@media (max-width: 1100px) {
+@media (max-width:1024px) {
   #livro-jogador .sumario-content { grid-template-columns: 1fr; }
   #livro-jogador .sumario-side-panel { display: none; }
 }
-@media (max-width: 640px) {
+@media (max-width:640px) {
   #livro-jogador .sumario-content { font-size: .92rem; }
   #livro-jogador .sumario-content ul { columns: 1 !important; }
 }
@@ -3781,7 +3822,7 @@ main { margin-left: 0 !important; }
             th {
                 background: #f4f4f4 !important;
                 color: #000000 !important;
-                border-bottom: 1.5px solid #9c2a2a !important;
+                border-bottom: 1.5px solid var(--accent-deep) !important;
                 font-size: 8.5pt !important;
                 padding: 0.4rem 0.6rem !important;
             }
@@ -3851,7 +3892,7 @@ main { margin-left: 0 !important; }
 .landing-obs-link { font-size:.8rem; color:var(--text-muted); cursor:pointer; text-decoration:underline; transition:color var(--dur); display:inline-flex; align-items:center; gap:.4rem; max-width:90vw; text-align:center; line-height:1.5; }
 .landing-obs-link:hover { color:var(--accent-light); }
 .landing-obs-link .ic { flex-shrink:0; }
-@media (max-width:480px) {
+@media (max-width:640px) {
   .landing-cards { flex-direction:column; align-items:center; }
   .landing-card { min-width:240px; padding:1.5rem 2rem; }
 }
@@ -3910,14 +3951,14 @@ main { margin-left: 0 !important; }
   position: fixed; top: 50%; left: 0; transform: translateY(-50%);
   z-index: 410; width: 30px; height: 68px;
   background: linear-gradient(135deg, rgba(28,26,34,.95), rgba(60,18,18,.85));
-  border: 1px solid rgba(193,63,63,.45); border-left: none;
+  border: 1px solid rgba(var(--accent-rgb), .45); border-left: none;
   border-radius: 0 12px 12px 0;
   display: flex; align-items: center; justify-content: center;
   color: var(--accent-light); font-size: 1.05rem; cursor: pointer;
-  box-shadow: 3px 0 16px rgba(0,0,0,.55), 0 0 14px rgba(193,63,63,.08);
+  box-shadow: 3px 0 16px rgba(0,0,0,.55), 0 0 14px var(--accent-t08);
   transition: left .38s cubic-bezier(.22,.85,.32,1.1), background .25s, color .25s, box-shadow .25s;
 }
-#livro-sidebar-arrow-btn:hover { background: var(--accent); color: #fff; box-shadow: 3px 0 18px rgba(0,0,0,.6), 0 0 20px rgba(193,63,63,.35); }
+#livro-sidebar-arrow-btn:hover { background: var(--accent); color: #fff; box-shadow: 3px 0 18px rgba(0,0,0,.6), 0 0 20px var(--accent-t35); }
 #livro-sidebar-arrow-btn .arrow-ic { display: inline-block; transition: transform .38s cubic-bezier(.22,.85,.32,1.1); }
 #livro-sidebar-arrow-btn.open .arrow-ic { transform: rotate(180deg); }
 
@@ -3926,20 +3967,20 @@ main { margin-left: 0 !important; }
   width: 290px; max-width: 86vw;
   height: 100vh !important; max-height: 100vh !important;
   background: linear-gradient(165deg, rgba(20,18,24,.99) 0%, rgba(12,10,14,.99) 55%, rgba(9,8,11,1) 100%) !important;
-  border-right: 1px solid rgba(193,63,63,.28);
+  border-right: 1px solid rgba(var(--accent-rgb), .28);
   box-shadow: 6px 0 36px rgba(0,0,0,.65), inset -1px 0 0 rgba(255,255,255,.03);
   transform: translateX(-100%);
   transition: transform .38s cubic-bezier(.22,.85,.32,1.1);
   z-index: 400 !important;
   padding: 4.5rem 1.1rem 1.5rem !important;
   overflow-y: auto;
-  scrollbar-width: thin; scrollbar-color: rgba(193,63,63,.4) transparent;
+  scrollbar-width: thin; scrollbar-color: var(--accent-t40) transparent;
 }
 #livro-sidebar.open { transform: translateX(0); }
 #livro-sidebar::-webkit-scrollbar { width: 5px; }
 #livro-sidebar::-webkit-scrollbar-track { background: transparent; }
-#livro-sidebar::-webkit-scrollbar-thumb { background: rgba(193,63,63,.4); border-radius: 3px; }
-#livro-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(193,63,63,.65); }
+#livro-sidebar::-webkit-scrollbar-thumb { background: var(--accent-t40); border-radius: 3px; }
+#livro-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent-rgb), .65); }
 
 /* Conteúdo ocupa a largura toda — a sidebar agora flutua por cima, não empurra mais */
 #livro-layout { display: block !important; }
@@ -3983,19 +4024,113 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
 #livro-jogador #livro-sidebar-arrow-btn {
   box-shadow: none !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FRENTE 3 — NAVEGAÇÃO MOBILE REFINADA
+   Melhorias aditivas (só sobrescrevem propriedades pontuais) para uma
+   navegação mais limpa e fluida no celular. A estrutura/JS não muda.
+═══════════════════════════════════════════════════════════════════ */
+@media (max-width:1024px) {
+  /* Topbar enxuta: vira uma faixa fina só com a identidade (logo).
+     Os botões de menu/ranking que havia aqui são redundantes — a barra
+     inferior (tabbar) já cobre essas ações. Centralizamos o logo e
+     escondemos os botões laterais para um topo limpo. */
+  .topbar { justify-content:center; padding:.45rem .75rem; padding-top:calc(.45rem + var(--safe-top)); }
+  .topbar .topbar-menu-btn { display:none; }
+  .topbar-logo { font-size:1rem; letter-spacing:1px; }
+
+  /* Tabbar: toque mais tátil e estado ativo mais claro. */
+  .tabbar-btn { transition:color var(--dur), background var(--dur-fast); border-radius:12px; margin:.2rem; }
+  .tabbar-btn:active { background:var(--accent-t08); }
+  .tabbar-btn.active { color:var(--accent-light); }
+  .tabbar-btn.active .ic { transform:translateY(-2px) scale(1.12); filter:drop-shadow(0 0 6px var(--accent-glow)); }
+  /* Pílula de fundo sutil sob o item ativo, em vez de só a barrinha. */
+  .tabbar-btn.active::after {
+    content:''; position:absolute; inset:.15rem .35rem auto; top:.15rem;
+    height:calc(100% - .3rem); border-radius:12px;
+    background:var(--accent-t08); z-index:-1;
+  }
+}
+
+/* Animação de entrada suave da tabbar quando ela aparece (login). */
+.tabbar.show { animation:tabbarUp .45s var(--ease-out); }
+@keyframes tabbarUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FRENTE 4 — MODERNIZAÇÃO DE COMPONENTES
+   Refinos aditivos: profundidade real, easing fluido dos tokens e
+   micro-interações sutis. Não reescreve estrutura — só polimento.
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Cards do ranking: hover mais fluido + brilho superior no topo ── */
+.lenda-card {
+  transition: transform var(--dur) var(--ease-out),
+              box-shadow var(--dur) var(--ease-out),
+              border-color var(--dur) var(--ease-out);
+  border-radius: var(--r-md);
+}
+.lenda-card::after {
+  /* fio de luz no topo do card — aparece no hover, dá sensação premium */
+  content:''; position:absolute; top:0; left:0; right:0; height:1px; z-index:4;
+  background:linear-gradient(to right, transparent, var(--accent-light), transparent);
+  opacity:0; transition:opacity var(--dur) var(--ease-out);
+  pointer-events:none;
+}
+.lenda-card:hover { transform: translateY(-5px); }
+.lenda-card:hover::after { opacity:.7; }
+.lenda-card:active { transform: translateY(-2px) scale(.995); }
+
+/* ── Botões primários: leve elevação e brilho ao interagir ── */
+.login-btn, .hero-cta {
+  transition: background var(--dur) var(--ease),
+              transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur) var(--ease-out);
+}
+.login-btn:hover, .hero-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+.login-btn:active, .hero-cta:active { transform: translateY(0); box-shadow:none; }
+
+/* ── Inputs/campos: foco mais nítido e moderno (anel suave) ── */
+.field-group input:focus,
+.field-group textarea:focus,
+.field-group select:focus,
+.login-box input:focus,
+.sb-search input:focus {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 3px var(--accent-t15);
+  outline: none;
+}
+
+/* ── Chips de meta no ranking: pílula mais limpa ── */
+.lenda-meta-chip {
+  border-radius: var(--r-pill);
+  transition: border-color var(--dur), color var(--dur);
+}
+
+/* ── Painéis da ficha: cantos coerentes com a escala de raios ── */
+.ficha-panel, .attr-rank-panel, .lendas-loading { border-radius: var(--r-md); }
+
+/* ── Rolagem mais suave e discreta no corpo (toque premium) ── */
+@media (hover: hover) {
+  .lenda-card, .login-btn, .hero-cta, .tabbar-btn { will-change: transform; }
+}
+
+
 </style>
-<style type="text/css"></style><style>
+<style>
     body.modo-editor-livro .bloco-editavel { outline:1px dashed rgba(180,140,30,.3); }
     #livro-jogador.modo-editor-livro .bloco-editavel:hover { outline-color:var(--gold); background:rgba(180,140,30,.04); }
     #livro-sidebar a.active { color:#fff; background:var(--accent); font-weight:600; border-radius:4px; }
     #livro-sidebar a { color:#d4d2de; text-decoration:none; display:block; padding:.38rem .55rem; border-radius:4px; font-size:.93rem; transition:color .2s,background .2s; }
-    #livro-sidebar a:hover { color:#fff; background:rgba(156,42,42,.18); }
+    #livro-sidebar a:hover { color:#fff; background:rgba(var(--deep-rgb), .18); }
     #livro-sidebar .toc-label { font-size:.7rem; text-transform:uppercase; letter-spacing:1.5px; color:#e8696e; margin:.9rem 0 .3rem; display:block; padding-left:.4rem; border-left:3px solid #e8696e; font-weight:600; }
     /* BUG CORRIGIDO: links DENTRO do conteúdo do livro (Sumário Interativo e
        qualquer referência cruzada no corpo do texto) não tinham nenhuma regra
        de estilo — ficavam com o azul+sublinhado padrão do navegador, quebrando
        a identidade visual do site em pelo menos 66 links espalhados pelo livro. */
-    #livro-content a { color: var(--accent-light); text-decoration: none; border-bottom: 1px solid rgba(193,63,63,.3); transition: color .2s, border-color .2s; }
+    #livro-content a { color: var(--accent-light); text-decoration: none; border-bottom: 1px solid rgba(var(--accent-rgb), .3); transition: color .2s, border-color .2s; }
     #livro-content a:hover { color: var(--gold-light); border-bottom-color: var(--gold-light); }
     #livro-content a:visited { color: var(--accent-light); }
     @media (max-width:1024px) {
@@ -4297,7 +4432,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
         <!-- Preenchido por renderizarPersonagensNaSidebar() -->
       </div>
       <div style="margin-top:.3rem">
-        <a onclick="criarNovoPersonagem()" style="display:flex;align-items:center;gap:.4rem;color:var(--accent-light);font-size:.83rem;padding:.35rem .5rem;border-radius:3px;cursor:pointer;transition:background .2s" onmouseover="this.style.background=&#39;rgba(156,42,42,.12)&#39;" onmouseout="this.style.background=&#39;transparent&#39;">
+        <a onclick="criarNovoPersonagem()" style="display:flex;align-items:center;gap:.4rem;color:var(--accent-light);font-size:.83rem;padding:.35rem .5rem;border-radius:3px;cursor:pointer;transition:background .2s" onmouseover="this.style.background=&#39;var(--deep-t12)&#39;" onmouseout="this.style.background=&#39;transparent&#39;">
           <span style="font-size:1rem;line-height:1">+</span> Novo Personagem
         </a>
       </div>
@@ -4388,7 +4523,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
 
       <!-- TAB: RANKING GLOBAL AUDITORIA -->
       <div class="gm-tab-content" id="content-tab-ranking-audit">
-        <div class="lore-box" style="margin-bottom:1.5rem;border-color:rgba(193,63,63,.4)">
+        <div class="lore-box" style="margin-bottom:1.5rem;border-color:var(--accent-t40)">
           <strong style="color:var(--accent-light)">Auditoria do Ranking Global</strong><br>
           Verifica todos os personagens existentes no sistema e indexa automaticamente qualquer um que esteja faltando no ranking.<br>
           <strong style="color:var(--silver)">Use sempre que suspeitar que personagens não estão aparecendo.</strong>
@@ -4397,7 +4532,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
           <button id="btn-sincronizar-ranking" onclick="sincronizarRankingCompleto()" style="background:var(--accent);border:none;color:#fff;padding:.65rem 1.5rem;font-family:&#39;Playfair Display&#39;,serif;font-size:.95rem;cursor:pointer;letter-spacing:1px;transition:background .2s" onmouseover="this.style.background=&#39;var(--accent-light)&#39;" onmouseout="this.style.background=&#39;var(--accent)&#39;">
             🔄 Sincronizar Ranking Global
           </button>
-          <button onclick="carregarRanking()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.65rem 1.5rem;font-family:&#39;Playfair Display&#39;,serif;font-size:.95rem;cursor:pointer;letter-spacing:1px;transition:all .2s" onmouseover="this.style.background=&#39;rgba(156,42,42,.15)&#39;" onmouseout="this.style.background=&#39;none&#39;">
+          <button onclick="carregarRanking()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.65rem 1.5rem;font-family:&#39;Playfair Display&#39;,serif;font-size:.95rem;cursor:pointer;letter-spacing:1px;transition:all .2s" onmouseover="this.style.background=&#39;rgba(var(--deep-rgb), .15)&#39;" onmouseout="this.style.background=&#39;none&#39;">
             ↻ Recarregar Ranking
           </button>
         </div>
@@ -4451,7 +4586,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
             </div>
           </div>
           <div style="margin-top:1.1rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-            <button onclick="restaurarFormulasPadrao()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.4rem 1rem;font-family:inherit;font-size:.82rem;cursor:pointer;letter-spacing:.5px" onmouseover="this.style.background=&#39;rgba(156,42,42,.12)&#39;" onmouseout="this.style.background=&#39;none&#39;">↺ Restaurar Fórmulas Padrão</button>
+            <button onclick="restaurarFormulasPadrao()" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.4rem 1rem;font-family:inherit;font-size:.82rem;cursor:pointer;letter-spacing:.5px" onmouseover="this.style.background=&#39;var(--deep-t12)&#39;" onmouseout="this.style.background=&#39;none&#39;">↺ Restaurar Fórmulas Padrão</button>
             <span style="font-size:.78rem;color:var(--text-muted)">— corrige fórmulas salvas incorretamente (ex: PE retornando sempre 0).</span>
           </div>
         </div>
@@ -4805,7 +4940,7 @@ function _mostrarAvisoDiagnostico(origem, code) {
   el.id = 'diag-aviso';
   el.style.cssText = `
     position:fixed;bottom:14px;right:14px;z-index:9999;max-width:340px;
-    background:#1a0a0a;border:1px solid rgba(193,63,63,.55);border-radius:8px;
+    background:#1a0a0a;border:1px solid rgba(var(--accent-rgb), .55);border-radius:8px;
     padding:.85rem 1rem;color:#f0d0d0;font-family:'Source Sans 3',sans-serif;
     font-size:.78rem;line-height:1.5;box-shadow:0 8px 30px rgba(0,0,0,.6);
   `;
@@ -4819,7 +4954,7 @@ function _mostrarAvisoDiagnostico(origem, code) {
     <span style="opacity:.85">${explicacao}</span><br>
     <span style="opacity:.6;font-size:.7rem">Origem: ${origem} · Código: ${code}</span>
     <div style="margin-top:.5rem;text-align:right">
-      <button onclick="document.getElementById('diag-aviso').remove()" style="background:none;border:1px solid rgba(193,63,63,.4);color:#f0d0d0;padding:.2rem .6rem;font-size:.72rem;cursor:pointer;border-radius:4px">Fechar</button>
+      <button onclick="document.getElementById('diag-aviso').remove()" style="background:none;border:1px solid var(--accent-t40);color:#f0d0d0;padding:.2rem .6rem;font-size:.72rem;cursor:pointer;border-radius:4px">Fechar</button>
     </div>`;
   document.body.appendChild(el);
 }
@@ -5396,7 +5531,7 @@ let _personalizacoes = {}; // { docId: { tema, wallpaper, gifPoder, gifTransform
 
 const TEMAS = {
   abismo:   { icon: '🌑', ic: 'moon',  nome: 'Abismo',    cor: '#5a1a5a' },
-  sangue:   { icon: '🩸', ic: 'heart', nome: 'Sangue',    cor: '#9c2a2a' },
+  sangue:   { icon: '🩸', ic: 'heart', nome: 'Sangue',    cor: 'var(--accent-deep)' },
   guerra:   { icon: '⚔️', ic: 'sword', nome: 'Guerra',    cor: '#b87020' },
   vampirico:{ icon: '🦇', ic: 'skull', nome: 'Vampírico', cor: '#7a0a5a' },
   soberano: { icon: '👑', ic: 'crown', nome: 'Soberano',  cor: '#d4ad3a' },
@@ -6603,7 +6738,7 @@ async function _renderPerfilUsuario(targetUser) {
       ${dados.bio ? _escHtml(dados.bio).replace(/\n/g,'<br>') : `<span class="livro-area-empty">Este jogador ainda não escreveu uma descrição.</span>`}
     </div>
     ${ehProprioUsuario ? `
-    <button onclick="abrirEditarPerfilUsuario()" style="margin-top:.75rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.55rem 1rem;font-family:inherit;font-size:.8rem;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:.4rem">
+    <button onclick="abrirEditarPerfilUsuario()" style="margin-top:.75rem;background:var(--deep-t12);border:1px solid var(--accent-t40);color:var(--accent-light);padding:.55rem 1rem;font-family:inherit;font-size:.8rem;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:.4rem">
       <svg class="ic ic-sm"><use href="#ic-edit"/></svg> Editar Perfil de Usuário
     </button>` : ''}
   `;
@@ -6623,7 +6758,7 @@ function abrirEditarPerfilUsuario() {
       <div style="text-align:center;margin-bottom:.8rem">
         <img id="editar-usuario-foto-preview" src="${_escUrl(dadosAtuais.foto)}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--border);display:${dadosAtuais.foto ? 'inline-block' : 'none'};margin-bottom:.5rem" onerror="this.style.display='none'">
         <div>
-          <button type="button" onclick="abrirSeletorFotoUsuario()" style="background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.5rem .9rem;font-family:inherit;font-size:.78rem;cursor:pointer;min-height:44px">Trocar Foto</button>
+          <button type="button" onclick="abrirSeletorFotoUsuario()" style="background:var(--deep-t12);border:1px solid var(--accent-t40);color:var(--accent-light);padding:.5rem .9rem;font-family:inherit;font-size:.78rem;cursor:pointer;min-height:44px">Trocar Foto</button>
         </div>
       </div>
       <label style="font-size:.72rem;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase">Descrição</label>
@@ -6911,7 +7046,7 @@ function abrirPerfilPublico(f) {
           <!-- Sistema de Likes -->
           <div class="livro-likes-row" style="display:flex;flex-direction:column;align-items:center;gap:.2rem;margin-top:.85rem">
             <button id="btn-curtir" ${_perfilEhProprio ? '' : `onclick="alternarCurtida('${pid}','${f.user}','${_nomePersonagemEscapado}')"`}
-              style="background:rgba(156,42,42,.1);border:1px solid rgba(193,63,63,.35);color:var(--text);padding:.5rem 1.2rem;border-radius:20px;font-family:inherit;font-size:.88rem;cursor:${_perfilEhProprio?'default':'pointer'};display:inline-flex;align-items:center;gap:.4rem;transition:all .2s;min-height:44px">
+              style="background:rgba(var(--deep-rgb), .1);border:1px solid var(--accent-t35);color:var(--text);padding:.5rem 1.2rem;border-radius:20px;font-family:inherit;font-size:.88rem;cursor:${_perfilEhProprio?'default':'pointer'};display:inline-flex;align-items:center;gap:.4rem;transition:all .2s;min-height:44px">
               🤍 Carregando…
             </button>
             <a onclick="abrirListaCurtidas('${pid}')" style="font-size:.74rem;color:var(--text-muted);cursor:pointer;text-decoration:underline;padding:.5rem;min-height:44px;display:inline-flex;align-items:center">Ver quem curtiu</a>
@@ -7085,8 +7220,8 @@ function abrirPerfilPublico(f) {
           </div>
           <div style="text-align:center;margin-top:1rem">
             <button onclick="document.getElementById('livro-overlay').remove();navTo('secao-ranking')"
-              style="background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.55rem 1.2rem;font-family:inherit;font-size:.83rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:all .2s"
-              onmouseover="this.style.background='rgba(156,42,42,.25)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
+              style="background:var(--deep-t12);border:1px solid var(--accent-t40);color:var(--accent-light);padding:.55rem 1.2rem;font-family:inherit;font-size:.83rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:all .2s"
+              onmouseover="this.style.background='rgba(var(--deep-rgb), .25)'" onmouseout="this.style.background='var(--deep-t12)'">
               ${icone('lendas','ic-sm')} Ver Livro das Lendas completo
             </button>
           </div>
@@ -7114,8 +7249,8 @@ function abrirPerfilPublico(f) {
         ${(f.user === usuarioAtual && f.nomePersonagem === personagemAtual) ? `
         <div style="padding:1rem 1.75rem 2rem;display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap">
           <button onclick="document.getElementById('livro-overlay').remove();abrirPersonalizacao()"
-            style="background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.6rem 1.3rem;font-family:inherit;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:.45rem;transition:all .2s"
-            onmouseover="this.style.background='rgba(156,42,42,.25)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
+            style="background:var(--deep-t12);border:1px solid var(--accent-t40);color:var(--accent-light);padding:.6rem 1.3rem;font-family:inherit;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:.45rem;transition:all .2s"
+            onmouseover="this.style.background='rgba(var(--deep-rgb), .25)'" onmouseout="this.style.background='var(--deep-t12)'">
             <svg class="ic"><use href="#ic-gear"/></svg> Personalizar Perfil
           </button>
         </div>` : ''}
@@ -7242,11 +7377,11 @@ function abrirPersonalizacao() {
         <div class="personalizar-section-title">Foto de Capa do Perfil</div>
         <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.6rem">Aparece como banner no topo do Grimório. Envie uma imagem da galeria ou cole uma URL.</p>
         <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem">
-          <button onclick="abrirSeletorCapaPersonalizacao()" style="width:100%;padding:.65rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);font-family:inherit;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s" onmouseover="this.style.background='rgba(156,42,42,.22)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
+          <button onclick="abrirSeletorCapaPersonalizacao()" style="width:100%;padding:.65rem;background:var(--deep-t12);border:1px solid var(--accent-t40);color:var(--accent-light);font-family:inherit;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s" onmouseover="this.style.background='rgba(var(--deep-rgb), .22)'" onmouseout="this.style.background='var(--deep-t12)'">
             <svg class="ic"><use href="#ic-camera"/></svg> Enviar Foto de Capa da Galeria
           </button>
           <img id="capa-preview-img" src="${_escUrl(p.wallpaperUrl||'')}" style="width:100%;max-height:80px;object-fit:cover;border:1px solid rgba(60,40,60,.5);border-radius:2px;display:${p.wallpaperUrl?'block':'none'};" onerror="this.style.display='none'">
-          <button type="button" onclick="removerCapaPersonalizacao()" style="width:100%;padding:.4rem;min-height:44px;background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;font-family:inherit;font-size:.78rem;cursor:pointer" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">✕ Remover Capa</button>
+          <button type="button" onclick="removerCapaPersonalizacao()" style="width:100%;padding:.4rem;min-height:44px;background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);font-family:inherit;font-size:.78rem;cursor:pointer" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">✕ Remover Capa</button>
         </div>
 
         <div class="personalizar-section-title">Wallpaper do Perfil (URL)</div>
@@ -7256,7 +7391,7 @@ function abrirPersonalizacao() {
           <input type="text" id="wp-custom-url" placeholder="Cole URL de imagem (https://...)"
             value="${_escHtml((!p.wallpaperUrl || p.wallpaperUrl.startsWith('data:')) ? '' : (p.wallpaperUrl||''))}"
             style="flex:1;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.45rem .65rem;font-family:inherit;font-size:.82rem;outline:none">
-          <button onclick="usarWallpaperCustom()" style="background:none;border:1px solid rgba(193,63,63,.4);color:var(--accent-light);padding:.45rem .85rem;font-family:inherit;font-size:.8rem;cursor:pointer">Usar</button>
+          <button onclick="usarWallpaperCustom()" style="background:none;border:1px solid var(--accent-t40);color:var(--accent-light);padding:.45rem .85rem;font-family:inherit;font-size:.8rem;cursor:pointer">Usar</button>
         </div>
 
         <div class="personalizar-section-title">GIFs do Personagem</div>
@@ -7270,10 +7405,10 @@ function abrirPersonalizacao() {
               <div>
                 <label><svg class="ic"><use href="#ic-prism"/></svg> GIF — Poder Principal</label>
                 <input type="text" id="gif-poder" placeholder="https://... (ou envie da galeria)" value="${_escHtml(p.gifPoder||'')}" oninput="previewGif('gif-poder','prev-poder')">
-                <button type="button" onclick="abrirSeletorGifPoder()" style="margin-top:.35rem;width:100%;padding:.45rem;background:rgba(156,42,42,.12);border:1px solid rgba(193,63,63,.4);color:var(--accent-light);font-family:inherit;font-size:.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem" onmouseover="this.style.background='rgba(156,42,42,.22)'" onmouseout="this.style.background='rgba(156,42,42,.12)'">
+                <button type="button" onclick="abrirSeletorGifPoder()" style="margin-top:.35rem;width:100%;padding:.45rem;background:var(--deep-t12);border:1px solid var(--accent-t40);color:var(--accent-light);font-family:inherit;font-size:.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem" onmouseover="this.style.background='rgba(var(--deep-rgb), .22)'" onmouseout="this.style.background='var(--deep-t12)'">
                   <svg class="ic ic-sm"><use href="#ic-camera"/></svg> Enviar GIF da Galeria
                 </button>
-                <button type="button" onclick="removerGifPoderPersonalizacao()" style="margin-top:.3rem;width:100%;padding:.35rem;min-height:44px;background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;font-family:inherit;font-size:.72rem;cursor:pointer" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">✕ Remover GIF</button>
+                <button type="button" onclick="removerGifPoderPersonalizacao()" style="margin-top:.3rem;width:100%;padding:.35rem;min-height:44px;background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);font-family:inherit;font-size:.72rem;cursor:pointer" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">✕ Remover GIF</button>
               </div>
               <img id="prev-poder" class="gif-preview-sm" src="${_escUrl(p.gifPoder||'')}" onerror="this.style.display='none'" style="${p.gifPoder?'display:block':''}">
             </div>
@@ -7763,8 +7898,8 @@ function abrirAcoesMiniatura(slot, src) {
           <svg class="ic"><use href="#ic-refresh"/></svg> Trocar Foto
         </button>
         <button onclick="document.getElementById('modal-mini-acao').remove();removerFotoGaleria(${slot})"
-          style="width:100%;padding:.6rem;background:rgba(156,42,42,.15);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;font-family:inherit;font-size:.88rem;cursor:pointer;transition:all .2s"
-          onmouseover="this.style.background='rgba(193,63,63,.25)'" onmouseout="this.style.background='rgba(156,42,42,.15)'">
+          style="width:100%;padding:.6rem;background:rgba(var(--deep-rgb), .15);border:1px solid var(--accent-t40);color:var(--accent-text);font-family:inherit;font-size:.88rem;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.background='var(--accent-t25)'" onmouseout="this.style.background='rgba(var(--deep-rgb), .15)'">
           <svg class="ic"><use href="#ic-close"/></svg> Remover Foto
         </button>
         <button onclick="abrirLightbox('${_escUrl(src)}')"
@@ -7815,7 +7950,7 @@ function addArmaRow() {
     <td data-label="Tipo"><input type="text" id="arm${n}-tipo" style="min-width:55px" oninput="salvarLocal()"></td>
     <td data-label="Alcance"><input type="text" id="arm${n}-alc" style="min-width:55px" oninput="salvarLocal()"></td>
     <td data-label="Notas"><input type="text" id="arm${n}-obs" oninput="salvarLocal()"></td>
-    <td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
+    <td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
   `;
   tbody.appendChild(tr);
   salvarLocal();
@@ -7843,7 +7978,7 @@ function renderFotoPersonagem() {
   const principal = _fotoPrincipal
     ? `<div style="position:relative;display:inline-block">
         <img src="${_escUrl(_fotoPrincipal)}" class="personagem-foto-display" onclick="abrirSeletorFotoPrincipal()" title="Clique para trocar">
-        <button onclick="event.stopPropagation();removerFotoPrincipal()" title="Remover foto principal" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.75);border:none;color:#f5a0a0;font-size:.65rem;cursor:pointer;padding:.15rem .35rem;border-radius:2px;line-height:1.4">✕</button>
+        <button onclick="event.stopPropagation();removerFotoPrincipal()" title="Remover foto principal" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.75);border:none;color:var(--accent-text);font-size:.65rem;cursor:pointer;padding:.15rem .35rem;border-radius:2px;line-height:1.4">✕</button>
        </div>`
     : `<div class="personagem-foto-placeholder" onclick="abrirSeletorFotoPrincipal()"><svg class="ic ic-xl"><use href="#ic-camera"/></svg><span>Foto Principal</span></div>`;
 
@@ -7977,8 +8112,8 @@ function atualizarFichaHero() {
   // Cor dinâmica baseada no % do recurso atual
   function corRecurso(atual, max, tipo) {
     const a = parseInt(atual) || 0, m = parseInt(max) || 1;
-    if (tipo === 'pe') return a <= 0 ? '#f5a0a0' : a <= Math.floor(m * 0.3) ? '#e0a040' : 'var(--arcane-light)';
-    return a <= 0 ? '#f5a0a0' : a <= Math.floor(m * 0.3) ? '#e0a040' : 'var(--accent-light)';
+    if (tipo === 'pe') return a <= 0 ? 'var(--accent-text)' : a <= Math.floor(m * 0.3) ? '#e0a040' : 'var(--arcane-light)';
+    return a <= 0 ? 'var(--accent-text)' : a <= Math.floor(m * 0.3) ? '#e0a040' : 'var(--accent-light)';
   }
 
   const fotoEl = _fotoPrincipal
@@ -8297,13 +8432,13 @@ function renderizarPersonagensAccordion() {
           <button data-acao="ativar" style="background:var(--accent);border:none;color:#fff;padding:.45rem 1.2rem;font-family:'Playfair Display',serif;font-size:.88rem;cursor:pointer;letter-spacing:1px;transition:background .2s" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='var(--accent)'">
             ▶ Ativar Ficha
           </button>
-          <button data-acao="ver-atributos" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.45rem 1rem;font-family:'Playfair Display',serif;font-size:.88rem;cursor:pointer;letter-spacing:.5px;transition:all .2s" onmouseover="this.style.background='rgba(156,42,42,.15)'" onmouseout="this.style.background='none'" title="Ir para os atributos desta ficha">
+          <button data-acao="ver-atributos" style="background:none;border:1px solid var(--accent);color:var(--accent-light);padding:.45rem 1rem;font-family:'Playfair Display',serif;font-size:.88rem;cursor:pointer;letter-spacing:.5px;transition:all .2s" onmouseover="this.style.background='rgba(var(--deep-rgb), .15)'" onmouseout="this.style.background='none'" title="Ir para os atributos desta ficha">
             ◆ Ver Atributos
           </button>
           <button data-acao="renomear" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.45rem 1rem;font-family:inherit;font-size:.85rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">
             ✏ Editar
           </button>
-          <button data-acao="excluir" title="Excluir personagem" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.45rem .7rem;font-family:inherit;font-size:.9rem;cursor:pointer;transition:all .2s;margin-left:auto" onmouseover="this.style.background='rgba(220,60,60,.15)'" onmouseout="this.style.background='none'">
+          <button data-acao="excluir" title="Excluir personagem" style="background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);padding:.45rem .7rem;font-family:inherit;font-size:.9rem;cursor:pointer;transition:all .2s;margin-left:auto" onmouseover="this.style.background='rgba(220,60,60,.15)'" onmouseout="this.style.background='none'">
             🗑
           </button>
         </div>
@@ -9037,7 +9172,7 @@ function calcTudo() {
   // ── Total de pontos de atributo ──
   const total = forca + destreza + vigor + intelecto + alma + carisma;
   const ta = document.getElementById('total-attr');
-  if (ta) { ta.textContent = total; ta.style.color = total > 80 ? '#f5a0a0' : 'var(--accent-light)'; }
+  if (ta) { ta.textContent = total; ta.style.color = total > 80 ? 'var(--accent-text)' : 'var(--accent-light)'; }
 
   // ── Atualizar recursos na tela ──
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
@@ -9086,7 +9221,7 @@ function calcRecursoAtual(tipo) {
     const el = document.getElementById('pv-atual-display');
     if (el) {
       el.textContent = atual;
-      el.style.color = atual <= 0 ? '#f5a0a0' : atual <= Math.floor((pvMax + pvExtra) * 0.3) ? '#e0a040' : 'var(--accent-light)';
+      el.style.color = atual <= 0 ? 'var(--accent-text)' : atual <= Math.floor((pvMax + pvExtra) * 0.3) ? '#e0a040' : 'var(--accent-light)';
     }
     atualizarFichaHero();
   } else if (tipo === 'sta') {
@@ -9099,7 +9234,7 @@ function calcRecursoAtual(tipo) {
     const el = document.getElementById('sta-atual-display');
     if (el) {
       el.textContent = atual;
-      el.style.color = atual <= 0 ? '#f5a0a0' : atual <= Math.floor((staMax + staExtra) * 0.3) ? '#e0a040' : 'var(--accent-light)';
+      el.style.color = atual <= 0 ? 'var(--accent-text)' : atual <= Math.floor((staMax + staExtra) * 0.3) ? '#e0a040' : 'var(--accent-light)';
     }
     atualizarFichaHero();
   } else if (tipo === 'pe') {
@@ -9111,7 +9246,7 @@ function calcRecursoAtual(tipo) {
     const el = document.getElementById('pe-atual-display');
     if (el) {
       el.textContent = atual;
-      el.style.color = atual <= 0 ? '#f5a0a0' : atual <= Math.floor(peMax * 0.3) ? '#e0a040' : 'var(--arcane-light)';
+      el.style.color = atual <= 0 ? 'var(--accent-text)' : atual <= Math.floor(peMax * 0.3) ? '#e0a040' : 'var(--arcane-light)';
     }
     atualizarFichaHero();
   }
@@ -9237,7 +9372,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Habilidades Passivas</div>
       <div style="display:flex;gap:.4rem">
         <button onclick="addPassiva()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Passiva</button>
-        <button onclick="removePassiva()" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.3rem .7rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'" title="Remover última passiva">−</button>
+        <button onclick="removePassiva()" style="background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);padding:.3rem .7rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'" title="Remover última passiva">−</button>
       </div>
     </div>
     <div class="table-wrapper"><table>
@@ -9255,7 +9390,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Despertares</div>
       <div style="display:flex;gap:.4rem">
         <button onclick="addDespertar()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Despertar</button>
-        <button onclick="removeDespertar()" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.3rem .7rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'" title="Remover último despertar">−</button>
+        <button onclick="removeDespertar()" style="background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);padding:.3rem .7rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'" title="Remover último despertar">−</button>
       </div>
     </div>
     <div class="table-wrapper"><table>
@@ -9274,7 +9409,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
       <div class="ficha-panel-title" style="font-size:.75rem;padding:0">Técnicas</div>
       <div style="display:flex;gap:.4rem">
         <button onclick="addTecnica()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.3rem .9rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Técnica</button>
-        <button onclick="removeTecnica()" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.3rem .7rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'" title="Remover última técnica">−</button>
+        <button onclick="removeTecnica()" style="background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);padding:.3rem .7rem;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'" title="Remover última técnica">−</button>
       </div>
     </div>
     <div id="tecnicas-lista"></div>
@@ -9356,8 +9491,8 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
                 <input type="number" id="pv-extra" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pv');salvarLocal()">
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
-                <span style="font-size:.6rem;color:#f5a0a0;white-space:nowrap">Gasto</span>
-                <input type="number" id="pv-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pv');salvarLocal()">
+                <span style="font-size:.6rem;color:var(--accent-text);white-space:nowrap">Gasto</span>
+                <input type="number" id="pv-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--accent-t40);color:var(--accent-text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pv');salvarLocal()">
               </div>
               <div style="border-top:1px solid var(--border);padding-top:.3rem;text-align:center">
                 <div style="font-size:.55rem;color:var(--accent-light);letter-spacing:1px;margin-bottom:.1rem">ATUAL</div>
@@ -9383,8 +9518,8 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
                 <input type="number" id="sta-extra" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('sta');salvarLocal()">
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
-                <span style="font-size:.6rem;color:#f5a0a0;white-space:nowrap">Gasto</span>
-                <input type="number" id="sta-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('sta');salvarLocal()">
+                <span style="font-size:.6rem;color:var(--accent-text);white-space:nowrap">Gasto</span>
+                <input type="number" id="sta-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--accent-t40);color:var(--accent-text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('sta');salvarLocal()">
               </div>
               <div style="border-top:1px solid var(--border);padding-top:.3rem;text-align:center">
                 <div style="font-size:.55rem;color:#a080d0;letter-spacing:1px;margin-bottom:.1rem">ATUAL</div>
@@ -9406,8 +9541,8 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
                 <input type="number" id="b-pe" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcTudoDebounced()">
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
-                <span style="font-size:.6rem;color:#f5a0a0;white-space:nowrap">Gasto</span>
-                <input type="number" id="pe-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid rgba(193,63,63,.4);color:#f5a0a0;padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pe');salvarLocal()">
+                <span style="font-size:.6rem;color:var(--accent-text);white-space:nowrap">Gasto</span>
+                <input type="number" id="pe-gasto" value="0" style="width:44px;background:var(--bg-input);border:1px solid var(--accent-t40);color:var(--accent-text);padding:.15rem .3rem;font-size:.78rem;outline:none;text-align:center" oninput="calcRecursoAtual('pe');salvarLocal()">
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:.3rem">
                 <span style="font-size:.6rem;color:var(--gold);white-space:nowrap" title="INT(STA máx ÷ PE máx)">Custo</span>
@@ -9457,9 +9592,9 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <span style="font-size:.78rem;color:var(--text-muted)">Sucessos:</span>
             <input type="checkbox" id="ms1"> <input type="checkbox" id="ms2"> <input type="checkbox" id="ms3">
             <span style="font-size:.78rem;color:var(--text-muted)">Fracassos:</span>
-            <input type="checkbox" id="mf1" style="accent-color:#c13f3f">
-            <input type="checkbox" id="mf2" style="accent-color:#c13f3f">
-            <input type="checkbox" id="mf3" style="accent-color:#c13f3f">
+            <input type="checkbox" id="mf1" style="accent-color:var(--accent)">
+            <input type="checkbox" id="mf2" style="accent-color:var(--accent)">
+            <input type="checkbox" id="mf3" style="accent-color:var(--accent)">
           </div>
         </div>
       </div>
@@ -9477,7 +9612,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         <span><span class="ficha-expand-seta" id="seta-armas">▶</span> Armas</span>
         <div style="display:flex;gap:.4rem" onclick="event.stopPropagation()">
           <button onclick="addArmaRow()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.2rem .65rem;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:.5px" onmouseover="this.style.borderColor='var(--accent-light)';this.style.color='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">+ Slot</button>
-          <button onclick="removeArmaRow()" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.2rem .65rem;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
+          <button onclick="removeArmaRow()" style="background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);padding:.2rem .65rem;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
         </div>
       </div>
       <div class="ficha-expand-area" id="area-armas">
@@ -9485,7 +9620,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         <div class="table-wrapper"><table>
           <thead><tr><th style="min-width:120px">Nome</th><th>Bônus Atq.</th><th>Dano</th><th>Crítico</th><th>Tipo</th><th>Alcance</th><th>Notas</th><th style="width:28px"></th></tr></thead>
           <tbody id="armas-tbody">
-            <tr id="arma-row-1"><td data-label="Nome"><input type="text" id="arm1-nome" style="min-width:110px" oninput="salvarLocal()"></td><td data-label="Bônus Atq."><input type="text" id="arm1-bat" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Dano"><input type="text" id="arm1-dano" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Crítico"><input type="text" id="arm1-crit" style="min-width:50px" oninput="salvarLocal()"></td><td data-label="Tipo"><input type="text" id="arm1-tipo" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Alcance"><input type="text" id="arm1-alc" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Notas"><input type="text" id="arm1-obs" oninput="salvarLocal()"></td><td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td></tr>
+            <tr id="arma-row-1"><td data-label="Nome"><input type="text" id="arm1-nome" style="min-width:110px" oninput="salvarLocal()"></td><td data-label="Bônus Atq."><input type="text" id="arm1-bat" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Dano"><input type="text" id="arm1-dano" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Crítico"><input type="text" id="arm1-crit" style="min-width:50px" oninput="salvarLocal()"></td><td data-label="Tipo"><input type="text" id="arm1-tipo" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Alcance"><input type="text" id="arm1-alc" style="min-width:55px" oninput="salvarLocal()"></td><td data-label="Notas"><input type="text" id="arm1-obs" oninput="salvarLocal()"></td><td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td></tr>
           </tbody>
         </table></div>
       </div>
@@ -9525,7 +9660,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0">Itens & Equipamentos</div>
         <div style="display:flex;gap:.4rem">
           <button onclick="addInvRow('inv-itens-tbody','item',['nome','qtd','esp','desc'],['Nome do Item','Qtd','Esp','Descrição'])" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Slot</button>
-          <button onclick="removeInvRow('inv-itens-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
+          <button onclick="removeInvRow('inv-itens-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
         </div>
       </div>
       <div class="table-wrapper"><table>
@@ -9536,7 +9671,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <td data-label="Qtd."><input type="number" id="item1-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
             <td data-label="Espaços"><input type="number" id="item1-esp" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
             <td data-label="Descrição / Efeito"><input type="text" id="item1-desc" oninput="salvarLocal()"></td>
-            <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
+            <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
           </tr>
         </tbody>
       </table></div>
@@ -9546,7 +9681,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
         <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0">Consumíveis</div>
         <div style="display:flex;gap:.4rem">
           <button onclick="addInvRow('inv-cons-tbody','cons',['nome','qtd','efei'],['Nome','Qtd','Efeito'])" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+ Slot</button>
-          <button onclick="removeInvRow('inv-cons-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
+          <button onclick="removeInvRow('inv-cons-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);padding:.25rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">− Slot</button>
         </div>
       </div>
       <div class="table-wrapper"><table>
@@ -9556,7 +9691,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <td data-label="Nome"><input type="text" id="cons1-nome" oninput="salvarLocal()"></td>
             <td data-label="Qtd."><input type="number" id="cons1-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
             <td data-label="Efeito"><input type="text" id="cons1-efei" oninput="salvarLocal()"></td>
-            <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
+            <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
           </tr>
         </tbody>
       </table></div>
@@ -9568,7 +9703,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0">Materiais & Recursos</div>
             <div style="display:flex;gap:.4rem">
               <button onclick="addInvRow('inv-mat-tbody','mat',['nome','qtd'],['Material','Qtd'])" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+</button>
-              <button onclick="removeInvRow('inv-mat-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">−</button>
+              <button onclick="removeInvRow('inv-mat-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">−</button>
             </div>
           </div>
           <div class="table-wrapper"><table>
@@ -9577,7 +9712,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
               <tr>
                 <td data-label="Material"><input type="text" id="mat1-nome" oninput="salvarLocal()"></td>
                 <td data-label="Qtd."><input type="number" id="mat1-qtd" style="width:50px;text-align:center" oninput="salvarLocal()"></td>
-                <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.8rem;padding:.1rem .25rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
+                <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.8rem;padding:.1rem .25rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
               </tr>
             </tbody>
           </table></div>
@@ -9588,7 +9723,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
             <div class="ficha-panel-title" style="font-size:.72rem;padding:.4rem 0">Núcleos</div>
             <div style="display:flex;gap:.4rem">
               <button onclick="addInvRow('inv-nuc-tbody','nuc',['nome','tipo','efei'],['Nome','Tipo','Efeito'])" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)'">+</button>
-              <button onclick="removeInvRow('inv-nuc-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:#f5a0a0;padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">−</button>
+              <button onclick="removeInvRow('inv-nuc-tbody',1)" style="background:none;border:1px solid rgba(245,160,160,.3);color:var(--accent-text);padding:.2rem .55rem;font-size:.75rem;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(220,60,60,.1)'" onmouseout="this.style.background='none'">−</button>
             </div>
           </div>
           <div class="table-wrapper"><table>
@@ -9598,7 +9733,7 @@ function gerarFichaHTML(targetUser, modoVisualizacao) {
                 <td data-label="Nome"><input type="text" id="nuc1-nome" oninput="salvarLocal()"></td>
                 <td data-label="Tipo"><input type="text" id="nuc1-tipo" style="width:70px" oninput="salvarLocal()"></td>
                 <td data-label="Efeito"><input type="text" id="nuc1-efei" oninput="salvarLocal()"></td>
-                <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.8rem;padding:.1rem .25rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
+                <td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.8rem;padding:.1rem .25rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
               </tr>
             </tbody>
           </table></div>
@@ -9994,7 +10129,7 @@ function addTecnica() {
   if(!c) return;
   const d = document.createElement('div');
   d.className = 'poder-tecnica'; d.id = `tec-${numTecnicas}`;
-  d.innerHTML = `<div class="poder-tecnica-header"><span class="poder-tecnica-num">${numTecnicas}</span><input type="text" placeholder="Nome da Técnica" style="flex:1;background:transparent;border:none;color:var(--text);font-family:'Playfair Display',serif;font-size:.95rem;outline:none" id="tn-${numTecnicas}" oninput="salvarLocal()"><input type="number" placeholder="PE" style="background:transparent;border:none;color:var(--accent-light);width:50px;text-align:right;font-size:.9rem;outline:none" id="tc-${numTecnicas}" oninput="salvarLocal()"><button onclick="event.stopPropagation();removerTecnicaEl(this)" title="Remover técnica" style="background:none;border:none;color:#555;font-size:.85rem;cursor:pointer;padding:.15rem .4rem;margin-left:.25rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'">✕</button></div><div class="poder-tecnica-body"><textarea placeholder="Descrição..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.5rem;font-family:inherit;font-size:.87rem;resize:vertical;width:100%;outline:none;min-height:70px" id="td-${numTecnicas}" oninput="salvarLocal()"></textarea><textarea placeholder="Efeitos, alcance..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.5rem;font-family:inherit;font-size:.87rem;resize:vertical;width:100%;outline:none;min-height:70px" id="te-${numTecnicas}" oninput="salvarLocal()"></textarea></div>`;
+  d.innerHTML = `<div class="poder-tecnica-header"><span class="poder-tecnica-num">${numTecnicas}</span><input type="text" placeholder="Nome da Técnica" style="flex:1;background:transparent;border:none;color:var(--text);font-family:'Playfair Display',serif;font-size:.95rem;outline:none" id="tn-${numTecnicas}" oninput="salvarLocal()"><input type="number" placeholder="PE" style="background:transparent;border:none;color:var(--accent-light);width:50px;text-align:right;font-size:.9rem;outline:none" id="tc-${numTecnicas}" oninput="salvarLocal()"><button onclick="event.stopPropagation();removerTecnicaEl(this)" title="Remover técnica" style="background:none;border:none;color:#555;font-size:.85rem;cursor:pointer;padding:.15rem .4rem;margin-left:.25rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'">✕</button></div><div class="poder-tecnica-body"><textarea placeholder="Descrição..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.5rem;font-family:inherit;font-size:.87rem;resize:vertical;width:100%;outline:none;min-height:70px" id="td-${numTecnicas}" oninput="salvarLocal()"></textarea><textarea placeholder="Efeitos, alcance..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text);padding:.5rem;font-family:inherit;font-size:.87rem;resize:vertical;width:100%;outline:none;min-height:70px" id="te-${numTecnicas}" oninput="salvarLocal()"></textarea></div>`;
   c.appendChild(d);
   salvarLocal();
 }
@@ -10411,7 +10546,7 @@ function addPet() {
   div.innerHTML = `
     <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.75rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between">
       <span style="font-size:.7rem;color:var(--accent-light);letter-spacing:2px;text-transform:uppercase">Companheiro #${n}</span>
-      <button onclick="removerPet(${n})" style="background:none;border:none;color:#555;font-size:.8rem;cursor:pointer;padding:.2rem .5rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'">✕ Remover</button>
+      <button onclick="removerPet(${n})" style="background:none;border:none;color:#555;font-size:.8rem;cursor:pointer;padding:.2rem .5rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'">✕ Remover</button>
     </div>
     <div class="field-row cols-3">
       <div class="field-group"><label>Nome</label><input type="text" id="${pfx}-nome" oninput="salvarLocal()"></div>
@@ -10462,7 +10597,7 @@ function addInvRow(tbodyId, prefix, fields, labels) {
   tr.innerHTML = fields.map((f, i) => {
     const isNum = f === 'qtd' || f === 'esp';
     return `<td data-label="${labels[i]||''}"><input type="${isNum?'number':'text'}" id="${prefix}${n}-${f}" ${isNum?'style="width:50px;text-align:center"':''} placeholder="${labels[i]||''}" oninput="salvarLocal()"></td>`;
-  }).join('') + `<td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover linha">✕</button></td>`;
+  }).join('') + `<td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'" title="Remover linha">✕</button></td>`;
   tbody.appendChild(tr);
   salvarLocal();
 }
@@ -10625,7 +10760,7 @@ function preencherCampos(d) {
           <td><input type="text" id="arm${n}-tipo" style="min-width:55px" oninput="salvarLocal()"></td>
           <td><input type="text" id="arm${n}-alc" style="min-width:55px" oninput="salvarLocal()"></td>
           <td><input type="text" id="arm${n}-obs" oninput="salvarLocal()"></td>
-          <td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
+          <td><button onclick="removeArmaRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'" title="Remover">✕</button></td>
         `;
         armasTbody2.appendChild(tr);
       }
@@ -10651,7 +10786,7 @@ function preencherCampos(d) {
         tr.innerHTML = fields.map((f, i) => {
           const isNum = f === 'qtd' || f === 'esp';
           return `<td data-label="${labels[i]||''}"><input type="${isNum?'number':'text'}" id="${prefix}${n}-${f}" ${isNum?'style="width:50px;text-align:center"':''} placeholder="${labels[i]||''}" oninput="salvarLocal()"></td>`;
-        }).join('') + `<td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='#f5a0a0'" onmouseout="this.style.color='#555'" title="Remover linha">✕</button></td>`;
+        }).join('') + `<td><button onclick="removeInvRowEl(this)" style="background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:.15rem .3rem" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='#555'" title="Remover linha">✕</button></td>`;
         tbody.appendChild(tr);
       }
     });
@@ -11127,7 +11262,7 @@ function toggleADMCard(bodyId, user) {
           <span style="font-size:.78rem;color:var(--text-muted)">Editando campos mecânicos de <strong style="color:var(--accent-light)">${USUARIOS[user].nome}</strong></span>
           <div style="margin-top:.4rem">
             <span style="font-size:.65rem;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase">Personagem: </span>
-            <select id="gm-perso-select-${user}" style="background:var(--bg-input);border:1px solid rgba(156,42,42,.4);color:var(--accent-light);padding:.25rem .5rem;font-family:inherit;font-size:.78rem;outline:none;cursor:pointer" onchange="admTrocarPersonagem('${user}')">
+            <select id="gm-perso-select-${user}" style="background:var(--bg-input);border:1px solid rgba(var(--deep-rgb), .4);color:var(--accent-light);padding:.25rem .5rem;font-family:inherit;font-size:.78rem;outline:none;cursor:pointer" onchange="admTrocarPersonagem('${user}')">
               <option value="">Carregando...</option>
             </select>
           </div>
@@ -12227,13 +12362,13 @@ document.addEventListener('DOMContentLoaded', () => {
     #livro-jogador.modo-editor-livro .bloco-editavel:hover { outline-color:var(--gold); background:rgba(180,140,30,.04); }
     #livro-sidebar a.active { color:#fff; background:var(--accent); font-weight:600; border-radius:4px; }
     #livro-sidebar a { color:#d4d2de; text-decoration:none; display:block; padding:.38rem .55rem; border-radius:4px; font-size:.93rem; transition:color .2s,background .2s; }
-    #livro-sidebar a:hover { color:#fff; background:rgba(156,42,42,.18); }
+    #livro-sidebar a:hover { color:#fff; background:rgba(var(--deep-rgb), .18); }
     #livro-sidebar .toc-label { font-size:.7rem; text-transform:uppercase; letter-spacing:1.5px; color:#e8696e; margin:.9rem 0 .3rem; display:block; padding-left:.4rem; border-left:3px solid #e8696e; font-weight:600; }
     /* BUG CORRIGIDO: links DENTRO do conteúdo do livro (Sumário Interativo e
        qualquer referência cruzada no corpo do texto) não tinham nenhuma regra
        de estilo — ficavam com o azul+sublinhado padrão do navegador, quebrando
        a identidade visual do site em pelo menos 66 links espalhados pelo livro. */
-    #livro-content a { color: var(--accent-light); text-decoration: none; border-bottom: 1px solid rgba(193,63,63,.3); transition: color .2s, border-color .2s; }
+    #livro-content a { color: var(--accent-light); text-decoration: none; border-bottom: 1px solid rgba(var(--accent-rgb), .3); transition: color .2s, border-color .2s; }
     #livro-content a:hover { color: var(--gold-light); border-bottom-color: var(--gold-light); }
     #livro-content a:visited { color: var(--accent-light); }
     @media (max-width:1024px) {
@@ -12353,7 +12488,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div style="font-family:&#39;Playfair Display&#39;,serif;font-size:.95rem;color:var(--accent-light);margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:2px solid var(--accent)">Índice</div>
 
         <ul style="margin-bottom: 0.6rem;">
-            <li><a href="#livro-sumario" style="color: #c13f3f; font-weight: 600;">→ Sumário Interativo</a></li>
+            <li><a href="#livro-sumario" style="color: var(--accent); font-weight: 600;">→ Sumário Interativo</a></li>
         </ul>
 
         <!-- I. O MUNDO -->
@@ -12421,7 +12556,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         <!-- Botão de saída — sempre visível ao final da lista de seções -->
         <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)">
-          <button onclick="fecharLivro()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.45rem;background:rgba(156,42,42,.1);border:1px solid rgba(193,63,63,.35);color:var(--accent-light);padding:.6rem .8rem;font-family:inherit;font-size:.85rem;cursor:pointer;border-radius:4px;transition:background .2s,border-color .2s" onmouseover="this.style.background=&#39;rgba(156,42,42,.22)&#39;;this.style.borderColor=&#39;var(--accent-light)&#39;" onmouseout="this.style.background=&#39;rgba(156,42,42,.1)&#39;;this.style.borderColor=&#39;rgba(193,63,63,.35)&#39;">
+          <button onclick="fecharLivro()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.45rem;background:rgba(var(--deep-rgb), .1);border:1px solid var(--accent-t35);color:var(--accent-light);padding:.6rem .8rem;font-family:inherit;font-size:.85rem;cursor:pointer;border-radius:4px;transition:background .2s,border-color .2s" onmouseover="this.style.background=&#39;rgba(var(--deep-rgb), .22)&#39;;this.style.borderColor=&#39;var(--accent-light)&#39;" onmouseout="this.style.background=&#39;rgba(var(--deep-rgb), .1)&#39;;this.style.borderColor=&#39;var(--accent-t35)&#39;">
             <svg class="ic ic-sm"><use href="#ic-arrow-left"></use></svg> Sair do Livro
           </button>
         </div>
@@ -12451,7 +12586,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         <!-- SUMÁRIO INTERATIVO -->
         <section id="livro-sumario" style="margin-bottom: 2.5rem;">
-            <h2 style="text-align: center; color: #c13f3f; font-size: 1.6rem; margin-bottom: 1.2rem; letter-spacing: 1px;">Sumário</h2>
+            <h2 style="text-align: center; color: var(--accent); font-size: 1.6rem; margin-bottom: 1.2rem; letter-spacing: 1px;">Sumário</h2>
             
             <p style="text-align: center; max-width: 700px; margin: 0 auto 1.5rem; color: #a8a8b3; font-size: 0.95rem;">
                 Este é o <strong>Livro do Jogador</strong> de <em>Torre do Pesadelo</em>. 
@@ -12467,7 +12602,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- I. O MUNDO -->
                     <div style="margin-bottom: 1.4rem;">
-                        <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">I. O Mundo</h3>
+                        <h3 style="color: var(--accent); margin-bottom: 0.4rem; font-size: 1.15rem;">I. O Mundo</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
                             <li><a href="#intro">O Mundo de Torre do Pesadelo</a></li>
                             <li><a href="#torre-pesadelo">A Torre do Pesadelo</a></li>
@@ -12481,7 +12616,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- II. CRIAÇÃO DE PERSONAGEM -->
                     <div style="margin-bottom: 1.4rem;">
-                        <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">II. Criação de Personagem</h3>
+                        <h3 style="color: var(--accent); margin-bottom: 0.4rem; font-size: 1.15rem;">II. Criação de Personagem</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
                             <li><a href="#criacao">Guia de Criação</a></li>
                             <li><a href="#personalidade-poder">Personalidade e Poder Principal</a></li>
@@ -12493,7 +12628,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- III. SISTEMA DE PODER -->
                     <div style="margin-bottom: 1.4rem;">
-                        <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">III. Sistema de Poder</h3>
+                        <h3 style="color: var(--accent); margin-bottom: 0.4rem; font-size: 1.15rem;">III. Sistema de Poder</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
                             <li><a href="#alma-fragmentada">Alma Fragmentada</a></li>
                             <li><a href="#evolucao-poder">Evolução do Poder</a></li>
@@ -12504,7 +12639,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- IV. PROGRESSÃO E ASCENSÃO -->
                     <div style="margin-bottom: 1.4rem;">
-                        <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">IV. Progressão e Ascensão</h3>
+                        <h3 style="color: var(--accent); margin-bottom: 0.4rem; font-size: 1.15rem;">IV. Progressão e Ascensão</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
                             <li><a href="#ascensao">As Espirais da Ascensão (Humanos)</a></li>
                             <li><a href="#corrupcao">As Espirais da Corrupção — Monstros</a></li>
@@ -12513,7 +12648,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- V. ECONOMIA E ARTESANATO -->
                     <div style="margin-bottom: 1.4rem;">
-                        <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">V. Economia e Artesanato</h3>
+                        <h3 style="color: var(--accent); margin-bottom: 0.4rem; font-size: 1.15rem;">V. Economia e Artesanato</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
                             <li><a href="#economia">Sistema Monetário (Espíritos)</a></li>
                             <li><a href="#forja">Sistema de Forja</a></li>
@@ -12525,7 +12660,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- VI. REGRAS DE JOGO -->
                     <div>
-                        <h3 style="color: #c13f3f; margin-bottom: 0.4rem; font-size: 1.15rem;">VI. Regras de Jogo</h3>
+                        <h3 style="color: var(--accent); margin-bottom: 0.4rem; font-size: 1.15rem;">VI. Regras de Jogo</h3>
                         <ul style="list-style: none; padding-left: 1rem; line-height: 1.65;">
                             <li><a href="#sistema-resolucao">Sistema de Resolução</a></li>
                             <li style="padding-left: 0.8rem; font-size: 0.9rem;"><a href="#pericias">Perícias</a></li>
@@ -13972,7 +14107,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <strong>Aviso para quem sobe:</strong> Quanto mais alto você vai, mais a Torre te nota. E quanto mais ela te nota, mais ela testa. Muitos dos maiores Despertos da história não caíram em batalha — eles foram consumidos pela própria ascensão.
         </div>
 
-        <div class="system-card" style="border-left: 5px solid #c13f3f; background-color: #1a0a0a;">
+        <div class="system-card" style="border-left: 5px solid var(--accent); background-color: #1a0a0a;">
             <strong>O Tabu da Devoração</strong><br><br>
             Existe um segredo que os Despertos mais velhos só mencionam em sussurros, quando estão bêbados de medo ou de desespero: é possível arrancar e absorver o <strong>núcleo de outro humano desperto</strong>.<br><br>
             Diferente de qualquer monstro, o núcleo de um Desperto não carrega apenas essência corrompida — ele carrega <strong>toda a energia que aquela pessoa acumulou ao longo de sua vida inteira</strong>. Cada torre escalada, cada companheiro perdido, cada noite sem dormir, cada escolha que o moldou. Absorver isso é roubar não o poder de uma besta, mas a soma de uma jornada humana inteira.<br><br>
