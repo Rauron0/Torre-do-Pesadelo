@@ -509,7 +509,12 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 .logout-btn:hover { border-color:var(--accent-light); color:var(--accent-light); }
 
 /* MAIN */
-main { margin-left:260px; padding:2rem 2rem 6rem; max-width:100%; box-sizing:border-box; overflow-x:hidden; }
+/* margin-left fixo de 260px removido: desde a refatoração da sidebar
+   (ver bloco "ÍNDICE / SIDEBAR" mais abaixo) ela passou a ser overlay,
+   então o offset real é definido só ali. O teto de largura para
+   ultrawide também vive nesse mesmo bloco, para ter uma única fonte
+   de verdade sobre a largura do conteúdo. */
+main { padding:2rem 2rem 6rem; max-width:100%; box-sizing:border-box; overflow-x:hidden; }
 
 /* HERO */
 .hero { min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3rem 1rem; border-bottom:1px solid var(--border); background:radial-gradient(ellipse at 50% 0%,var(--deep-t08) 0%,transparent 60%); }
@@ -2184,10 +2189,12 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 #btn-curtir.curtido {
   background: rgba(var(--accent-rgb), .22);
   border-color: rgba(220,90,90,.6);
+  color: var(--accent-light);
 }
 #btn-curtir:not([style*="cursor: default"]):hover {
   background: var(--deep-t20);
 }
+.btn-curtir-post.curtido { color: var(--accent-light); }
 
 /* ══════════════════════════════════════════════════════
    PERFIL PÚBLICO — MOBILE REDESIGN IMERSIVO
@@ -3353,8 +3360,13 @@ input, textarea, select, button { position: relative; z-index: 2; }
    ÍNDICE / SIDEBAR — REFATORAÇÃO COMPLETA (aba lateral recolhível)
    ═══════════════════════════════════════════════════════════ */
 
-/* Conteúdo principal ocupa a tela toda — sidebar agora é overlay */
-main { margin-left: 0 !important; }
+/* Conteúdo principal ocupa a tela toda — sidebar agora é overlay.
+   Sem teto de largura, em monitores ultrawide (3000px+) grids de duas
+   colunas como .ficha-layout-cols esticavam cada coluna a mais de
+   1500px, ilegível. Centralizamos com um teto de 1600px — em telas
+   menores que isso o auto não tem o que centralizar, então o
+   comportamento de antes (borda a borda) continua idêntico. */
+main { margin-left: auto !important; margin-right: auto !important; max-width: 1600px; }
 .topbar { padding-left: 3.2rem; }
 
 /* Painel "grimório" — fundo com gradiente, glass discreto, bordas vermelhas */
@@ -4172,6 +4184,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
     <symbol id="ic-scroll" viewBox="0 0 24 24"><path d="M6 4h11v13a3 3 0 0 0 3 3H8a3 3 0 0 1-3-3V5"></path><path d="M9 8h6M9 12h6" stroke-width="1.2"></path></symbol>
     <symbol id="ic-banner" viewBox="0 0 24 24"><path d="M6 3h12v15l-6-3.5L6 18z"></path></symbol>
     <symbol id="ic-handshake" viewBox="0 0 24 24"><path d="M3 11l4-3 5 3 5-3 4 3"></path><path d="M7 8v7M17 8v7M12 11v6" stroke-width="1.3"></path></symbol>
+    <symbol id="ic-chat" viewBox="0 0 24 24"><path d="M4 5h16v10H9l-4 4z"></path><path d="M8 9h8M8 12.5h5" stroke-width="1.2"></path></symbol>
     <symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.5 2"></path></symbol>
     <symbol id="ic-camera" viewBox="0 0 24 24"><path d="M3 8h3l1.5-2h9L18 8h3v12H3z"></path><circle cx="12" cy="13" r="3.5"></circle></symbol>
     <symbol id="ic-medal" viewBox="0 0 24 24"><circle cx="12" cy="15" r="5"></circle><path d="M9 3l3 6 3-6" stroke-width="1.4"></path><path d="M12 13.2l.9 1.7 1.9.3-1.4 1.3.3 1.9-1.7-.9-1.7.9.3-1.9-1.4-1.3 1.9-.3z" class="ic-fill" stroke="none"></path></symbol>
@@ -4814,25 +4827,25 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
     </section>
 
     <!-- CAPÍTULOS -->
-    <section id="cap1" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 1</span><h1>A Ficha de Personagem</h1><p>A ficha é o documento central do seu personagem — um registro vivo de tudo que ele é, pode fazer e carrega consigo.</p><div class="attr-grid"><div class="attr-card"><h4>Ficha Base</h4><p style="font-size:.88rem;color:var(--text-muted)">Identidade, atributos, recursos e perícias.</p></div><div class="attr-card"><h4>Poder</h4><p style="font-size:.88rem;color:var(--text-muted)">Habilidades, técnicas e Técnica Final.</p></div><div class="attr-card"><h4>Registro &amp; Inventário</h4><p style="font-size:.88rem;color:var(--text-muted)">História, personalidade e equipamentos.</p></div><div class="attr-card"><h4>Pets &amp; Montarias</h4><p style="font-size:.88rem;color:var(--text-muted)">Companheiros com ficha e atributos próprios.</p></div></div></section>
+    <section id="cap1" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 1</span><h1>A Ficha de Personagem</h1><p>A ficha é o documento central do seu personagem — um registro vivo de tudo que ele é, pode fazer e carrega consigo. Ela cresce junto com você: a cada sessão, a cada Despertar e a cada núcleo absorvido, seus números, técnicas e história mudam. Não é uma folha que você preenche uma vez e esquece; é o retrato em constante transformação de um Desperto.</p><p>Ela se organiza em grandes áreas, cada uma cuidando de uma parte diferente do personagem:</p><div class="attr-grid"><div class="attr-card"><h4>Ficha Base</h4><p style="font-size:.88rem;color:var(--text-muted)">Quem ele é e o que o define: identidade, aparência, atributos, recursos e perícias.</p></div><div class="attr-card"><h4>Poder</h4><p style="font-size:.88rem;color:var(--text-muted)">A expressão da Alma do personagem — conceito, técnicas e Despertares.</p></div><div class="attr-card"><h4>Registro &amp; Inventário</h4><p style="font-size:.88rem;color:var(--text-muted)">A alma narrativa e os bens: história, personalidade, relações e equipamentos.</p></div><div class="attr-card"><h4>Pets &amp; Montarias</h4><p style="font-size:.88rem;color:var(--text-muted)">Companheiros com ficha e atributos próprios, quase personagens completos.</p></div></div><div class="lore-box"><strong>Como ler este livro:</strong> os próximos capítulos percorrem cada área da ficha na ordem em que ela aparece. Você não precisa decorar tudo de uma vez — preencha o que entender, jogue, e volte aqui sempre que precisar aprofundar uma parte.</div></section>
 
-    <section id="cap2" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 2</span><h1>Ficha Base</h1><p>Reúne todas as informações fundamentais do personagem — quem ele é e o que o define dentro do sistema.</p><div class="system-card"><strong>Campos:</strong> Nome, Nível, Raça, Idade, Altura, Peso, Gênero, Cabelos, Olhos, Pele, Roupas, Aparência e Poder.</div><div class="lore-box"><strong>Dica:</strong> Preencha a Aparência com detalhes vívidos — quanto mais detalhado, melhor o roleplay nas sessões.</div></section>
+    <section id="cap2" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 2</span><h1>Ficha Base</h1><p>Reúne as informações fundamentais do personagem — quem ele é e o que o define dentro do sistema. Todo Desperto começa como um ser humano comum; não existem raças jogáveis neste mundo. Cada um é uma pessoa cujo Núcleo da Alma foi forçado a despertar pela dor, pela perda ou pelo simples ato de sobreviver.</p><p>Por isso, a aparência e o passado não são só enfeite: o corpo de um Desperto costuma carregar as marcas do que ele viveu — cicatrizes de monstros, queimaduras de Névoa, marcas prateadas de forja nas mãos, ou um olhar que já viu coisas demais.</p><div class="attr-grid"><div class="attr-card"><h4>Identidade</h4><p style="font-size:.87rem;color:var(--text-muted)">Nome, Nível, Idade, Gênero e o Antecedente — a vida que o personagem tinha antes do Núcleo acordar.</p></div><div class="attr-card"><h4>Aparência</h4><p style="font-size:.87rem;color:var(--text-muted)">Altura, peso, cabelos, olhos, pele, roupas e as marcas que o passado deixou no corpo.</p></div><div class="attr-card"><h4>Poder</h4><p style="font-size:.87rem;color:var(--text-muted)">O conceito central da Alma, que se conecta diretamente à personalidade e à história.</p></div></div><div class="lore-box"><strong>Dica:</strong> preencha a Aparência com detalhes vívidos e deixe seu Antecedente conversar com o conceito do seu Poder. Um Sobrevivente de Surto com poder de lâminas carrega uma raiva diferente de um Estudioso de Ruínas que manipula ecos — e isso aparece tanto no roleplay quanto em como o poder se manifesta.</div></section>
 
-    <section id="cap3" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 3</span><h1>Atributos</h1><p>Todo personagem possui seis atributos. Ao criar, você recebe <strong class="key-term">80 pontos</strong> para distribuir.</p><div class="attr-grid"><div class="attr-card"><h4>Força (FOR)</h4><ul><li>Potência física bruta</li><li>Dano físico</li><li>Atletismo</li></ul></div><div class="attr-card"><h4>Destreza (DES)</h4><ul><li>Velocidade e reflexos</li><li>Esquivas e precisão</li><li>Iniciativa</li></ul></div><div class="attr-card"><h4>Vigor (VIG)</h4><ul><li>Resistência física</li><li>Pontos de Vida</li><li>Fortitude</li></ul></div><div class="attr-card"><h4>Intelecto (INT)</h4><ul><li>Raciocínio</li><li>Investigação</li><li>Estratégia</li></ul></div><div class="attr-card"><h4>Alma (ALM)</h4><ul><li>Força espiritual</li><li>Poderes e técnicas</li><li>Resistência mental</li></ul></div><div class="attr-card"><h4>Carisma (CAR)</h4><ul><li>Presença e influência</li><li>Persuasão</li><li>Liderança</li></ul></div></div><div class="table-wrapper"><table><thead><tr><th>Atributo</th><th>Modificador</th></tr></thead><tbody><tr><td>8–9</td><td>−1</td></tr><tr><td>10–11</td><td>+0</td></tr><tr><td>12–13</td><td>+1</td></tr><tr><td>14–15</td><td>+2</td></tr><tr><td>16–17</td><td>+3</td></tr><tr><td>18–19</td><td>+4</td></tr><tr><td>20–21</td><td>+5</td></tr></tbody></table></div></section>
+    <section id="cap3" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 3</span><h1>Atributos</h1><p>Todo personagem possui seis atributos que definem do que ele é capaz — no corpo, na mente e na alma. Ao criar, você recebe <strong class="key-term">80 pontos</strong> para distribuir entre eles. Cada valor gera um <strong>modificador</strong> (a tabela no fim do capítulo), que é o número que de fato entra nas rolagens.</p><div class="attr-grid"><div class="attr-card"><h4>Força (FOR)</h4><p style="font-size:.86rem;color:var(--text-muted);margin-bottom:.5rem">Poder físico bruto do corpo.</p><ul><li>O quanto você acerta num soco ou golpe corpo a corpo</li><li>Levantar, empurrar ou arrastar peso</li><li>Quebrar, dobrar ou forçar objetos</li><li>Resistir a um agarrão ou se soltar dele</li></ul></div><div class="attr-card"><h4>Destreza (DES)</h4><p style="font-size:.86rem;color:var(--text-muted);margin-bottom:.5rem">Agilidade, reflexos e precisão.</p><ul><li>Esquivar de ataques e desviar de perigos</li><li>Mirar com precisão à distância</li><li>Equilíbrio, acrobacia e furtividade</li><li>Quem age primeiro no combate (iniciativa)</li></ul></div><div class="attr-card"><h4>Vigor (VIG)</h4><p style="font-size:.86rem;color:var(--text-muted);margin-bottom:.5rem">Resistência e vitalidade do corpo.</p><ul><li>Seus Pontos de Vida</li><li>Aguentar dano, veneno, frio e exaustão</li><li>Sustentar esforço físico prolongado</li><li>Segurar o próprio poder sem o corpo colapsar</li></ul></div><div class="attr-card"><h4>Intelecto (INT)</h4><p style="font-size:.86rem;color:var(--text-muted);margin-bottom:.5rem">Raciocínio, percepção e saber.</p><ul><li>Resolver problemas e bolar estratégias</li><li>Investigar, deduzir e notar detalhes</li><li>Conhecimento sobre o mundo e suas ameaças</li><li>Controle mental sobre poderes complexos</li></ul></div><div class="attr-card"><h4>Alma (ALM)</h4><p style="font-size:.86rem;color:var(--text-muted);margin-bottom:.5rem">A força do seu Núcleo e do seu poder.</p><ul><li>A potência bruta do seu Poder</li><li>Manipular energia e o sobrenatural</li><li>Resistir à corrupção da Névoa</li><li>Firmeza espiritual diante do medo e do horror</li></ul></div><div class="attr-card"><h4>Carisma (CAR)</h4><p style="font-size:.86rem;color:var(--text-muted);margin-bottom:.5rem">Presença e força de personalidade.</p><ul><li>Convencer, enganar ou intimidar</li><li>Liderar e inspirar aliados</li><li>Resistir a manipulação mental ou espiritual</li><li>O peso da sua presença num ambiente</li></ul></div></div><p style="margin-top:1.25rem"><strong>Como o modificador funciona:</strong> o valor que você coloca no atributo não é usado diretamente nas rolagens — o que conta é o modificador derivado dele. A partir de 10 (o valor "humano médio"), cada 2 pontos sobem o modificador em +1. É esse número que você soma aos dados.</p><div class="table-wrapper"><table><thead><tr><th>Valor do Atributo</th><th>Modificador</th></tr></thead><tbody><tr><td>8–9</td><td>−1</td></tr><tr><td>10–11</td><td>+0</td></tr><tr><td>12–13</td><td>+1</td></tr><tr><td>14–15</td><td>+2</td></tr><tr><td>16–17</td><td>+3</td></tr><tr><td>18–19</td><td>+4</td></tr><tr><td>20–21</td><td>+5</td></tr></tbody></table></div></section>
 
-    <section id="cap4" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 4</span><h1>Recursos</h1><p>Todos calculados automaticamente pela ficha com base nos seus atributos e nível.</p><div class="attr-grid"><div class="attr-card"><h4>PV</h4><p style="font-size:.87rem;color:var(--text-muted)">Resistência total. Vigor + Alma.</p></div><div class="attr-card"><h4>STA</h4><p style="font-size:.87rem;color:var(--text-muted)">Fôlego e esforço físico.</p></div><div class="attr-card"><h4>PE</h4><p style="font-size:.87rem;color:var(--text-muted)">Energia para poderes e técnicas.</p></div><div class="attr-card"><h4>CA</h4><p style="font-size:.87rem;color:var(--text-muted)">Dificuldade de ser atingido.</p></div><div class="attr-card"><h4>Iniciativa</h4><p style="font-size:.87rem;color:var(--text-muted)">Velocidade de reação em combate.</p></div><div class="attr-card"><h4>Proficiência</h4><p style="font-size:.87rem;color:var(--text-muted)">Bônus de treinamento por nível.</p></div></div></section>
+    <section id="cap4" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 4</span><h1>Recursos</h1><p>Recursos são os números que dizem o quanto o personagem aguenta, quanto poder consegue gastar e quão difícil é atingi-lo. Eles não são distribuídos manualmente: a ficha calcula todos automaticamente a partir dos seus atributos e nível. Quando você sobe um atributo, os recursos ligados a ele sobem junto.</p><div class="attr-grid"><div class="attr-card"><h4>PV — Pontos de Vida</h4><p style="font-size:.87rem;color:var(--text-muted)">O quanto o corpo aguenta antes de cair. Nasce do Vigor (durabilidade física) somado à Alma (energia vital que sustenta o corpo).</p></div><div class="attr-card"><h4>STA — Stamina</h4><p style="font-size:.87rem;color:var(--text-muted)">Fôlego para esforço físico intenso: correr, escalar, lutar de forma prolongada. Esgotar a stamina deixa o personagem exausto.</p></div><div class="attr-card"><h4>PE — Energia</h4><p style="font-size:.87rem;color:var(--text-muted)">O combustível dos poderes e técnicas. Cada técnica tem um custo em PE — sem energia, o poder não se manifesta.</p></div><div class="attr-card"><h4>CA — Classe de Armadura</h4><p style="font-size:.87rem;color:var(--text-muted)">O quão difícil é acertar o personagem. Quanto maior, mais ataques erram ou são desviados antes de causar dano.</p></div><div class="attr-card"><h4>Iniciativa</h4><p style="font-size:.87rem;color:var(--text-muted)">Define quem age primeiro quando o combate começa. Ligada à Destreza — reflexos rápidos agem antes.</p></div><div class="attr-card"><h4>Proficiência</h4><p style="font-size:.87rem;color:var(--text-muted)">O bônus de treinamento que cresce com o nível. É somado às perícias em que você tem Maestria ou Especialização.</p></div></div><div class="system-card"><strong>Fórmula dos Pontos de Vida:</strong><br><br>PV = (Vigor × 2) + (Alma × 2)<br><br>O Vigor entra como durabilidade do corpo; a Alma, como a energia vital que o mantém de pé. Um Desperto pode ser fisicamente frágil mas ainda resistente, se a alma dele for forte o bastante para sustentá-lo.</div></section>
 
-    <section id="cap5" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 5</span><h1>Poder</h1><p>O Poder é o coração do personagem. Todo Desperto possui uma habilidade única que define sua identidade.</p><div class="system-card"><strong>Campos:</strong> Poder Principal • Atributo Principal • Passiva • Técnicas • Técnica Suprema • Evoluções Futuras</div><div class="lore-box"><strong>Lembre-se:</strong> O Poder reflete quem esse Desperto é. Ele deve ser único e coerente com a história do personagem.</div></section>
+    <section id="cap5" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 5</span><h1>Poder</h1><p>O Poder é o coração do personagem — mas é muito mais do que uma "habilidade". Ele é a <strong class="key-term">expressão da sua Alma</strong>: nasce de quem o personagem é, da sua personalidade, das suas dores e da sua história. Dois Despertos nunca manifestam o mesmo poder da mesma forma, porque nenhum deles tem a mesma alma.</p><p>O poder não vive separado do corpo. Ele está ligado diretamente à pessoa: ao que ela sente, ao que ela suporta fisicamente e ao quanto ela compreende a si mesma. Por isso, para funcionar de verdade, todo poder se apoia em <strong>três pilares</strong> que precisam crescer juntos.</p><div class="attr-grid"><div class="attr-card"><h4>Poder — a Expressão</h4><p style="font-size:.88rem;color:var(--text-muted)">A matéria-prima do seu conceito: espadas, fogo, sombras, telecinese, ecos. É a parte visível — o "o quê" você manifesta.</p></div><div class="attr-card"><h4>Mente — o Controle</h4><p style="font-size:.88rem;color:var(--text-muted)">Sua capacidade de moldar, direcionar e compreender o poder. Quanto mais complexo ele fica, mais exige foco, vontade e entendimento.</p></div><div class="attr-card"><h4>Corpo — o Suporte</h4><p style="font-size:.88rem;color:var(--text-muted)">O quanto seu corpo aguenta sustentar o poder. Mesmo poderes "mentais" cobram um preço físico quando usados de forma intensa.</p></div></div><div class="lore-box"><strong>A verdade sobre o Poder:</strong> os melhores poderes não são os mais fortes no começo — são aqueles cujos donos fizeram os três pilares evoluírem em equilíbrio. Um poder que cresce torto sempre cobra um preço: na sanidade, no corpo, ou na própria alma. À medida que você avança pelos Despertares, o conceito se expande, mas a exigência sobre mente e corpo cresce junto.</div><div class="system-card"><strong>Na ficha, seu Poder reúne:</strong><br><br><strong>Poder Principal</strong> — o conceito central da sua Alma.<br><strong>Conceito do Poder</strong> — por que ele é assim, ligado à sua personalidade e história.<br><strong>Atributo Principal</strong> — o atributo que rege sua manifestação.<br><strong>Técnicas</strong> — as aplicações concretas que você usa em combate, com custos e efeitos.<br><strong>Despertares</strong> — as evoluções que expandem o que seu poder pode fazer.</div></section>
 
-    <section id="cap6" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 6</span><h1>Registro</h1><p>Documento narrativo — história, motivações e marcos do personagem.</p><div class="attr-grid"><div class="attr-card"><h4>Personalidade</h4><p style="font-size:.87rem;color:var(--text-muted)">Traços, Ideais, Ligações e Defeitos.</p></div><div class="attr-card"><h4>História</h4><p style="font-size:.87rem;color:var(--text-muted)">De onde veio e o que o moldou.</p></div><div class="attr-card"><h4>Marcos</h4><p style="font-size:.87rem;color:var(--text-muted)">Eventos relevantes das sessões.</p></div><div class="attr-card"><h4>NPCs</h4><p style="font-size:.87rem;color:var(--text-muted)">Personagens e relações importantes.</p></div></div></section>
+    <section id="cap6" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 6</span><h1>Registro</h1><p>Se a Ficha Base diz o que o personagem é, o Registro diz <em>quem</em> ele é. É o documento narrativo: a história, as motivações, os medos e os marcos que tornam um Desperto uma pessoa, e não só uma planilha de números. Num mundo de horror como as Torres, é esse registro que dá peso a cada escolha em jogo.</p><div class="attr-grid"><div class="attr-card"><h4>Personalidade</h4><p style="font-size:.87rem;color:var(--text-muted)">Traços, Ideais, Ligações e Defeitos. É daqui que o Poder nasce — a alma se expressa naquilo que a pessoa mais valoriza ou teme.</p></div><div class="attr-card"><h4>História</h4><p style="font-size:.87rem;color:var(--text-muted)">De onde veio e o que o moldou. Costuma se conectar ao Antecedente e à ferida que acordou o Núcleo.</p></div><div class="attr-card"><h4>Marcos</h4><p style="font-size:.87rem;color:var(--text-muted)">Os eventos importantes vividos nas sessões — vitórias, perdas e transformações que ficam registradas.</p></div><div class="attr-card"><h4>Relações</h4><p style="font-size:.87rem;color:var(--text-muted)">Aliados, rivais e NPCs que importam. As pessoas que o personagem protege, teme ou persegue.</p></div></div><div class="lore-box"><strong>Comece pela ferida:</strong> o que seu personagem perdeu, ou teme perder? É quase sempre daí que sai o conceito mais forte de poder e a história mais marcante. Deixe Antecedente, Personalidade e Poder conversarem entre si — quando os três contam a mesma história, o personagem ganha vida própria na mesa.</div></section>
 
-    <section id="cap7" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 7</span><h1>Inventário</h1><p>Equipamentos, consumíveis, materiais, núcleos e moeda do personagem.</p><div class="lore-box"><strong>Núcleos:</strong> Itens especiais extraídos das Torres. Essenciais para progressão e forja avançada.</div></section>
+    <section id="cap7" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 7</span><h1>Inventário</h1><p>Tudo que o personagem carrega e acumula em sua jornada pelas Torres. O inventário se divide em categorias, cada uma com um papel diferente na sobrevivência e na progressão.</p><div class="attr-grid"><div class="attr-card"><h4>Equipamentos</h4><p style="font-size:.87rem;color:var(--text-muted)">Armas, armaduras e ferramentas. O que o personagem usa diretamente em combate e exploração.</p></div><div class="attr-card"><h4>Consumíveis</h4><p style="font-size:.87rem;color:var(--text-muted)">Itens de uso único — poções, remédios e suprimentos que se gastam ao serem usados.</p></div><div class="attr-card"><h4>Materiais</h4><p style="font-size:.87rem;color:var(--text-muted)">Recursos brutos extraídos do mundo, usados na forja e na criação de novos itens.</p></div><div class="attr-card"><h4>Núcleos</h4><p style="font-size:.87rem;color:var(--text-muted)">Itens especiais arrancados das Torres e dos monstros. O coração da progressão.</p></div></div><div class="lore-box"><strong>Núcleos &amp; Forja:</strong> os núcleos são muito mais do que loot. São essenciais para a progressão do seu poder e para a forja avançada — ferreiros das Espirais usam partes e núcleos de monstros para criar equipamentos que carregam um pedaço da energia daquela criatura. Absorver um núcleo forte pode fortalecer sua Alma; forjá-lo num item pode transformá-lo numa arma única.</div><div class="system-card"><strong>Moeda — Espíritos (Esp):</strong> a economia das Torres não corre em ouro, e sim em Espíritos. É com eles que se pagam serviços, forjas e informações dentro das cidades.</div></section>
 
-    <section id="cap8" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 8</span><h1>Pets &amp; Montarias</h1><p>Companheiros com ficha própria, atributos e habilidades — quase personagens completos.</p><div class="attr-grid"><div class="attr-card"><h4>Pets</h4><p style="font-size:.87rem;color:var(--text-muted)">Criaturas companheiras com atributos e ações.</p></div><div class="attr-card"><h4>Montarias</h4><p style="font-size:.87rem;color:var(--text-muted)">Para locomoção e combate. Evoluem separadamente.</p></div></div></section>
+    <section id="cap8" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 8</span><h1>Pets &amp; Montarias</h1><p>Companheiros não são itens de inventário — são quase personagens completos. Cada um tem ficha própria, com atributos, pontos de vida e habilidades, e age em cena junto com você. Um bom companheiro pode mudar o rumo de um combate, abrir caminhos que o personagem sozinho não alcançaria, ou simplesmente ser o laço que mantém um Desperto humano em meio ao horror.</p><div class="attr-grid"><div class="attr-card"><h4>Pets</h4><p style="font-size:.87rem;color:var(--text-muted)">Criaturas companheiras com atributos, PV e ações próprias. Lutam, exploram e reagem ao mundo ao seu lado. Alguns evoluem com você ao longo da jornada.</p></div><div class="attr-card"><h4>Montarias</h4><p style="font-size:.87rem;color:var(--text-muted)">Companheiros voltados à locomoção e ao combate montado. Têm a própria ficha e evoluem separadamente, ganhando força e novas capacidades.</p></div></div><div class="lore-box"><strong>Mais que ferramentas:</strong> trate seus pets e montarias com o mesmo cuidado narrativo do seu personagem. Um companheiro com história, personalidade e vínculo real pesa muito mais na mesa do que uma simples criatura de combate — e a perda de um deles pode marcar um Desperto para sempre.</div></section>
 
-    <section id="cap9" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 9</span><h1>Progressão</h1><div class="table-wrapper"><table><thead><tr><th>Nível</th><th>Proficiência</th></tr></thead><tbody><tr><td>1–4</td><td>+2</td></tr><tr><td>5–8</td><td>+3</td></tr><tr><td>9–12</td><td>+4</td></tr><tr><td>13–16</td><td>+5</td></tr><tr><td>17–20</td><td>+6</td></tr></tbody></table></div><div class="system-card"><strong>Maestria (Mt.):</strong> Adiciona Proficiência à perícia.<br><br><strong>Especialização (Es.):</strong> Adiciona 1,5× Proficiência. Representa excelência avançada.</div></section>
+    <section id="cap9" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 9</span><h1>Progressão</h1><p>Um Desperto não fica parado. A cada nível, ele se torna mais capaz — e a Torre exige mais dele. A progressão tem dois lados: a <strong>Proficiência</strong>, que cresce automaticamente com o nível, e as <strong>perícias treinadas</strong> (Maestria e Especialização), que você escolhe para refletir aquilo em que seu personagem realmente se destaca.</p><p>A Proficiência é o bônus de treinamento geral. Quanto maior o nível, mais ela soma nas perícias em que você é treinado:</p><div class="table-wrapper"><table><thead><tr><th>Nível</th><th>Proficiência</th></tr></thead><tbody><tr><td>1–4</td><td>+2</td></tr><tr><td>5–8</td><td>+3</td></tr><tr><td>9–12</td><td>+4</td></tr><tr><td>13–16</td><td>+5</td></tr><tr><td>17–20</td><td>+6</td></tr></tbody></table></div><div class="system-card"><strong>Maestria (Mt.)</strong> — Você é treinado naquela perícia: soma a Proficiência inteira ao teste. Representa competência sólida, fruto de prática.<br><br><strong>Especialização (Es.)</strong> — Vai além da maestria: soma 1,5× a Proficiência. Representa excelência avançada, o tipo de habilidade que define um especialista de verdade.</div><div class="lore-box"><strong>Escolha com intenção:</strong> seus slots de Maestria e Especialização são limitados. Distribua-os no que conta a história do seu personagem — um Sobrevivente de Surto provavelmente domina Integridade e Vontade; um Estudioso de Ruínas, Investigação e História.</div></section>
 
-    <section id="cap10" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 10</span><h1>Perícias</h1><div class="table-wrapper"><table><thead><tr><th>Perícia</th><th>Atributo</th><th>Uso</th></tr></thead><tbody><tr><td>Atletismo</td><td>FOR</td><td>Escaladas, saltos, feitos físicos</td></tr><tr><td>Luta</td><td>DES</td><td>Ataques corpo a corpo</td></tr><tr><td>Acrobacia</td><td>DES</td><td>Equilíbrio e movimentação</td></tr><tr><td>Furtividade</td><td>DES</td><td>Infiltração e ocultação</td></tr><tr><td>Pontaria</td><td>DES</td><td>Ataques à distância</td></tr><tr><td>Prestidigitação</td><td>DES</td><td>Manipulação de objetos</td></tr><tr><td>Reflexos</td><td>DES</td><td>Reações rápidas</td></tr><tr><td>Fortitude</td><td>VIG</td><td>Resistir venenos e doenças</td></tr><tr><td>Integridade</td><td>VIG</td><td>Resistir danos prolongados</td></tr><tr><td>Intuição</td><td>INT</td><td>Perceber intenções</td></tr><tr><td>Medicina</td><td>INT</td><td>Primeiros socorros</td></tr><tr><td>Percepção</td><td>INT</td><td>Notar detalhes e ameaças</td></tr><tr><td>Astúcia</td><td>INT</td><td>Improvisação e lógica</td></tr><tr><td>Investigação</td><td>INT</td><td>Reunir pistas</td></tr><tr><td>História</td><td>INT</td><td>Conhecimentos históricos</td></tr><tr><td>Ofícios</td><td>INT</td><td>Criação de itens</td></tr><tr><td>Religião</td><td>INT</td><td>Conhecimentos espirituais</td></tr><tr><td>Magia</td><td>ALM</td><td>Energia sobrenatural</td></tr><tr><td>Feitiçaria</td><td>ALM</td><td>Técnicas mágicas</td></tr><tr><td>Vontade</td><td>ALM</td><td>Resistência mental</td></tr><tr><td>Persuasão</td><td>CAR</td><td>Convencer e negociar</td></tr><tr><td>Enganação</td><td>CAR</td><td>Mentir e blefar</td></tr><tr><td>Intimidação</td><td>CAR</td><td>Pressionar e impor</td></tr><tr><td>Performance</td><td>CAR</td><td>Atuação e entretenimento</td></tr></tbody></table></div></section>
+    <section id="cap10" class="section-anchor"><div class="divider"></div><span class="chapter-number">Capítulo 10</span><h1>Perícias</h1><p>As perícias representam as competências específicas do seu personagem — as coisas que ele sabe fazer bem. Cada perícia é regida por um atributo: quando você faz um teste, soma o modificador daquele atributo, mais a Proficiência se tiver Maestria ou Especialização nela. É assim que dois personagens com a mesma Força podem ter resultados bem diferentes em Atletismo: um treinou, o outro não.</p><p>A tabela abaixo lista todas as perícias, o atributo que rege cada uma e exemplos do que elas cobrem na prática:</p><div class="table-wrapper"><table><thead><tr><th>Perícia</th><th>Atributo</th><th>Uso</th></tr></thead><tbody><tr><td>Atletismo</td><td>FOR</td><td>Escaladas, saltos, feitos físicos</td></tr><tr><td>Luta</td><td>DES</td><td>Ataques corpo a corpo</td></tr><tr><td>Acrobacia</td><td>DES</td><td>Equilíbrio e movimentação</td></tr><tr><td>Furtividade</td><td>DES</td><td>Infiltração e ocultação</td></tr><tr><td>Pontaria</td><td>DES</td><td>Ataques à distância</td></tr><tr><td>Prestidigitação</td><td>DES</td><td>Manipulação de objetos</td></tr><tr><td>Reflexos</td><td>DES</td><td>Reações rápidas</td></tr><tr><td>Fortitude</td><td>VIG</td><td>Resistir venenos e doenças</td></tr><tr><td>Integridade</td><td>VIG</td><td>Resistir danos prolongados</td></tr><tr><td>Intuição</td><td>INT</td><td>Perceber intenções</td></tr><tr><td>Medicina</td><td>INT</td><td>Primeiros socorros</td></tr><tr><td>Percepção</td><td>INT</td><td>Notar detalhes e ameaças</td></tr><tr><td>Astúcia</td><td>INT</td><td>Improvisação e lógica</td></tr><tr><td>Investigação</td><td>INT</td><td>Reunir pistas</td></tr><tr><td>História</td><td>INT</td><td>Conhecimentos históricos</td></tr><tr><td>Ofícios</td><td>INT</td><td>Criação de itens</td></tr><tr><td>Religião</td><td>INT</td><td>Conhecimentos espirituais</td></tr><tr><td>Magia</td><td>ALM</td><td>Energia sobrenatural</td></tr><tr><td>Feitiçaria</td><td>ALM</td><td>Técnicas mágicas</td></tr><tr><td>Vontade</td><td>ALM</td><td>Resistência mental</td></tr><tr><td>Persuasão</td><td>CAR</td><td>Convencer e negociar</td></tr><tr><td>Enganação</td><td>CAR</td><td>Mentir e blefar</td></tr><tr><td>Intimidação</td><td>CAR</td><td>Pressionar e impor</td></tr><tr><td>Performance</td><td>CAR</td><td>Atuação e entretenimento</td></tr></tbody></table></div></section>
 
     <!-- RANKING — LIVRO DAS LENDAS -->
     <section id="secao-ranking" class="section-anchor">
@@ -5529,15 +5542,19 @@ let _lendasFichas = []; // cache de todas as fichas
 let _abaAtual = 'geral';
 let _personalizacoes = {}; // { docId: { tema, wallpaper, gifPoder, gifTransformacao, gifSuprema } }
 
+// O campo `icon` (emoji) existia aqui antes mas nunca era lido em
+// lugar nenhum do código — só `ic` (nome do ícone SVG do sprite) é
+// usado de fato (ex: temaInfo.ic no rodapé do Grimório). Removido para
+// não sugerir, a quem for editar isso depois, que o emoji está em uso.
 const TEMAS = {
-  abismo:   { icon: '🌑', ic: 'moon',  nome: 'Abismo',    cor: '#5a1a5a' },
-  sangue:   { icon: '🩸', ic: 'heart', nome: 'Sangue',    cor: 'var(--accent-deep)' },
-  guerra:   { icon: '⚔️', ic: 'sword', nome: 'Guerra',    cor: '#b87020' },
-  vampirico:{ icon: '🦇', ic: 'skull', nome: 'Vampírico', cor: '#7a0a5a' },
-  soberano: { icon: '👑', ic: 'crown', nome: 'Soberano',  cor: '#d4ad3a' },
-  infernal: { icon: '🔥', ic: 'flame', nome: 'Infernal',  cor: '#e05010' },
-  glacial:  { icon: '❄️', ic: 'prism', nome: 'Glacial',   cor: '#40a0c0' },
-  cosmico:  { icon: '🌌', ic: 'bolt',  nome: 'Cósmico',   cor: '#5020c0' },
+  abismo:   { ic: 'moon',  nome: 'Abismo',    cor: '#5a1a5a' },
+  sangue:   { ic: 'heart', nome: 'Sangue',    cor: 'var(--accent-deep)' },
+  guerra:   { ic: 'sword', nome: 'Guerra',    cor: '#b87020' },
+  vampirico:{ ic: 'skull', nome: 'Vampírico', cor: '#7a0a5a' },
+  soberano: { ic: 'crown', nome: 'Soberano',  cor: '#d4ad3a' },
+  infernal: { ic: 'flame', nome: 'Infernal',  cor: '#e05010' },
+  glacial:  { ic: 'prism', nome: 'Glacial',   cor: '#40a0c0' },
+  cosmico:  { ic: 'bolt',  nome: 'Cósmico',   cor: '#5020c0' },
 };
 
 const WALLPAPERS = [
@@ -5753,6 +5770,11 @@ function _fichaFromRankingGlobal(docId, d) {
     user,
     info: USUARIOS[user] || { nome: d.nome || personagem, role: 'player' },
     nomePersonagem: personagem,
+    // _docId: o ID REAL do documento no rankingGlobal. Usado pelo filtro de
+    // ocultos para casar exatamente com o que o painel de visibilidade
+    // salvou (docSnap.id). Reconstruir via _fsDocId podia divergir em docs
+    // antigos, fazendo um personagem "oculto" continuar aparecendo.
+    _docId: docId,
     nome: d.nome || personagem,
     nivel: nivel.toString(),
     poder: d.poder || '—',
@@ -6146,8 +6168,12 @@ async function carregarRanking() {
     }
 
     // ── Filtra personagens ocultos pelo GM antes de renderizar ──
+    // Usa o _docId real (preservado de docSnap.id) quando disponível, para
+    // casar exatamente com o ID salvo pelo painel de visibilidade. Só
+    // reconstrói via _fsDocId no fallback (fichas que vieram da varredura
+    // e ainda não têm _docId do rankingGlobal).
     const visiveis = fichas.filter(f => {
-      const docId = _fsDocId(f.user, f.nomePersonagem);
+      const docId = f._docId || _fsDocId(f.user, f.nomePersonagem);
       return !_rankingOcultos.has(docId);
     });
 
@@ -6207,21 +6233,48 @@ async function salvarRankingOcultos() {
       window.doc(window.db, 'rankingConfig', 'ocultos'),
       { ids: [..._rankingOcultos], atualizadoEm: Date.now() }
     );
-  } catch(e) { console.warn('[Ranking] Erro ao salvar ocultos:', e); }
+  } catch(e) {
+    console.warn('[Ranking] Erro ao salvar ocultos:', e);
+    // Torna o erro visível: a causa mais comum é regra de segurança do
+    // Firestore bloqueando escrita em rankingConfig/ocultos (que não é um
+    // doc "do usuário"). Sem isto, o GM via o botão voltar sozinho sem
+    // nenhuma explicação. Ver nota em FIRESTORE_RULES abaixo.
+    _diag('salvarRankingOcultos', e);
+    throw e; // propaga para o toggle saber que falhou e reverter o estado
+  }
 }
 
 async function toggleOcultarPersonagem(docId, btn) {
-  if (_rankingOcultos.has(docId)) {
+  // Guarda o estado anterior para poder reverter se o salvamento falhar.
+  const estavaOculto = _rankingOcultos.has(docId);
+  if (estavaOculto) {
     _rankingOcultos.delete(docId);
-    if (btn) { btn.textContent = 'Ocultar'; btn.classList.remove('oculto-ativo'); }
   } else {
     _rankingOcultos.add(docId);
-    if (btn) { btn.textContent = 'Mostrar'; btn.classList.add('oculto-ativo'); }
   }
-  await salvarRankingOcultos();
+  try {
+    await salvarRankingOcultos();
+  } catch(e) {
+    // Salvamento falhou (provável bloqueio de regra do Firestore) — desfaz
+    // a mudança em memória para a tela não mentir que ficou salvo.
+    if (estavaOculto) _rankingOcultos.add(docId);
+    else _rankingOcultos.delete(docId);
+    alert('Não foi possível salvar a visibilidade no servidor. Verifique as regras do Firestore para a coleção "rankingConfig".');
+    // Re-renderiza o painel para refletir o estado real revertido.
+    renderGMRankingVisibilidade();
+    return;
+  }
+  // Sucesso: atualiza o botão clicado.
+  const agoraOculto = _rankingOcultos.has(docId);
+  if (btn) {
+    btn.classList.toggle('oculto-ativo', agoraOculto);
+    btn.innerHTML = agoraOculto
+      ? '<svg class="ic ic-sm"><use href="#ic-eye"/></svg> Mostrar'
+      : '<svg class="ic ic-sm"><use href="#ic-moon"/></svg> Ocultar';
+  }
   // Atualiza o ranking público imediatamente (sem recarregar do Firestore)
   const visiveis = _todasFichasParaGM.length
-    ? _todasFichasParaGM.filter(f => !_rankingOcultos.has(_fsDocId(f.user, f.nomePersonagem)))
+    ? _todasFichasParaGM.filter(f => !_rankingOcultos.has(f._docId || _fsDocId(f.user, f.nomePersonagem)))
     : _lendasFichas;
   renderizarCartoes(visiveis, _abaAtual);
 }
@@ -6347,7 +6400,7 @@ async function _atualizarUiCurtidas(targetPid) {
   // O perfil pode ter sido fechado enquanto isso carregava — confere de novo
   const btn = document.getElementById('btn-curtir');
   if (!btn) return;
-  btn.innerHTML = (curtiu ? '❤️' : '🤍') + ' ' + total + (total === 1 ? ' Curtida' : ' Curtidas');
+  btn.innerHTML = icone('heart', curtiu ? 'ic-sm ic-fill' : 'ic-sm') + ' ' + total + (total === 1 ? ' Curtida' : ' Curtidas');
   btn.classList.toggle('curtido', curtiu);
 }
 
@@ -6417,7 +6470,7 @@ async function abrirListaCurtidas(targetPid) {
   ov.id = 'lista-curtidas-overlay';
   ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
   ov.innerHTML = `<div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;max-width:360px;width:90%;max-height:70vh;overflow-y:auto;padding:1.2rem" onclick="event.stopPropagation()">
-    <h3 style="margin:0 0 .8rem;font-family:'Playfair Display',serif;color:var(--gold-light);display:flex;align-items:center;gap:.4rem">❤️ Curtidas</h3>
+    <h3 style="margin:0 0 .8rem;font-family:'Playfair Display',serif;color:var(--gold-light);display:flex;align-items:center;gap:.4rem">${icone('heart','ic-sm ic-fill')} Curtidas</h3>
     <div id="lista-curtidas-conteudo" style="font-size:.85rem;color:var(--text-muted)">Carregando…</div>
   </div>`;
   document.body.appendChild(ov);
@@ -6433,7 +6486,7 @@ async function abrirListaCurtidas(targetPid) {
     itens.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     conteudo.innerHTML = itens.map(it =>
       `<div style="padding:.5rem 0;border-bottom:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:.4rem">
-        <span style="opacity:.7">❤️</span> ${it.sourceNome || it.source || 'Desconhecido'}
+        <span style="opacity:.7">${icone('heart','ic-sm ic-fill')}</span> ${it.sourceNome || it.source || 'Desconhecido'}
       </div>`
     ).join('');
   } catch(e) {
@@ -6571,8 +6624,8 @@ function _renderPostItem(id, post, pid) {
     ${post.conteudo ? `<div class="livro-descricao" style="margin-bottom:.5rem">${_escHtml(post.conteudo).replace(/\n/g,'<br>')}</div>` : ''}
     ${post.imagem ? `<img src="${_escUrl(post.imagem)}" loading="lazy" onclick="abrirLightbox('${_escUrl(post.imagem)}')" style="width:100%;max-height:320px;object-fit:cover;cursor:pointer;border:1px solid var(--border);margin-bottom:.5rem">` : ''}
     <div style="display:flex;gap:.5rem;align-items:center;padding-top:.2rem;border-top:1px solid var(--border)">
-      <button id="btn-curtir-post-${id}" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">🤍 …</button>
-      <button onclick="alternarComentarios('${id}')" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">💬 Comentários</button>
+      <button id="btn-curtir-post-${id}" class="btn-curtir-post" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">${icone('heart','ic-sm')} …</button>
+      <button onclick="alternarComentarios('${id}')" style="background:none;border:none;color:var(--text-muted);font-size:.82rem;cursor:pointer;padding:.6rem .7rem;min-height:44px">${icone('chat','ic-sm')} Comentários</button>
     </div>
     <div id="comentarios-area-${id}" style="display:none;margin-top:.6rem"></div>
   </div>`;
@@ -6606,7 +6659,8 @@ async function _atualizarUiCurtidasPost(postId) {
   ]);
   const btnFinal = document.getElementById('btn-curtir-post-' + postId);
   if (!btnFinal) return;
-  btnFinal.innerHTML = (curtiu ? '❤️' : '🤍') + ' ' + total;
+  btnFinal.classList.toggle('curtido', curtiu);
+  btnFinal.innerHTML = icone('heart', curtiu ? 'ic-sm ic-fill' : 'ic-sm') + ' ' + total;
   btnFinal.onclick = () => alternarCurtidaPost(postId);
 }
 
@@ -7047,7 +7101,7 @@ function abrirPerfilPublico(f) {
           <div class="livro-likes-row" style="display:flex;flex-direction:column;align-items:center;gap:.2rem;margin-top:.85rem">
             <button id="btn-curtir" ${_perfilEhProprio ? '' : `onclick="alternarCurtida('${pid}','${f.user}','${_nomePersonagemEscapado}')"`}
               style="background:rgba(var(--deep-rgb), .1);border:1px solid var(--accent-t35);color:var(--text);padding:.5rem 1.2rem;border-radius:20px;font-family:inherit;font-size:.88rem;cursor:${_perfilEhProprio?'default':'pointer'};display:inline-flex;align-items:center;gap:.4rem;transition:all .2s;min-height:44px">
-              🤍 Carregando…
+              ${icone('heart','ic-sm')} Carregando…
             </button>
             <a onclick="abrirListaCurtidas('${pid}')" style="font-size:.74rem;color:var(--text-muted);cursor:pointer;text-decoration:underline;padding:.5rem;min-height:44px;display:inline-flex;align-items:center">Ver quem curtiu</a>
           </div>
@@ -8226,6 +8280,15 @@ function _renderizarGridAtributos() {
       <input type="number" id="a-${sigla}" min="1" max="30" value="${valores[sigla] ?? 10}" oninput="calcTudoDebounced()">
       <div class="atributo-mod" id="m-${sigla}">+0</div>
     </div>`).join('');
+  // Re-renderizar zera todos os "+0" acima. Recalcula o modificador de cada
+  // atributo na hora, com os valores que acabamos de reaplicar — assim os
+  // modificadores aparecem corretos mesmo quando esta função roda DEPOIS de
+  // calcTudo() (ex.: ao GM assumir um personagem). Antes, ficavam em "+0"
+  // porque nada chamava calcTudo() de novo após a re-renderização do grid.
+  ATRIBUTOS_BASE.forEach(({sigla}) => {
+    const modEl = document.getElementById('m-' + sigla);
+    if (modEl) modEl.textContent = fmtMod(getMod(valores[sigla] ?? 10));
+  });
 }
 
 function _aplicarFavoritosVisual(favoritos) {
@@ -10013,9 +10076,10 @@ function _renderSlots(tipo, total) {
          <span class="pericias-slot-nome">${slot.nome}</span>
          <span class="pericias-slot-attr">${slot.attr}</span>
          <span class="pericias-slot-bonus">${bonus}</span>
-         <button class="pericias-slot-clear" onclick="event.stopPropagation();limparSlotPericia('${tipo}',${i})" title="Remover">✕</button>`
+         <button class="pericias-slot-clear" onclick="event.stopPropagation();limparSlotPericia('${tipo}',${i})" title="Esvaziar este slot">✕</button>`
       : `<span class="pericias-slot-num">${i+1}</span>
-         <span class="pericias-slot-nome">Selecionar ${tipo === 'maestria' ? 'Maestria' : 'Especialização'}…</span>`;
+         <span class="pericias-slot-nome">Selecionar ${tipo === 'maestria' ? 'Maestria' : 'Especialização'}…</span>
+         <button class="pericias-slot-clear" onclick="event.stopPropagation();removerSlotPericia('${tipo}',${i})" title="Remover este slot">✕</button>`;
 
     if (!slot) div.onclick = () => abrirSeletorPericia(tipo, i);
     div.querySelector?.('.pericias-slot-nome')?.addEventListener?.('click', () => { if (slot) abrirSeletorPericia(tipo, i); });
@@ -10119,6 +10183,28 @@ function limparSlotPericia(tipo, slotIdx) {
   const key = tipo === 'maestria' ? 'maestrias' : 'especializacoes';
   if (_slotsPericia[key]) _slotsPericia[key][slotIdx] = null;
   buildPericias();
+  salvarLocal();
+}
+
+// Remove um slot INTEIRO (não só esvazia). Diminui a quantidade de slots
+// disponíveis (campo f-mt / f-es) em 1 e remove aquela posição do array
+// salvo, deslocando os slots seguintes para cima. Como a contagem de slots
+// é guiada por f-mt/f-es e esses campos são salvos na ficha, a remoção
+// persiste — o slot não reaparece ao recarregar. (Antes só existia
+// "esvaziar", que mantinha o slot vazio na tela, dando a impressão de que
+// a exclusão não era salva.)
+function removerSlotPericia(tipo, slotIdx) {
+  const key = tipo === 'maestria' ? 'maestrias' : 'especializacoes';
+  const campoId = tipo === 'maestria' ? 'f-mt' : 'f-es';
+  const campo = document.getElementById(campoId);
+  if (!campo) return;
+  const atual = parseInt(campo.value) || 0;
+  if (atual <= 0) return;
+  // Remove a posição do array de slots (desloca os seguintes para cima).
+  if (Array.isArray(_slotsPericia[key])) _slotsPericia[key].splice(slotIdx, 1);
+  campo.value = Math.max(0, atual - 1);
+  buildPericias();
+  calcTudo();   // recalcula totais que dependem de mt/es
   salvarLocal();
 }
 
