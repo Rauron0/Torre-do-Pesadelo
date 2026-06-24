@@ -6185,7 +6185,10 @@ async function _carregarMapaCurtidas() {
       if (!target) return;
       mapa[target] = (mapa[target] || 0) + 1;
     });
-  } catch(e) { console.warn('[Likes] Erro ao carregar mapa de curtidas:', e); }
+  } catch(e) {
+    console.warn('[Likes] Erro ao carregar mapa de curtidas:', e);
+    _diag('_carregarMapaCurtidas', e);
+  }
   return mapa;
 }
 
@@ -10244,10 +10247,11 @@ async function updateRankingEntry(user, personagem, dados, foto, silencioso) {
     // REGRA: qualquer campo exibido em abrirPerfilPublico() DEVE ser salvo aqui.
     // Campos ausentes em fichas antigas recebem string vazia (nunca undefined/null
     // para strings, para não quebrar o layout de nenhum personagem).
-    // merge:true é necessário aqui: o campo "curtidas" é mantido por fora deste
-    // fluxo (incrementado/decrementado direto em alternarCurtida, a cada like).
-    // Sem merge, este setDoc reescreveria o documento inteiro a cada vez que o
-    // jogador salvasse a ficha, apagando a contagem de curtidas acumulada.
+    // NOTA: "curtidas" não é mais salvo aqui — é calculado direto da coleção
+    // 'likes' a cada carregamento do ranking (ver _carregarMapaCurtidas em
+    // carregarRanking). Por isso este setDoc voltou a ser uma sobrescrita
+    // simples (sem merge:true) — mais simples e com o mesmo comportamento já
+    // testado de antes, já que não há mais nenhum campo externo a preservar.
     await window.setDoc(window.doc(window.db, 'rankingGlobal', docId), {
       user: userNorm,
       personagem,                                              // necessário para galeria e lookup
@@ -10291,7 +10295,7 @@ async function updateRankingEntry(user, personagem, dados, foto, silencioso) {
       poderSuprema:   dados['p-suprema']   || '',
       poderConceito:  dados['p-conceito']  || '',
       tecnicas:       Array.isArray(dados.tecnicas) ? dados.tecnicas.filter(t => t && (t.nome || t.desc)) : [],
-    }, { merge: true });
+    });
   } catch(e) {
     if (!silencioso) _diag('updateRankingEntry(' + docId + ')', e);
     console.warn('[Ranking] Erro ao atualizar rankingGlobal:', e);
