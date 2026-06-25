@@ -6349,9 +6349,20 @@ async function toggleOcultarPersonagem(docId, btn) {
       : '<svg class="ic ic-sm"><use href="#ic-moon"/></svg> Ocultar';
   }
   // Atualiza o ranking público imediatamente (sem recarregar do Firestore)
+  //
+  // BUG CORRIGIDO: antes, esse "visiveis" filtrado só era usado para UM
+  // render imediato (a linha renderizarCartoes abaixo) — o cache global
+  // _lendasFichas continuava com TODO MUNDO, inclusive quem acabou de ser
+  // ocultado. Qualquer coisa que re-renderizasse depois usando esse cache
+  // direto (ex: mudarAbaRanking ao trocar de aba do ranking, ou o re-render
+  // depois de curtir) trazia o personagem oculto de volta pra tela — sem
+  // nem precisar de um reload de página, só de trocar de aba. Persistindo
+  // o filtro em _lendasFichas também, esse cache passa a refletir o estado
+  // real, e qualquer re-render seguinte continua respeitando o ocultar.
   const visiveis = _todasFichasParaGM.length
     ? _todasFichasParaGM.filter(f => !_rankingOcultos.has(f._docId || _fsDocId(f.user, f.nomePersonagem)))
-    : _lendasFichas;
+    : _lendasFichas.filter(f => !_rankingOcultos.has(f._docId || _fsDocId(f.user, f.nomePersonagem)));
+  _lendasFichas = visiveis;
   renderizarCartoes(visiveis, _abaAtual);
 }
 
