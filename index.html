@@ -2191,10 +2191,42 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   border-color: rgba(220,90,90,.6);
   color: var(--accent-light);
 }
-#btn-curtir:not([style*="cursor: default"]):hover {
+/* Antes esse seletor checava [style*="cursor: default"] no atributo
+   inline pra saber se era o próprio perfil — agora que o estilo virou
+   classe (.btn-curtir-perfil), usamos .is-own diretamente, sem depender
+   do conteúdo textual de um atributo style. */
+#btn-curtir:not(.is-own):hover {
   background: var(--deep-t20);
 }
 .btn-curtir-post.curtido { color: var(--accent-light); }
+
+.livro-likes-row { display: flex; flex-direction: column; align-items: center; gap: .2rem; margin-top: .85rem; }
+.btn-curtir-perfil {
+  background: rgba(var(--deep-rgb), .1);
+  border: 1px solid var(--accent-t35);
+  color: var(--text);
+  padding: .5rem 1.2rem;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: .88rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  transition: all .2s;
+  min-height: 44px;
+}
+.btn-curtir-perfil.is-own { cursor: default; }
+.link-ver-curtidas {
+  font-size: .74rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: .5rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
 
 /* ══════════════════════════════════════════════════════
    PERFIL PÚBLICO — MOBILE REDESIGN IMERSIVO
@@ -6062,6 +6094,50 @@ async function carregarRanking() {
       console.warn('[Ranking] collection/getDocs indisponíveis — usando apenas fallback por ficha.');
     }
 
+    // ═══ BACKFILL: registros do rankingGlobal sem o campo `atributos` ═══
+    // O campo `atributos` (usado pelo Ranking de Atributos) foi adicionado
+    // a updateRankingEntry() depois que a maioria dos personagens já tinha
+    // sido migrada para rankingGlobal. Por design (ver comentário em
+    // _fichaFromRankingGlobal), um personagem sem esse campo fica de fora
+    // do Ranking de Atributos até salvar a ficha de novo — pra não exibir
+    // um valor 10 "inventado" que nunca foi real.
+    //
+    // Só que isso significa que, até cada jogador abrir e salvar a própria
+    // ficha pelo menos uma vez, o Ranking de Atributos só mostra quem já
+    // foi resalvo — na prática, só os personagens de quem estava testando
+    // a feature (ex: Rauron), e não os de pratesz/tortuga/herick/sec/melpe.
+    // Em vez de esperar cada jogador salvar manualmente, lemos a ficha
+    // bruta de quem está faltando e regravamos o rankingGlobal já com o
+    // campo presente — uma vez por personagem; depois disso fica
+    // permanente no Firestore e este passo nem roda de novo pra ele.
+    for (const f of fichas) {
+      if (f.atributos) continue; // já tem o campo — nada a fazer
+      const podeBackfill = f.user && (
+        _normUser(f.user) === _normUser(usuarioAtual) || roleAtual === 'gm' || roleAtual === 'adm'
+      );
+      if (!podeBackfill || !window.getDoc) continue;
+      try {
+        const fichaDocId = f._docId || _fsDocId(f.user, f.nomePersonagem);
+        const fichaSnap = await window.getDoc(window.doc(window.db, 'fichas', fichaDocId));
+        if (!fichaSnap.exists()) continue;
+        const raw = fichaSnap.data().dados;
+        const d = typeof raw === 'string' ? JSON.parse(raw) : (raw || {});
+        await updateRankingEntry(f.user, f.nomePersonagem, d, f.foto || null, true);
+        // Atualiza em memória pra já refletir no ranking exibido AGORA,
+        // sem precisar esperar o próximo carregarRanking() (30s depois).
+        const atributosReais = {
+          for: parseInt(d['a-for']) || 10,
+          des: parseInt(d['a-des']) || 10,
+          vig: parseInt(d['a-vig']) || 10,
+          int: parseInt(d['a-int']) || 10,
+          alm: parseInt(d['a-alm']) || 10,
+          car: parseInt(d['a-car']) || 10,
+        };
+        f.atributos = atributosReais;
+        f.atributosTotal = Object.values(atributosReais).reduce((s, v) => s + v, 0);
+      } catch(e) { console.warn('[Ranking] Backfill de atributos falhou para', f.user, f.nomePersonagem, e); }
+    }
+
     // ═══ FALLBACK: fichas antigas ainda não migradas para rankingGlobal ═══
     // Cobre personagens criados/salvos antes desta atualização (que ainda
     // não passaram por updateRankingEntry). Pesado (1 leitura por usuário
@@ -7098,12 +7174,11 @@ function abrirPerfilPublico(f) {
           ${f.frase ? `<div class="livro-frase">"${_escHtml(f.frase)}"</div>` : ''}
 
           <!-- Sistema de Likes -->
-          <div class="livro-likes-row" style="display:flex;flex-direction:column;align-items:center;gap:.2rem;margin-top:.85rem">
-            <button id="btn-curtir" ${_perfilEhProprio ? '' : `onclick="alternarCurtida('${pid}','${f.user}','${_nomePersonagemEscapado}')"`}
-              style="background:rgba(var(--deep-rgb), .1);border:1px solid var(--accent-t35);color:var(--text);padding:.5rem 1.2rem;border-radius:20px;font-family:inherit;font-size:.88rem;cursor:${_perfilEhProprio?'default':'pointer'};display:inline-flex;align-items:center;gap:.4rem;transition:all .2s;min-height:44px">
+          <div class="livro-likes-row">
+            <button id="btn-curtir" class="btn-curtir-perfil${_perfilEhProprio ? ' is-own' : ''}" ${_perfilEhProprio ? '' : `onclick="alternarCurtida('${pid}','${f.user}','${_nomePersonagemEscapado}')"`}>
               ${icone('heart','ic-sm')} Carregando…
             </button>
-            <a onclick="abrirListaCurtidas('${pid}')" style="font-size:.74rem;color:var(--text-muted);cursor:pointer;text-decoration:underline;padding:.5rem;min-height:44px;display:inline-flex;align-items:center">Ver quem curtiu</a>
+            <a onclick="abrirListaCurtidas('${pid}')" class="link-ver-curtidas">Ver quem curtiu</a>
           </div>
         </div>
       </div>
@@ -8974,7 +9049,26 @@ function getFormulas() {
     // Especialização: attrMod + ⌊nível÷2⌋ + ⌊maestria × 1.5⌋
     'per-es':   'attrMod + floor(nivel / 2) + floor(maestria * 1.5)',
   };
-  const saved = JSON.parse(localStorage.getItem('tp_formulas') || '{}');
+  let saved = {};
+  try {
+    const raw = localStorage.getItem('tp_formulas');
+    if (raw) saved = JSON.parse(raw);
+  } catch(e) {
+    // Sem este try/catch, um valor corrompido aqui (ex: gravação antiga
+    // incompleta) fazia o JSON.parse lançar uma excessão direto na
+    // PRIMEIRA linha de getFormulas() — que é a PRIMEIRA linha de
+    // calcTudo(). Sem nada pra capturar o erro, calcTudo() parava ali,
+    // ANTES de chegar no bloco que escreve os modificadores (+3, -1...)
+    // de cada atributo na tela. O valor numérico do atributo continuava
+    // aparecendo certo (vem de preencherCampos(), que roda ANTES e não
+    // depende disso) — só o modificador ficava travado no "+0" padrão
+    // do template, em TODO personagem, sempre, porque calcTudo() nunca
+    // chegava a terminar. Agora descartamos o dado corrompido e seguimos
+    // com as fórmulas oficiais, em vez de travar a ficha inteira.
+    console.warn('[Fórmulas] tp_formulas corrompido no localStorage, descartando e usando padrão:', e);
+    localStorage.removeItem('tp_formulas');
+    saved = {};
+  }
   const merged = { ...def, ...saved };
 
   // ─── Auto-correção: fórmula de PE corrompida ───
@@ -9169,6 +9263,7 @@ function avaliarFormula(expr, ctx) {
 }
 
 function calcTudo() {
+  try {
   const f = getFormulas();
 
   // ── Atributos brutos ──
@@ -9272,6 +9367,14 @@ function calcTudo() {
   atualizarSlotsPericia();
 
   salvarLocal();
+  } catch(e) {
+    // Rede de segurança: qualquer erro inesperado aqui (não só o de
+    // tp_formulas corrompido, já tratado em getFormulas) cai aqui em vez
+    // de abortar a função silenciosamente no meio — o que travava os
+    // modificadores de atributo (e os recursos calculados) na tela.
+    console.error('[calcTudo] Erro inesperado — modificadores/recursos podem não ter atualizado:', e);
+    _diag('calcTudo', e);
+  }
 }
 
 // ─── CÁLCULO AUTOMÁTICO DOS RECURSOS ATUAIS ───
