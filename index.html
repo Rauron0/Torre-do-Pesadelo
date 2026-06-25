@@ -4943,6 +4943,22 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
 
 <script>
 // ═══════════════════════════════════════════════════════════
+// NOTA DE ARQUITETURA (Fase 4 — modularização, decisão registrada)
+// Este app continua de propósito num arquivo HTML único: a forma de
+// publicação atual não foi confirmada (host com deploy de pasta? envio
+// direto do arquivo?), e separar em .css/.js exigiria gerenciar múltiplos
+// arquivos juntos — risco real de quebrar o deploy sem essa confirmação.
+// Em vez disso, esta rodada de "Fase 4" consolidou um padrão de segurança
+// que vinha sendo reimplementado ficha a ficha (capa, avatar, galeria):
+// sempre capturar usuarioAtual/personagemAtual ANTES de qualquer operação
+// assíncrona (upload, fetch), e nunca confiar no estado global no momento
+// em que a operação termina — ver salvarFotosPerfilSeguro, _personalizacaoAlvo
+// e os comentários "BUG CORRIGIDO" espalhados pelas funções de foto.
+// Se decidirem migrar para múltiplos arquivos no futuro, o passo seguro é:
+// 1) confirmar o método de deploy, 2) extrair primeiro a BARRA DE EDITOR
+// GM (bloco enorme, só usado por GM) para um <script> separado carregado
+// sob demanda — maior ganho de performance com menor risco de regressão.
+// ═══════════════════════════════════════════════════════════
 // USUÁRIOS — gerenciados pelo Firebase Authentication + Firestore
 // NÃO há mais senhas hardcodadas aqui. O objeto abaixo é apenas
 // um cache local preenchido após login via Firebase Auth.
@@ -7481,6 +7497,15 @@ function abrirPersonalizacao() {
   _gifPoderArquivoTemp = null;
   _gifPoderRemovido = false;
   const pid = _fsDocId(usuarioAtual, personagemAtual);
+  // Trava aqui o personagem-alvo deste modal. Sem isso, se o jogador
+  // trocar de personagem (ex: clicar em outro na sidebar) com o modal
+  // ainda aberto e SÓ DEPOIS clicar em Salvar, a capa/tema/GIFs seriam
+  // gravados no personagem NOVO — porque este modal é um overlay solto
+  // no <body>, não filho de #ficha-content, então trocar de personagem
+  // não o fecha nem o atualiza automaticamente. salvarPersonalizacao()
+  // usa este valor capturado aqui, e não usuarioAtual/personagemAtual
+  // direto, justamente para nunca gravar no personagem errado.
+  _personalizacaoAlvo = { user: usuarioAtual, personagem: personagemAtual, pid };
   const p = _personalizacoes[pid] || {};
 
   const temasBtns = Object.entries(TEMAS).map(([id, t]) =>
@@ -7649,6 +7674,9 @@ function imageToBlobCapa(file) {
 
 let _capaArquivoTemp = null;
 let _capaRemovida = false;
+// Trava QUAL personagem uma sessão do modal de Personalização pertence —
+// ver explicação completa em abrirPersonalizacao()/salvarPersonalizacao().
+let _personalizacaoAlvo = null;
 
 // Remove a capa atual (preview + arquivo pendente + sinaliza remoção pro
 // salvarPersonalizacao). A exclusão real no Storage só acontece ao salvar,
@@ -7734,7 +7762,29 @@ function previewGif(inputId, imgId) {
 
 async function salvarPersonalizacao() {
   if (!usuarioAtual || !personagemAtual) return;
-  const pid = _fsDocId(usuarioAtual, personagemAtual);
+  // BUG CORRIGIDO (mesma causa do "fotos trocadas entre personagens" nas
+  // fotos de perfil): o upload da capa e do GIF do poder pro Cloudinary é
+  // lento. Antes, os campos "user"/"personagem" salvos no documento eram
+  // lidos de usuarioAtual/personagemAtual SÓ DEPOIS do upload terminar —
+  // se o jogador trocasse de personagem nesse meio tempo, a capa enviada
+  // ficava marcada com os dados do personagem NOVO, mesmo pertencendo ao
+  // antigo. Capturando aqui no início, antes de qualquer upload, a capa
+  // sempre fica associada a quem ela realmente é.
+  //
+  // SEGUNDA CAMADA (recém-corrigida): a captura acima só protegia contra
+  // troca de personagem DURANTE o upload. Mas o modal de Personalização é
+  // um overlay solto no <body> (não filho de #ficha-content) — trocar de
+  // personagem com o modal ainda aberto NÃO o fecha. Se o jogador abria o
+  // modal pro personagem A, trocava pra B na sidebar sem fechar o modal,
+  // e SÓ ENTÃO clicava em Salvar, usuarioAtual/personagemAtual já eram os
+  // de B — e a capa de A acabava salva no personagem errado (B), mesmo
+  // sem upload lento nenhum de permeio. Por isso agora usamos o alvo
+  // travado no momento em que o modal foi ABERTO (_personalizacaoAlvo),
+  // e não o estado atual — cobre os dois cenários de uma vez.
+  const alvo = _personalizacaoAlvo || { user: usuarioAtual, personagem: personagemAtual };
+  const userNoMomento = alvo.user;
+  const personagemNoMomento = alvo.personagem;
+  const pid = _fsDocId(userNoMomento, personagemNoMomento);
   const old = _personalizacoes[pid] || {};
 
   const btnSalvar = document.querySelector('.personalizar-btn-salvar');
@@ -7793,8 +7843,8 @@ async function salvarPersonalizacao() {
     wallpaperUrl: wallpaperUrl,
     gifPoder, gifTransformacao, gifSuprema,
     ts: Date.now(),
-    user: usuarioAtual,
-    personagem: personagemAtual,
+    user: userNoMomento,
+    personagem: personagemNoMomento,
   };
 
   _personalizacoes[pid] = dados;
@@ -7859,6 +7909,26 @@ async function salvarFotosPerfil(user, personagem, principal, galeria) {
     });
     console.log('[Fotos] salvo:', docId);
   } catch(e) { _diag('salvarFotosPerfil(' + docId + ')', e); }
+}
+
+// Salva UMA alteração pontual (foto principal OU um slot da galeria) no
+// personagem indicado, sem depender de _fotoPrincipal/_galeriaFotos (que
+// podem já pertencer a outro personagem se o jogador trocou de ficha
+// enquanto um upload estava em andamento — ver correção em
+// abrirSeletorFotoPrincipal/adicionarFotoGaleria). Busca o documento ATUAL
+// desse personagem no Firestore antes de escrever, e só então aplica a
+// alteração — assim nunca sobrescrevemos a galeria de alguém com a
+// galeria de outra pessoa que por acaso estava em memória.
+async function salvarFotosPerfilSeguro(user, personagem, alteracao) {
+  if (!window.db || !window.doc || !window.getDoc || !window.setDoc) return;
+  const atual = await carregarFotosPerfil(user, personagem) || {};
+  const principal = ('principal' in alteracao) ? alteracao.principal : (atual.principal ?? null);
+  let galeria = Array.isArray(atual.galeria) ? atual.galeria.slice(0, 10) : [];
+  while (galeria.length < 10) galeria.push(null);
+  if (alteracao.slotIndex !== undefined) {
+    galeria[alteracao.slotIndex] = alteracao.galeriaSlot ?? null;
+  }
+  await salvarFotosPerfil(user, personagem, principal, galeria);
 }
 
 async function carregarFotosPerfil(user, personagem) {
@@ -7944,30 +8014,54 @@ async function abrirSeletorFotoPrincipal() {
   input.onchange = async () => {
     if (!input.files[0]) { input.remove(); return; }
     if (!usuarioAtual || !personagemAtual) { alert('Nenhum personagem ativo. Ative um personagem antes de salvar a foto.'); input.remove(); return; }
+    // BUG CORRIGIDO ("fotos sendo trocadas entre os personagens"): o
+    // upload pro Cloudinary é lento (rede). Antes, usuarioAtual/
+    // personagemAtual só eram lidos DEPOIS do upload terminar — se o
+    // jogador trocasse de personagem nesse meio tempo (ex: clicou em
+    // outro personagem na sidebar enquanto a imagem subia), a foto nova
+    // era salva no personagem ATUAL NO MOMENTO EM QUE O UPLOAD TERMINOU,
+    // não no personagem de onde ela realmente veio. Capturando aqui, ANTES
+    // do upload, garantimos que a foto sempre vai para o personagem certo,
+    // independente do que aconteça na tela enquanto ela sobe.
+    const userNoMomento = usuarioAtual;
+    const personagemNoMomento = personagemAtual;
+    let url;
     try {
       const blob = await imageToBlob(input.files[0], 900, 0.85);
-      const url = await _cloudinaryUpload(blob, 'avatars');
-      _fotoPrincipal = url;
+      url = await _cloudinaryUpload(blob, 'avatars');
     } catch(e) {
       console.warn('[Fotos] Erro ao enviar avatar pro Cloudinary:', e);
       alert('Não foi possível enviar a foto. Verifique sua conexão e tente novamente.');
       input.remove();
       return;
     }
-    renderFotoPersonagem();
-    atualizarFichaHero();
-    await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
+    // Só atualiza o que está NA TELA se o personagem ativo ainda for o
+    // mesmo de quando o upload começou — caso contrário, _fotoPrincipal
+    // já pertence a outro personagem agora, e sobrescrevê-la aqui faria
+    // a troca acontecer ao contrário (a tela do personagem novo mostraria
+    // a foto do antigo).
+    const aindaNoMesmoPersonagem = (usuarioAtual === userNoMomento && personagemAtual === personagemNoMomento);
+    if (aindaNoMesmoPersonagem) {
+      _fotoPrincipal = url;
+      renderFotoPersonagem();
+      atualizarFichaHero();
+    }
+    // O salvamento usa SEMPRE o personagem capturado no início — nunca o
+    // estado global, que pode já ter mudado.
+    await salvarFotosPerfilSeguro(userNoMomento, personagemNoMomento, { principal: url });
     // Atualiza rankingGlobal com a nova foto
     try {
-      const dadosAtuais = JSON.parse(localStorage.getItem('ficha_' + usuarioAtual + '_' + personagemAtual) || '{}');
-      await updateRankingEntry(usuarioAtual, personagemAtual, dadosAtuais, _fotoPrincipal);
+      const dadosAtuais = JSON.parse(localStorage.getItem('ficha_' + userNoMomento + '_' + personagemNoMomento) || '{}');
+      await updateRankingEntry(userNoMomento, personagemNoMomento, dadosAtuais, url);
       // Atualiza o ranking NA TELA imediatamente — pedido explícito: alterar
       // foto deve refletir no ranking sozinho, sem esperar o auto-refresh.
       if (document.getElementById('ranking-grid')) carregarRanking();
     } catch(e) { console.warn('[Ranking] Erro ao atualizar foto no ranking:', e); }
-    // Atualiza cache da sidebar
-    const fotoKey = '_sbfoto_' + usuarioAtual + '_' + personagemAtual;
-    sessionStorage.setItem(fotoKey, _fotoPrincipal);
+    // Atualiza cache da sidebar (sempre do personagem de origem da foto —
+    // a sidebar lista todos os personagens, então isso está certo mesmo
+    // se não for mais o personagem ativo na tela)
+    const fotoKey = '_sbfoto_' + userNoMomento + '_' + personagemNoMomento;
+    sessionStorage.setItem(fotoKey, url);
     renderizarPersonagensNaSidebar();
     input.remove();
   };
@@ -7982,19 +8076,29 @@ async function adicionarFotoGaleria(slot) {
   input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
   input.onchange = async () => {
     if (!input.files[0]) { input.remove(); return; }
+    if (!usuarioAtual || !personagemAtual) { input.remove(); return; }
+    // Mesma correção de abrirSeletorFotoPrincipal — captura o personagem
+    // ANTES do upload lento, pra foto nunca ir pro personagem errado caso
+    // o jogador troque de ficha enquanto a imagem sobe.
+    const userNoMomento = usuarioAtual;
+    const personagemNoMomento = personagemAtual;
+    let url;
     try {
       const blob = await imageToBlob(input.files[0], 900, 0.85);
-      const url = await _cloudinaryUpload(blob, 'gallery');
-      _galeriaFotos[slot] = url;
+      url = await _cloudinaryUpload(blob, 'gallery');
     } catch(e) {
       console.warn('[Fotos] Erro ao enviar foto da galeria pro Cloudinary:', e);
       alert('Não foi possível enviar a foto. Verifique sua conexão e tente novamente.');
       input.remove();
       return;
     }
-    renderFotoPersonagem();
-    atualizarFichaHero();
-    await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
+    const aindaNoMesmoPersonagem = (usuarioAtual === userNoMomento && personagemAtual === personagemNoMomento);
+    if (aindaNoMesmoPersonagem) {
+      _galeriaFotos[slot] = url;
+      renderFotoPersonagem();
+      atualizarFichaHero();
+    }
+    await salvarFotosPerfilSeguro(userNoMomento, personagemNoMomento, { galeriaSlot: url, slotIndex: slot });
     input.remove();
   };
   document.body.appendChild(input);
@@ -8002,10 +8106,17 @@ async function adicionarFotoGaleria(slot) {
 }
 
 async function removerFotoGaleria(slot) {
+  // Mesmo padrão de segurança de abrirSeletorFotoPrincipal/adicionarFotoGaleria:
+  // captura o personagem ANTES, e usa salvarFotosPerfilSeguro (que busca a
+  // galeria atual no Firestore antes de gravar) em vez de salvarFotosPerfil
+  // direto com _galeriaFotos em memória, que pode já pertencer a outro
+  // personagem se o jogador trocou de ficha um instante antes de clicar.
+  const userNoMomento = usuarioAtual;
+  const personagemNoMomento = personagemAtual;
   _galeriaFotos[slot] = null;
   renderFotoPersonagem();
   atualizarFichaHero();
-  await salvarFotosPerfil(usuarioAtual, personagemAtual, _fotoPrincipal, _galeriaFotos);
+  await salvarFotosPerfilSeguro(userNoMomento, personagemNoMomento, { slotIndex: slot, galeriaSlot: null });
 }
 
 function abrirLightbox(src) {
@@ -8795,6 +8906,11 @@ function _aplicarEstadoAccordionPersonagens() {
 
 async function ativarPersonagem(nome) {
   if (personagemAtual) salvarLocal(); // salva o atual antes
+  // Fecha o modal de Personalização se estava aberto para o personagem
+  // ANTERIOR — ele não é filho de #ficha-content, então sobreviveria à
+  // troca sozinho e poderia acabar salvando no personagem errado (ver
+  // _personalizacaoAlvo em abrirPersonalizacao/salvarPersonalizacao).
+  document.getElementById('personalizar-overlay')?.remove();
   personagemAtual = nome;
   // recarrega ficha
   const fichaContent = document.getElementById('ficha-content');
@@ -8905,6 +9021,8 @@ async function deletarPersonagem(nome) {
 
   // 6. Se era o personagem ativo, carrega outro
   if (personagemAtual === nome) {
+    // Mesma proteção de ativarPersonagem — ver comentário lá.
+    document.getElementById('personalizar-overlay')?.remove();
     personagemAtual = lista[0] || null;
     const fichaContent = document.getElementById('ficha-content');
     if (personagemAtual && fichaContent) {
@@ -10818,13 +10936,17 @@ function removeInvRowEl(btn) {
 
 // ─── FOTO — botão de remover a foto principal ───────────────────
 async function removerFotoPrincipal() {
+  // Mesmo padrão de segurança das outras funções de foto — ver comentário
+  // em removerFotoGaleria.
+  const userNoMomento = usuarioAtual;
+  const personagemNoMomento = personagemAtual;
   _fotoPrincipal = null;
   renderFotoPersonagem();
   atualizarFichaHero();
-  await salvarFotosPerfil(usuarioAtual, personagemAtual, null, _galeriaFotos);
+  await salvarFotosPerfilSeguro(userNoMomento, personagemNoMomento, { principal: null });
   // limpa cache da sidebar
-  if (usuarioAtual && personagemAtual) {
-    sessionStorage.removeItem('_sbfoto_' + usuarioAtual + '_' + personagemAtual);
+  if (userNoMomento && personagemNoMomento) {
+    sessionStorage.removeItem('_sbfoto_' + userNoMomento + '_' + personagemNoMomento);
     renderizarPersonagensNaSidebar();
   }
 }
@@ -11033,6 +11155,8 @@ let _gmContextoOriginal = null; // guarda { usuarioAtual, personagemAtual } do G
 
 async function gmAssumirPersonagem(targetUser, nomePersonagem) {
   if (roleAtual !== 'gm') return; // segurança: só GM pode assumir ficha de outro
+  // Mesma proteção de ativarPersonagem — ver comentário lá.
+  document.getElementById('personalizar-overlay')?.remove();
   if (personagemAtual && usuarioAtual === (_gmContextoOriginal?.usuarioAtual || usuarioAtual)) {
     // Salva o que estava sendo editado (próprio personagem do GM ou outro assumido) antes de trocar
     salvarLocal();
@@ -11073,6 +11197,8 @@ async function gmAssumirPersonagem(targetUser, nomePersonagem) {
 async function gmVoltarParaPropriaFicha() {
   if (!_gmContextoOriginal) return;
   salvarLocal(); // garante que a última edição no personagem assumido foi salva
+  // Mesma proteção de ativarPersonagem — ver comentário lá.
+  document.getElementById('personalizar-overlay')?.remove();
 
   usuarioAtual = _gmContextoOriginal.usuarioAtual;
   personagemAtual = _gmContextoOriginal.personagemAtual;
