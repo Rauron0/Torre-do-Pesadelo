@@ -87,7 +87,7 @@
   --dur-fast: .15s; --dur: .25s; --dur-slow: .4s;
 
   /* ─── LAYOUT ─── */
-  --sidebar-w: 260px;
+  --sidebar-w: 290px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
   --tabbar-h: 60px;
@@ -774,6 +774,35 @@ tr:hover td { background:rgba(var(--deep-rgb), .05); }
   padding:.15rem .35rem; transition:color .2s; flex-shrink:0;
 }
 .pericias-slot-clear:hover { color:var(--accent-text); }
+
+/* ─── Tabela de Todas as Perícias (consulta rápida, dentro do painel) ─── */
+.pericias-todas-legenda {
+  font-size:.7rem; color:var(--text-muted); margin-bottom:.6rem;
+  display:flex; align-items:center; gap:.4rem; flex-wrap:wrap;
+}
+.pericias-todas-legenda-sep { opacity:.5; }
+.pericias-todas-row {
+  display:flex; align-items:center; gap:.6rem; padding:.4rem .5rem;
+  border-bottom:1px solid rgba(255,255,255,.05); min-height:38px;
+}
+.pericias-todas-row:last-child { border-bottom:none; }
+.pericias-todas-row:nth-child(odd) { background:rgba(255,255,255,.015); }
+.pericias-todas-nome { flex:1; font-size:.85rem; color:var(--text); min-width:0; }
+.pericias-todas-attr {
+  font-size:.65rem; color:var(--text-muted); min-width:28px; text-align:center;
+  letter-spacing:.5px;
+}
+.pericias-todas-selo { min-width:28px; display:flex; justify-content:center; }
+.pericias-todas-bonus {
+  font-family:'Playfair Display',serif; font-size:.95rem; font-weight:700;
+  color:var(--silver); min-width:32px; text-align:right;
+}
+.pericias-todas-badge {
+  font-size:.62rem; line-height:1; padding:.15rem .4rem; border-radius:3px;
+  border:1px solid currentColor; font-weight:600;
+}
+.pericias-todas-badge.mt { color:var(--accent-light); }
+.pericias-todas-badge.es { color:var(--gold-light); }
 
 /* dropdown de seleção de perícia */
 .pericias-dropdown-overlay {
@@ -2466,6 +2495,13 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-ranking-total { font-size: .85rem; color: var(--text-muted); }
 .livro-ranking-score { font-size: .85rem; color: var(--text-muted); }
 .livro-ranking-score strong { color: var(--accent-light); }
+.livro-ranking-chips { display: flex; gap: .4rem; justify-content: center; flex-wrap: wrap; margin-top: .75rem; }
+.livro-ranking-destaque {
+  margin-top: 1rem; text-align: center; font-size: .85rem; color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center; gap: .35rem; flex-wrap: wrap;
+}
+.livro-ranking-destaque strong { color: var(--gold-light); font-family: 'Playfair Display', serif; }
+.livro-ranking-destaque-pos { color: var(--accent-light); }
 .livro-section-title::after {
   content: ''; flex: 1; height: 1px;
   background: linear-gradient(to right, var(--accent-t40), transparent);
@@ -3454,6 +3490,24 @@ main { margin-left: auto !important; margin-right: auto !important; max-width: 1
    no celular, deixando o topo limpo para o conteúdo. */
 @media (max-width:1024px) {
   #sidebar-arrow-btn { display:none; }
+}
+
+/* ═══ DESKTOP (>1024px): sidebar permanente, não some mais ═══════════
+   O bloco unconditional acima (.sidebar { transform: translateX(-100%) })
+   também passou a valer pra qualquer tamanho de tela depois da última
+   refatoração, escondendo a sidebar por padrão até em desktop — antes
+   disso havia uma versão mobile-only desse mesmo esconder (ver
+   @media max-width:1024px mais acima no arquivo), e essa versão global
+   acabou competindo com ela e ganhando pra telas grandes também. Aqui
+   restauramos o comportamento de sidebar SEMPRE visível em telas largas
+   (como deveria ter ficado desde aquela refatoração), com o conteúdo
+   principal abrindo espaço pra ela — e mantemos o comportamento de
+   gaveta (esconder/mostrar com a seta) só pra telas estreitas, onde
+   não há espaço pra deixar a sidebar fixa o tempo todo. */
+@media (min-width:1025px) {
+  .sidebar { transform: translateX(0) !important; transition: none; }
+  #sidebar-arrow-btn, #sidebar-backdrop { display: none !important; }
+  main { margin-left: 290px !important; }
 }
 
 /* Logo */
@@ -7454,12 +7508,58 @@ function _carregarResumoRankingLivro(f) {
   }
   const posicao = idx + 1;
   const total = ordenados.length;
+
+  // ── Chips de estatísticas rápidas — mesma classe .lenda-meta-chip já
+  // usada nos cards do Livro das Lendas, pra manter a identidade visual.
+  const chips = [
+    { ic: 'heart',     val: f.curtidas ?? 0,  label: f.curtidas === 1 ? 'Curtida' : 'Curtidas' },
+    { ic: 'core',      val: f.nucleos ?? 0,   label: f.nucleos === 1 ? 'Núcleo' : 'Núcleos' },
+    { ic: 'medal',     val: f.vitorias ?? 0,  label: f.vitorias === 1 ? 'Vitória' : 'Vitórias' },
+  ].map(c => `<span class="lenda-meta-chip">${icone(c.ic,'ic-sm')} ${c.val} ${c.label}</span>`).join('');
+
+  // ── Destaque de atributo: em qual atributo este personagem é mais forte,
+  // e em que posição ele fica especificamente NESSE atributo (não no geral).
+  // Dá a mesma sensação de "build" que rankings de jogos competitivos têm.
+  const destaque = _calcularDestaqueAtributoLivro(f, fonte);
+
   container.innerHTML = `
     <div class="livro-ranking-posicao">
       <span class="livro-ranking-numero">#${posicao}</span>
       <span class="livro-ranking-total">de ${total} Despertos</span>
     </div>
-    <div class="livro-ranking-score">${icone('core','ic-sm')} Pontuação: <strong>${f.score ?? (ordenados[idx].score || 0)}</strong></div>`;
+    <div class="livro-ranking-score">${icone('core','ic-sm')} Pontuação: <strong>${f.score ?? (ordenados[idx].score || 0)}</strong></div>
+    <div class="livro-ranking-chips">${chips}</div>
+    ${destaque ? `
+    <div class="livro-area-card livro-ranking-destaque">
+      ${icone(destaque.ic,'ic-sm')} Atributo mais forte: <strong>${destaque.nome} (${destaque.valor})</strong>
+      — <span class="livro-ranking-destaque-pos">#${destaque.posicao} de ${destaque.total}</span> nesse atributo
+    </div>` : ''}`;
+}
+
+// Em qual dos 6 atributos este personagem tem o maior valor, e em que
+// posição ele fica especificamente no ranking DESSE atributo (reaproveita
+// _attrIconeRanking/ATRIBUTOS_BASE, já usados no Ranking de Atributos
+// principal, pra manter ícone e nome consistentes em todo o sistema).
+function _calcularDestaqueAtributoLivro(f, fonte) {
+  if (!f.atributos) return null;
+  const entradas = Object.entries(f.atributos).filter(([,v]) => typeof v === 'number');
+  if (!entradas.length) return null;
+  entradas.sort((a,b) => b[1] - a[1]);
+  const [sigla, valor] = entradas[0];
+
+  const comEsseAtributo = fonte.filter(x => x.atributos && typeof x.atributos[sigla] === 'number');
+  comEsseAtributo.sort((a,b) =>
+    b.atributos[sigla] - a.atributos[sigla] || (b.atributosTotal||0) - (a.atributosTotal||0));
+  const posicao = comEsseAtributo.findIndex(x => x.user === f.user && x.nomePersonagem === f.nomePersonagem) + 1;
+  if (posicao <= 0) return null;
+
+  const def = ATRIBUTOS_BASE.find(a => a.sigla === sigla);
+  return {
+    nome: def ? def.nome : sigla.toUpperCase(),
+    ic: _attrIconeRanking(sigla),
+    valor, posicao,
+    total: comEsseAtributo.length
+  };
 }
 
 function _carregarGaleriaLivro(user, personagem) {
@@ -10250,10 +10350,30 @@ function buildPericias() {
         <div id="slots-especializacao"></div>
       </div>
     </div>
+    <!-- TODAS AS PERÍCIAS — consulta rápida de todo o bônus calculado, não
+         só das que estão em slot de Maestria/Especialização. Pedido do
+         GM: em jogo é preciso ver o bônus de QUALQUER perícia na hora,
+         não só das que o personagem já tem proficiência. Fica fechada
+         por padrão (é uma barra expansiva DENTRO do painel de Perícias,
+         que já é expansivo) pra não competir visualmente com os slots. -->
+    <div class="pericias-slots-section pericias-mobile-group" data-grupo="todas">
+      <div class="pericias-slots-title pericias-mobile-header" onclick="togglePericiaGrupoMobile(this)">
+        <span>${icone('scroll','ic-sm')} Todas as Perícias</span><span class="seta">▶</span>
+      </div>
+      <div class="pericias-mobile-body" id="slots-todas-wrap">
+        <div class="pericias-todas-legenda">
+          <span class="pericias-todas-badge mt">Mt</span> Maestria
+          <span class="pericias-todas-badge es">Es</span> Especialização
+          <span class="pericias-todas-legenda-sep">·</span> sem selo = só o modificador do atributo
+        </div>
+        <div id="lista-todas-pericias"></div>
+      </div>
+    </div>
   `;
 
   _renderSlots('maestria', numMt);
   _renderSlots('especializacao', numEs);
+  _renderTodasPericias();
 }
 
 // Atualiza apenas os bônus/slots de perícia sem recriar o painel inteiro.
@@ -10266,6 +10386,47 @@ function atualizarSlotsPericia() {
   const numEs = parseInt(document.getElementById('f-es')?.value) || 3;
   _renderSlots('maestria', numMt);
   _renderSlots('especializacao', numEs);
+  _renderTodasPericias();
+}
+
+// ─── TABELA DE TODAS AS PERÍCIAS ─────────────────────────────────────────
+// Mostra as 24 perícias da ficha (PERICIAS_DEF) de uma vez, cada uma já
+// com o bônus calculado pro personagem atual — não só as que estão num
+// slot de Maestria/Especialização. Quem está num slot usa a MESMA fórmula
+// configurada pelo GM (per-mt/per-es) que os slots já usam; quem não está
+// em slot nenhum mostra só o modificador puro do atributo (attrMod), sem
+// nenhum bônus extra — exatamente como uma perícia sem treino funciona.
+// Se uma perícia estiver em slot de Maestria E de Especialização ao mesmo
+// tempo, usa a fórmula de Especialização (a mais "investida" das duas).
+function _renderTodasPericias() {
+  const container = document.getElementById('lista-todas-pericias');
+  if (!container) return;
+  const ctx = _getCalcCtx();
+  const attrMap = {FOR:ctx.modForca,DES:ctx.modDestreza,VIG:ctx.modVigor,INT:ctx.modIntelecto,ALM:ctx.modAlma,CAR:ctx.modCarisma};
+  const f = getFormulas();
+  const comMaestria = new Set((_slotsPericia.maestrias || []).filter(Boolean).map(s => s.nome));
+  const comEspecializacao = new Set((_slotsPericia.especializacoes || []).filter(Boolean).map(s => s.nome));
+
+  container.innerHTML = PERICIAS_DEF.map(p => {
+    const attrMod = attrMap[p.attr] ?? 0;
+    let bonus, selo = '';
+    if (comEspecializacao.has(p.nome)) {
+      bonus = avaliarFormula(f['per-es'], { ...ctx, attrMod });
+      selo = `<span class="pericias-todas-badge es">Es</span>`;
+    } else if (comMaestria.has(p.nome)) {
+      bonus = avaliarFormula(f['per-mt'], { ...ctx, attrMod });
+      selo = `<span class="pericias-todas-badge mt">Mt</span>`;
+    } else {
+      bonus = attrMod;
+    }
+    return `
+      <div class="pericias-todas-row">
+        <span class="pericias-todas-nome">${_escHtml(p.nome)}</span>
+        <span class="pericias-todas-attr">${p.attr}</span>
+        <span class="pericias-todas-selo">${selo}</span>
+        <span class="pericias-todas-bonus">${fmtMod(Math.round(bonus))}</span>
+      </div>`;
+  }).join('');
 }
 
 // Acordeão de Perícias (mobile) — abre/fecha cada grupo (Maestrias / Especializações)
@@ -12330,6 +12491,18 @@ function fecharLivroSidebar() {
 }
 
 function navTo(id) {
+  // CORREÇÃO: abrir o Livro do Jogador troca #app inteiro (topbar, sidebar,
+  // tabbar, todas as seções) para display:none — então um clique em
+  // "Ranking"/"Lendas" feito a partir de QUALQUER lugar enquanto o Livro
+  // está aberto chamava scrollIntoView num elemento que existe, mas está
+  // escondido atrás do overlay do Livro. Visualmente nada mudava — o
+  // usuário continuava vendo o capítulo em que estava no Livro, parecendo
+  // que o clique "parou nos capítulos" em vez de ir pro ranking. Fechando
+  // o Livro primeiro, a navegação sempre chega ao destino visível.
+  const livro = document.getElementById('livro-jogador');
+  if (livro && livro.style.display !== 'none' && typeof fecharLivro === 'function') {
+    fecharLivro();
+  }
   document.getElementById('sidebar').classList.remove('open');
   const arrow = document.getElementById('sidebar-arrow-btn');
   const backdrop = document.getElementById('sidebar-backdrop');
@@ -12339,13 +12512,27 @@ function navTo(id) {
   _syncTabbar(id);
   // Recarrega ranking ao navegar para ele (dados sempre frescos)
   if (id === 'secao-ranking' && typeof carregarRanking === 'function') {
-    setTimeout(() => carregarRanking(), 200);
+    setTimeout(() => {
+      carregarRanking();
+      // Re-rola depois do grid carregar: a seção de ranking fica logo
+      // depois do Capítulo 10 (bem extenso, com tabela de perícias), e o
+      // grid de cards entra DEPOIS do scroll inicial — sem repetir o
+      // scroll aqui, a posição calculada a 100ms podia ficar incorreta
+      // se a página ainda estivesse assentando o layout naquele momento.
+      const el = document.getElementById('secao-ranking');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 250);
   }
 }
 
 // ─── BOTTOM TAB BAR ─────────────────────────────────────────────────
 // Navega para uma seção e marca a aba ativa. Usada pela barra inferior mobile.
 function tabNav(id, btn) {
+  // Mesma correção de navTo() — ver comentário lá.
+  const livro = document.getElementById('livro-jogador');
+  if (livro && livro.style.display !== 'none' && typeof fecharLivro === 'function') {
+    fecharLivro();
+  }
   // Fecha sidebar se aberta
   document.getElementById('sidebar')?.classList.remove('open');
   document.getElementById('sidebar-backdrop')?.classList.remove('show');
@@ -12358,7 +12545,11 @@ function tabNav(id, btn) {
   _setTabAtiva(btn);
   // Recarrega ranking ao clicar na aba
   if (id === 'secao-ranking' && typeof carregarRanking === 'function') {
-    setTimeout(() => carregarRanking(), 200);
+    setTimeout(() => {
+      carregarRanking();
+      const elR = document.getElementById('secao-ranking');
+      if (elR) elR.scrollIntoView({ behavior: 'smooth' });
+    }, 250);
   }
 }
 
