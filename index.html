@@ -1633,10 +1633,10 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .lenda-card-wallpaper {
   position: absolute; inset: 0; z-index: 0;
   background-size: cover; background-position: center top;
-  opacity: .12;
+  opacity: .45;
   transition: opacity .3s;
 }
-.lenda-card:hover .lenda-card-wallpaper { opacity: .18; }
+.lenda-card:hover .lenda-card-wallpaper { opacity: .6; }
 
 /* GIF overlay para poder */
 .lenda-card-gif {
@@ -1656,9 +1656,9 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .lenda-card-overlay {
   position: absolute; inset: 0; z-index: 2;
   background: linear-gradient(to bottom,
-    rgba(8,6,12,.55) 0%,
-    rgba(8,6,12,.7) 50%,
-    rgba(8,6,12,.95) 100%
+    rgba(8,6,12,.38) 0%,
+    rgba(8,6,12,.62) 45%,
+    rgba(8,6,12,.92) 100%
   );
 }
 
@@ -2497,6 +2497,22 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-tecnica-desc { font-size: .85rem; color: var(--text-muted); line-height: 1.6; }
 .livro-tecnica-efeito { font-size: .8rem; color: var(--text-muted); margin-top: .4rem; opacity: .85; }
 .livro-suprema { color: #f0d0a0; }
+
+/* ── RANKING (aba Ranking) ── */
+.livro-ranking-resumo { text-align: center; padding: 1rem 0; }
+.livro-ranking-posicao { display: flex; align-items: baseline; justify-content: center; gap: .6rem; margin-bottom: .6rem; }
+.livro-ranking-numero { font-family: 'Playfair Display', serif; font-size: 2.4rem; color: var(--gold-light); text-shadow: 0 0 20px rgba(224,188,74,.3); }
+.livro-ranking-total { font-size: .85rem; color: var(--text-muted); }
+.livro-ranking-score { font-size: .85rem; color: var(--text-muted); }
+.livro-ranking-score strong { color: var(--accent-light); }
+.livro-ranking-chips { display: flex; gap: .4rem; justify-content: center; flex-wrap: wrap; margin-top: .75rem; }
+.livro-ranking-destaque {
+  margin-top: 1rem; text-align: center; font-size: .85rem; color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center; gap: .35rem; flex-wrap: wrap;
+}
+.livro-ranking-destaque strong { color: var(--gold-light); font-family: 'Playfair Display', serif; }
+.livro-ranking-destaque-pos { color: var(--accent-light); }
+@media (max-width:640px) { .livro-ranking-numero { font-size: 2rem; } }
 
 /* ── FAIXA DE PRESTÍGIO (topo do Grimório) ──
    Surfacing imediato de poder/posição — o "momento de prestígio" que o
@@ -7358,6 +7374,8 @@ function abrirPerfilPublico(f) {
         <button class="livro-tab-btn" data-tab="poder" onclick="_mudarAbaLivro('poder',this)" role="tab" aria-selected="false">${icone('bolt','ic-sm')} Poder</button>
         <button class="livro-tab-btn" data-tab="sobre" onclick="_mudarAbaLivro('sobre',this)" role="tab" aria-selected="false">${icone('scroll','ic-sm')} Sobre</button>
         <button class="livro-tab-btn" data-tab="publicacoes" onclick="_mudarAbaLivro('publicacoes',this)" role="tab" aria-selected="false">${icone('banner','ic-sm')} Publicações</button>
+        <button class="livro-tab-btn" data-tab="ranking" onclick="_mudarAbaLivro('ranking',this)" role="tab" aria-selected="false">${icone('lendas','ic-sm')} Ranking</button>
+        <button class="livro-tab-btn" data-tab="usuario" onclick="_mudarAbaLivro('usuario',this)" role="tab" aria-selected="false">${icone('ficha','ic-sm')} Usuário</button>
       </div>
 
       <div class="livro-body">
@@ -7383,17 +7401,6 @@ function abrirPerfilPublico(f) {
           <div class="livro-section" id="livro-galeria-section" style="display:none">
             <div class="livro-section-title">${icone('camera','ic-sm')} Galeria</div>
             <div class="livro-galeria" id="livro-galeria-fotos"></div>
-          </div>
-
-          <!-- Jogador por trás do Desperto (antes era a aba "Usuário").
-               IDs preservados — _carregarAbaUsuario() preenche por ID. -->
-          <div class="livro-section">
-            <div class="livro-section-title">${icone('ficha','ic-sm')} O Jogador</div>
-            <div id="usuario-perfil-area"><span class="livro-area-empty">Carregando…</span></div>
-          </div>
-          <div class="livro-section">
-            <div class="livro-section-title">${icone('banner','ic-sm')} Personagens Vinculados</div>
-            <div id="usuario-personagens-vinculados"><span class="livro-area-empty">Carregando…</span></div>
           </div>
         </div>
 
@@ -7514,6 +7521,35 @@ function abrirPerfilPublico(f) {
           </div>
         </div>
 
+        <!-- ═══ ABA: RANKING — posição no Livro das Lendas ═══ -->
+        <div class="livro-tab-pane" id="livro-pane-ranking">
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('lendas','ic-sm')} Posição no Ranking</div>
+            <div id="livro-ranking-resumo" class="livro-ranking-resumo">
+              <span class="livro-area-empty">Calculando posição...</span>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:1rem">
+            <button onclick="document.getElementById('livro-overlay').remove();navTo('secao-ranking')"
+              style="background:var(--deep-t12);border:1px solid var(--accent-t40);color:var(--accent-light);padding:.55rem 1.2rem;font-family:inherit;font-size:.83rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:all .2s"
+              onmouseover="this.style.background='rgba(var(--deep-rgb), .25)'" onmouseout="this.style.background='var(--deep-t12)'">
+              ${icone('lendas','ic-sm')} Ver Livro das Lendas completo
+            </button>
+          </div>
+        </div>
+
+        <!-- ═══ ABA: USUÁRIO — o jogador real por trás do personagem ═══ -->
+        <div class="livro-tab-pane" id="livro-pane-usuario">
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('ficha','ic-sm')} O Jogador</div>
+            <div id="usuario-perfil-area"><span class="livro-area-empty">Carregando...</span></div>
+          </div>
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('banner','ic-sm')} Personagens Vinculados</div>
+            <div id="usuario-personagens-vinculados"><span class="livro-area-empty">Carregando...</span></div>
+          </div>
+        </div>
+
         <!-- Rodapé épico -->
         <div class="livro-footer">
           ${icone(temaInfo.ic||'moon','ic-sm')} GRIMÓRIO DOS DESPERTOS • Crônicas das Torres ${icone(temaInfo.ic||'moon','ic-sm')}
@@ -7579,14 +7615,36 @@ function _carregarResumoRankingLivro(f) {
   if (scoreEl && scoreVal){ scoreVal.textContent = f.score ?? (ordenados[idx].score || 0); scoreEl.style.display = ''; }
 
   // Linha extra: atributo mais forte (sensação de "build" de jogo competitivo)
-  // + atalho para o Livro das Lendas completo (substitui a antiga aba Ranking).
+  // + atalho para o Livro das Lendas completo.
+  const destaque = _calcularDestaqueAtributoLivro(f, fonte);
   const extra = document.getElementById('livro-prestige-extra');
   if (extra) {
-    const destaque = _calcularDestaqueAtributoLivro(f, fonte);
     extra.innerHTML = `
       ${destaque ? `<span>${icone(destaque.ic,'ic-sm')} Mais forte em <strong>${destaque.nome}</strong> <span class="pos">#${destaque.posicao} de ${destaque.total}</span></span>` : ''}
       <a class="livro-prestige-link" onclick="document.getElementById('livro-overlay').remove();navTo('secao-ranking')">${icone('lendas','ic-sm')} Ver Livro das Lendas completo</a>`;
     extra.style.display = '';
+  }
+
+  // Aba "Ranking" (restaurada): visão detalhada com chips e destaque de atributo.
+  const container = document.getElementById('livro-ranking-resumo');
+  if (container) {
+    const chips = [
+      { ic: 'heart', val: f.curtidas ?? 0, label: (f.curtidas === 1 ? 'Curtida' : 'Curtidas') },
+      { ic: 'core',  val: f.nucleos ?? 0,  label: (f.nucleos === 1 ? 'Núcleo' : 'Núcleos') },
+      { ic: 'medal', val: f.vitorias ?? 0, label: (f.vitorias === 1 ? 'Vitória' : 'Vitórias') },
+    ].map(c => `<span class="lenda-meta-chip">${icone(c.ic,'ic-sm')} ${c.val} ${c.label}</span>`).join('');
+    container.innerHTML = `
+      <div class="livro-ranking-posicao">
+        <span class="livro-ranking-numero">#${posicao}</span>
+        <span class="livro-ranking-total">de ${total} Despertos</span>
+      </div>
+      <div class="livro-ranking-score">${icone('core','ic-sm')} Pontuação: <strong>${f.score ?? (ordenados[idx].score || 0)}</strong></div>
+      <div class="livro-ranking-chips">${chips}</div>
+      ${destaque ? `
+      <div class="livro-area-card livro-ranking-destaque">
+        ${icone(destaque.ic,'ic-sm')} Atributo mais forte: <strong>${destaque.nome} (${destaque.valor})</strong>
+        — <span class="livro-ranking-destaque-pos">#${destaque.posicao} de ${destaque.total}</span> nesse atributo
+      </div>` : ''}`;
   }
 }
 
