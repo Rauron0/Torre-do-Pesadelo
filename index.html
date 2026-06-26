@@ -416,7 +416,7 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 
 /* LOGIN */
 #login-screen { position:fixed; inset:0; z-index:1000; background:radial-gradient(ellipse at 30% 40%,#1a0a0a 0%,#0c0c0f 60%); display:flex; align-items:center; justify-content:center; flex-direction:column; padding:1.5rem; }
-.login-ornament { font-family:'Playfair Display',serif; font-size:.75rem; letter-spacing:5px; text-transform:uppercase; color:var(--accent-light); margin-bottom:.5rem; }
+.login-ornament { font-family:'Playfair Display',serif; font-size:.72rem; letter-spacing:5px; text-transform:uppercase; color:var(--accent-light); margin-bottom:.5rem; }
 .login-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,6vw,3.2rem); color:#f0f0f5; letter-spacing:-1px; text-align:center; margin-bottom:.25rem; }
 .login-subtitle { font-size:.85rem; color:var(--text-muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:2.5rem; }
 .login-box {
@@ -436,7 +436,7 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 .login-btn:hover { background:var(--accent-light); }
 .login-error { color:var(--accent-text); font-size:.85rem; margin-top:.75rem; text-align:center; display:none; }
 .login-footer { margin-top:1.5rem; font-size:.78rem; color:#555; text-align:center; letter-spacing:1px; }
-.login-obs-btn { margin-top:1rem; background:none; border:1px solid var(--border); color:var(--text-muted); padding:.5rem 1.5rem; font-family:inherit; font-size:.82rem; cursor:pointer; transition:all .2s; letter-spacing:1px; }
+.login-obs-btn { margin-top:1rem; background:none; border:1px solid var(--border); color:var(--text-muted); padding:.5rem 1.5rem; font-family:inherit; font-size:.82rem; cursor:pointer; transition:all .2s; letter-spacing:1px; min-width:15rem; max-width:90vw; text-align:center; box-sizing:border-box; border-radius:var(--r-sm); }
 .login-obs-btn:hover { border-color:var(--accent-light); color:var(--accent-light); }
 
 /* LAYOUT */
@@ -517,9 +517,9 @@ button { transition: transform var(--dur-fast) var(--ease), filter var(--dur-fas
 main { padding:2rem 2rem 6rem; max-width:100%; box-sizing:border-box; overflow-x:hidden; }
 
 /* HERO */
-.hero { min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3rem 1rem; border-bottom:1px solid var(--border); background:radial-gradient(ellipse at 50% 0%,var(--deep-t08) 0%,transparent 60%); }
-.hero-eyebrow { font-size:.72rem; letter-spacing:5px; text-transform:uppercase; color:var(--accent-light); margin-bottom:1rem; }
-.hero-title { font-family:'Playfair Display',serif; font-size:clamp(2.8rem,8vw,5rem); letter-spacing:-2px; color:#f5f5f7; line-height:1.05; margin-bottom:.5rem; }
+.hero { min-height:80vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3rem 1rem; position:relative; border-bottom:1px solid var(--deep-t20); background:radial-gradient(ellipse at 50% -10%, rgba(var(--deep-rgb), .14) 0%, rgba(80,20,40,.06) 50%, transparent 75%); }
+.hero-eyebrow { font-family:'Playfair Display',serif; font-size:.72rem; letter-spacing:5px; text-transform:uppercase; color:var(--accent-light); margin-bottom:1rem; }
+.hero-title { font-family:'Playfair Display',serif; font-size:clamp(2.8rem,8vw,5rem); letter-spacing:-2px; color:#f5f5f7; line-height:1.05; margin-bottom:.5rem; text-shadow:0 4px 20px rgba(0,0,0,.9), 0 0 40px var(--deep-t12); }
 .hero-subtitle { font-size:1rem; color:var(--silver); letter-spacing:3px; text-transform:uppercase; margin-bottom:2rem; }
 .hero-tags { display:flex; gap:.75rem; flex-wrap:wrap; justify-content:center; margin-bottom:2.5rem; }
 .hero-tag { border:1px solid var(--border); padding:.35rem .9rem; font-size:.78rem; color:var(--text-muted); letter-spacing:1px; }
@@ -1499,6 +1499,17 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   letter-spacing: 2px; padding: .4rem 0 .6rem;
   opacity: .7;
 }
+/* Affordance de rolagem: um leve fade na borda direita sinaliza que há
+   mais abas além da área visível (importante no mobile, onde as 6 abas
+   não cabem na largura da tela). Em telas largas, onde tudo cabe, o fade
+   fica sobre espaço vazio e some — sem custo. */
+.lendas-tabs-wrap { position: relative; }
+.lendas-tabs-wrap::after {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 2.75rem; height: 2.5rem;
+  pointer-events: none; z-index: 2;
+  background: linear-gradient(to right, rgba(10,9,13,0), var(--bg));
+}
 
 /* Loading state */
 .lendas-loading {
@@ -2427,7 +2438,6 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
     min-height: 44px; /* alvo de toque confortável */
   }
   .livro-tecnica-header { flex-direction: column; align-items: flex-start; gap: .15rem; }
-  .livro-ranking-numero { font-size: 2rem; }
 }
 
 /* ── CORPO DO LIVRO ── */
@@ -2488,20 +2498,62 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 .livro-tecnica-efeito { font-size: .8rem; color: var(--text-muted); margin-top: .4rem; opacity: .85; }
 .livro-suprema { color: #f0d0a0; }
 
-/* ── RANKING (aba Ranking) ── */
-.livro-ranking-resumo { text-align: center; padding: 1rem 0; }
-.livro-ranking-posicao { display: flex; align-items: baseline; justify-content: center; gap: .6rem; margin-bottom: .6rem; }
-.livro-ranking-numero { font-family: 'Playfair Display', serif; font-size: 2.4rem; color: var(--gold-light); text-shadow: 0 0 20px rgba(224,188,74,.3); }
-.livro-ranking-total { font-size: .85rem; color: var(--text-muted); }
-.livro-ranking-score { font-size: .85rem; color: var(--text-muted); }
-.livro-ranking-score strong { color: var(--accent-light); }
-.livro-ranking-chips { display: flex; gap: .4rem; justify-content: center; flex-wrap: wrap; margin-top: .75rem; }
-.livro-ranking-destaque {
-  margin-top: 1rem; text-align: center; font-size: .85rem; color: var(--text-muted);
-  display: flex; align-items: center; justify-content: center; gap: .35rem; flex-wrap: wrap;
+/* ── FAIXA DE PRESTÍGIO (topo do Grimório) ──
+   Surfacing imediato de poder/posição — o "momento de prestígio" que o
+   jogador vê assim que abre o perfil, sem precisar trocar de aba.
+   Estilo: selo de leaderboard (números grandes em Playfair, posição em
+   dourado com leve brilho), mantendo a identidade sangue/ouro do sistema. */
+.livro-prestige {
+  display: flex; align-items: stretch; justify-content: center;
+  flex-wrap: wrap;
+  padding: .9rem 1.5rem 1.05rem;
+  background: linear-gradient(180deg, rgba(var(--deep-rgb), .12), rgba(var(--deep-rgb), 0));
+  border-bottom: 1px solid rgba(var(--accent-rgb), .18);
 }
-.livro-ranking-destaque strong { color: var(--gold-light); font-family: 'Playfair Display', serif; }
-.livro-ranking-destaque-pos { color: var(--accent-light); }
+.livro-prestige-stat {
+  flex: 1 1 0; min-width: 70px;
+  display: flex; flex-direction: column; align-items: center; gap: .18rem;
+  padding: 0 .9rem; text-align: center; position: relative;
+}
+.livro-prestige-stat + .livro-prestige-stat::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%); width: 1px; height: 58%;
+  background: linear-gradient(to bottom, transparent, rgba(var(--accent-rgb), .28), transparent);
+}
+.livro-prestige-val {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.35rem, 5vw, 1.7rem); line-height: 1; color: #f0ecf7;
+  text-shadow: 0 2px 18px rgba(0,0,0,.8);
+}
+.livro-prestige-stat.rank .livro-prestige-val {
+  color: var(--gold-light); text-shadow: 0 0 22px rgba(224,188,74,.32);
+}
+.livro-prestige-label {
+  font-size: .6rem; letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--text-faint);
+}
+.livro-prestige-extra {
+  text-align: center; padding: .55rem 1.25rem 0;
+  display: flex; flex-direction: column; align-items: center; gap: .3rem;
+  font-size: .76rem; color: var(--text-muted);
+}
+.livro-prestige-extra strong { color: var(--gold-light); font-family: 'Playfair Display', serif; }
+.livro-prestige-extra .pos { color: var(--accent-light); }
+.livro-prestige-link {
+  color: var(--accent-light); cursor: pointer; font-size: .76rem;
+  display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .2rem;
+  text-decoration: none; border-bottom: 1px solid transparent; transition: border-color .2s;
+}
+.livro-prestige-link:hover { border-bottom-color: var(--accent-t40); }
+@media (max-width:640px) {
+  .livro-prestige { padding: .8rem .75rem .95rem; }
+  .livro-prestige-stat { padding: 0 .5rem; min-width: 62px; }
+}
+
+/* Estado de carregamento do botão de curtir — substitui o texto "Carregando…"
+   por um marcador discreto que não compete com o conteúdo do perfil. */
+.curtir-skeleton { opacity: .45; letter-spacing: 1px; }
+
 .livro-section-title::after {
   content: ''; flex: 1; height: 1px;
   background: linear-gradient(to right, var(--accent-t40), transparent);
@@ -3250,24 +3302,19 @@ th {
 tr:hover td { background: rgba(var(--deep-rgb), .1) !important; }
 .table-wrapper { border: 1px solid rgba(85,65,105,.6) !important; box-shadow: 0 2px 12px rgba(0,0,0,.3); }
 
-/* --- Hero: névoa e glow sangue --- */
-.hero {
-  background: radial-gradient(ellipse at 50% -10%, rgba(var(--deep-rgb), .14) 0%, rgba(80,20,40,.06) 50%, transparent 75%) !important;
-  border-bottom: 1px solid var(--deep-t20) !important;
-  position: relative;
-}
+/* --- Hero: névoa e glow sangue (mesclado na regra .hero base, sem !important) --- */
 
 /* --- Login screen: mais atmosférico --- */
 #login-screen {
-  background: radial-gradient(ellipse at 30% 35%, #1a0505 0%, #0c0810 50%, #060408 100%) !important;
+  background: radial-gradient(ellipse at 30% 35%, #1a0505 0%, #0c0810 50%, #060408 100%);
 }
 .login-box {
-  background: linear-gradient(160deg, #111018, #0d0b12) !important;
-  border: 1px solid rgba(60,45,70,.6) !important;
+  background: linear-gradient(160deg, #111018, #0d0b12);
+  border: 1px solid rgba(60,45,70,.6);
   box-shadow: 0 8px 40px rgba(0,0,0,.7), 0 0 60px rgba(var(--deep-rgb), .06);
 }
 .login-box::before {
-  background: linear-gradient(to right, transparent, var(--accent-light), transparent) !important;
+  background: linear-gradient(to right, transparent, var(--accent-light), transparent);
   opacity: .7;
 }
 
@@ -3310,7 +3357,7 @@ tr:hover td { background: rgba(var(--deep-rgb), .1) !important; }
 
 /* --- GM header dourado --- */
 .gm-header {
-  background: linear-gradient(135deg, #1a1200, #0e0c14) !important;
+  background: linear-gradient(135deg, #1a1200, #0e0c14);
   box-shadow: 0 4px 24px rgba(0,0,0,.5), 0 0 40px rgba(180,140,30,.04);
 }
 
@@ -3383,20 +3430,17 @@ main { position: relative; z-index: 1; }
 
 /* --- Divisor temático --- */
 .divider {
-  background: linear-gradient(to right, transparent, var(--accent), var(--deep-t30), transparent) !important;
-  opacity: .5 !important;
-  height: 1px !important;
+  background: linear-gradient(to right, transparent, var(--accent), var(--deep-t30), transparent);
+  opacity: .5;
+  height: 1px;
 }
 
 /* --- Títulos mais imponentes --- */
 h1, h2 {
   text-shadow: 0 2px 12px rgba(0,0,0,.8), 0 0 30px var(--deep-t08);
 }
-.hero-title {
-  text-shadow: 0 4px 20px rgba(0,0,0,.9), 0 0 40px var(--deep-t12) !important;
-}
 .login-title {
-  text-shadow: 0 0 30px rgba(var(--accent-rgb), .3), 0 4px 16px rgba(0,0,0,.8) !important;
+  text-shadow: 0 0 30px rgba(var(--accent-rgb), .3), 0 4px 16px rgba(0,0,0,.8);
 }
 
 /* --- Borda gótica nos modais --- */
@@ -3966,11 +4010,11 @@ main { margin-left: auto !important; margin-right: auto !important; max-width: 1
 #landing-screen {
   position: fixed; inset: 0; z-index: 2000;
   display: flex; align-items: center; justify-content: center; flex-direction: column;
-  background: radial-gradient(ellipse at 30% 40%, #1a0a0a 0%, #0c0c0f 60%);
+  background: radial-gradient(ellipse at 30% 35%, #1a0505 0%, #0c0810 50%, #060408 100%);
 }
-.landing-portal { font-size:.7rem; letter-spacing:4px; text-transform:uppercase; color:var(--accent-light); margin-bottom:.75rem; }
-.landing-title { font-family:'Playfair Display',serif; font-size:clamp(2.2rem,6vw,3.5rem); color:#f0f0f5; letter-spacing:-1px; text-align:center; margin-bottom:.4rem; }
-.landing-sub { font-size:.82rem; color:var(--text-muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:3rem; }
+.landing-portal { font-family:'Playfair Display',serif; font-size:.72rem; letter-spacing:5px; text-transform:uppercase; color:var(--accent-light); margin-bottom:.75rem; }
+.landing-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,6vw,3.2rem); color:#f0f0f5; letter-spacing:-1px; text-align:center; margin-bottom:.4rem; text-shadow:0 0 30px rgba(var(--accent-rgb), .3), 0 4px 16px rgba(0,0,0,.8); }
+.landing-sub { font-size:.85rem; color:var(--text-muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:2.75rem; }
 .landing-cards { display:flex; gap:1.25rem; flex-wrap:wrap; justify-content:center; margin-bottom:2rem; }
 .landing-card {
   background:var(--bg-surface); border:1px solid var(--border-strong);
@@ -4428,7 +4472,7 @@ body:has(#livro-jogador[style*="display: block"]) .tp-eye {
 </div>
 
 <!-- CADASTRO -->
-<div id="cadastro-screen" style="display:none; position:fixed; inset:0; z-index:1000; background:radial-gradient(ellipse at 30% 40%,#1a0a0a 0%,#0c0c0f 60%); align-items:center; justify-content:center; flex-direction:column;">
+<div id="cadastro-screen" style="display:none; position:fixed; inset:0; z-index:1000; background:radial-gradient(ellipse at 30% 35%,#1a0505 0%,#0c0810 50%,#060408 100%); align-items:center; justify-content:center; flex-direction:column;">
   <div class="login-ornament">Portal Oficial</div>
   <h1 class="login-title">Torre do Pesadelo</h1>
   <p class="login-subtitle">Criar Novo Acesso</p>
@@ -5709,6 +5753,9 @@ function mudarAbaRanking(aba, btn) {
   _abaAtual = aba;
   document.querySelectorAll('.lendas-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
+  // Centraliza a aba ativa na faixa rolável (conforto no mobile, onde as
+  // abas extrapolam a largura da tela).
+  try { btn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); } catch(e) {}
   const label = document.getElementById('lendas-tab-label');
   if (label) label.textContent = ABA_LABELS[aba] || '';
   renderizarCartoes(_lendasFichas, aba);
@@ -5850,10 +5897,10 @@ function renderizarCartoes(fichas, aba) {
         ${wp ? `<div class="lenda-card-wallpaper" style="background-image:url('${wp.url}')"></div>` : ''}
         ${p.gifPoder ? `<div class="lenda-card-gif"><img src="${_escUrl(p.gifPoder)}" alt="" onerror="this.style.display='none'"></div>` : ''}
         <div class="lenda-card-overlay"></div>
+        <span class="lenda-card-rank ${posClass}">${posLabel}</span>
+        ${f.faccao ? `<span class="lenda-card-faccao-badge">${_escHtml(f.faccao)}</span>` : ''}
+        <div class="lenda-avatar-wrap">${avatarHtml}</div>
         <div class="lenda-card-body">
-          <span class="lenda-card-rank ${posClass}">${posLabel}</span>
-          ${f.faccao ? `<span class="lenda-card-faccao-badge">${_escHtml(f.faccao)}</span>` : ''}
-          <div class="lenda-avatar-wrap">${avatarHtml}</div>
           <div class="lenda-nome">${_escHtml(f.nome)}</div>
           ${f.alcunha ? `<div class="lenda-alcunha">"${_escHtml(f.alcunha)}"</div>` : ''}
           ${f.classe ? `<div class="lenda-classe">${_escHtml(f.classe)}</div>` : ''}
@@ -7181,8 +7228,8 @@ function abrirPerfilPublico(f) {
   if (f.cidade)    tags.push(`<span class="livro-tag"><svg class="ic ic-sm"><use href="#ic-eye"/></svg> ${_escHtml(f.cidade)}</span>`);
   if (f.genero)    tags.push(`<span class="livro-tag">${_escHtml(f.genero)}</span>`);
   if (f.idade)     tags.push(`<span class="livro-tag">${_escHtml(f.idade)}</span>`);
-  tags.push(`<span class="livro-tag nivel">Nível ${f.nivel}</span>`);
-  if (f.nucleos)   tags.push(`<span class="livro-tag">◆ ${f.nucleos} núcleos</span>`);
+  // Nível e núcleos saíram das tags: agora vivem na Faixa de Prestígio (números
+  // grandes no topo), evitando repetir a mesma informação em dois lugares.
 
   // Timeline
   const timelineArr = linhas(f.socTimeline);
@@ -7270,24 +7317,47 @@ function abrirPerfilPublico(f) {
           <!-- Sistema de Likes -->
           <div class="livro-likes-row">
             <button id="btn-curtir" class="btn-curtir-perfil${_perfilEhProprio ? ' is-own' : ''}" ${_perfilEhProprio ? '' : `onclick="alternarCurtida('${pid}','${f.user}','${_nomePersonagemEscapado}')"`}>
-              ${icone('heart','ic-sm')} Carregando…
+              ${icone('heart','ic-sm')} <span class="curtir-skeleton">···</span>
             </button>
             <a onclick="abrirListaCurtidas('${pid}')" class="link-ver-curtidas">Ver quem curtiu</a>
           </div>
         </div>
       </div>
 
+      <!-- ═══ FAIXA DE PRESTÍGIO — poder/posição visíveis na hora ═══ -->
+      <!-- Posição e Pontuação são preenchidas por _carregarResumoRankingLivro()
+           quando o ranking já está em cache; se não, a faixa mostra só Nível e
+           Núcleos (estado válido, nunca "quebrado"). -->
+      <div class="livro-prestige" id="livro-prestige">
+        <div class="livro-prestige-stat rank" id="livro-prestige-pos" style="display:none">
+          <span class="livro-prestige-val" id="livro-prestige-pos-val">—</span>
+          <span class="livro-prestige-label">Posição</span>
+        </div>
+        <div class="livro-prestige-stat">
+          <span class="livro-prestige-val">${f.nivel}</span>
+          <span class="livro-prestige-label">Nível</span>
+        </div>
+        <div class="livro-prestige-stat">
+          <span class="livro-prestige-val">${f.nucleos || 0}</span>
+          <span class="livro-prestige-label">Núcleos</span>
+        </div>
+        <div class="livro-prestige-stat" id="livro-prestige-score" style="display:none">
+          <span class="livro-prestige-val" id="livro-prestige-score-val">—</span>
+          <span class="livro-prestige-label">Pontuação</span>
+        </div>
+      </div>
+      <div class="livro-prestige-extra" id="livro-prestige-extra" style="display:none"></div>
+
       <!-- ═══ CORPO DO GRIMÓRIO — SISTEMA DE ABAS ═══ -->
-      <!-- Substitui a rolagem longa anterior por 5 abas, reduzindo a
-           poluição visual e deixando o personagem (não o texto) como
-           foco imediato ao abrir o Grimório. -->
+      <!-- 4 abas: Perfil, Poder, Sobre, Publicações. A antiga aba "Ranking"
+           virou a Faixa de Prestígio acima; a antiga aba "Usuário" foi
+           dobrada no fim da aba Perfil (contexto do jogador é secundário ao
+           personagem). Menos abas = menos rolagem horizontal no mobile. -->
       <div class="livro-tabs-nav" role="tablist">
         <button class="livro-tab-btn active" data-tab="perfil" onclick="_mudarAbaLivro('perfil',this)" role="tab" aria-selected="true">${icone('ficha','ic-sm')} Perfil</button>
         <button class="livro-tab-btn" data-tab="poder" onclick="_mudarAbaLivro('poder',this)" role="tab" aria-selected="false">${icone('bolt','ic-sm')} Poder</button>
         <button class="livro-tab-btn" data-tab="sobre" onclick="_mudarAbaLivro('sobre',this)" role="tab" aria-selected="false">${icone('scroll','ic-sm')} Sobre</button>
         <button class="livro-tab-btn" data-tab="publicacoes" onclick="_mudarAbaLivro('publicacoes',this)" role="tab" aria-selected="false">${icone('banner','ic-sm')} Publicações</button>
-        <button class="livro-tab-btn" data-tab="ranking" onclick="_mudarAbaLivro('ranking',this)" role="tab" aria-selected="false">${icone('lendas','ic-sm')} Ranking</button>
-        <button class="livro-tab-btn" data-tab="usuario" onclick="_mudarAbaLivro('usuario',this)" role="tab" aria-selected="false">${icone('ficha','ic-sm')} Usuário</button>
       </div>
 
       <div class="livro-body">
@@ -7313,6 +7383,17 @@ function abrirPerfilPublico(f) {
           <div class="livro-section" id="livro-galeria-section" style="display:none">
             <div class="livro-section-title">${icone('camera','ic-sm')} Galeria</div>
             <div class="livro-galeria" id="livro-galeria-fotos"></div>
+          </div>
+
+          <!-- Jogador por trás do Desperto (antes era a aba "Usuário").
+               IDs preservados — _carregarAbaUsuario() preenche por ID. -->
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('ficha','ic-sm')} O Jogador</div>
+            <div id="usuario-perfil-area"><span class="livro-area-empty">Carregando…</span></div>
+          </div>
+          <div class="livro-section">
+            <div class="livro-section-title">${icone('banner','ic-sm')} Personagens Vinculados</div>
+            <div id="usuario-personagens-vinculados"><span class="livro-area-empty">Carregando…</span></div>
           </div>
         </div>
 
@@ -7425,41 +7506,11 @@ function abrirPerfilPublico(f) {
           </div>
         </div>
 
-        <!-- ═══ ABA: RANKING — Integração com o Livro das Lendas ═══ -->
         <!-- ═══ ABA: PUBLICAÇÕES — feed de posts do personagem, com likes e comentários ═══ -->
         <div class="livro-tab-pane" id="livro-pane-publicacoes">
           <div id="publicacoes-composer-area"></div>
           <div id="publicacoes-feed" class="livro-section">
             <span class="livro-area-empty">Carregando publicações…</span>
-          </div>
-        </div>
-
-        <div class="livro-tab-pane" id="livro-pane-ranking">
-          <div class="livro-section">
-            <div class="livro-section-title">${icone('lendas','ic-sm')} Posição no Ranking</div>
-            <div id="livro-ranking-resumo" class="livro-ranking-resumo">
-              <span class="livro-area-empty">Calculando posição...</span>
-            </div>
-          </div>
-          <div style="text-align:center;margin-top:1rem">
-            <button onclick="document.getElementById('livro-overlay').remove();navTo('secao-ranking')"
-              style="background:var(--deep-t12);border:1px solid var(--accent-t40);color:var(--accent-light);padding:.55rem 1.2rem;font-family:inherit;font-size:.83rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:all .2s"
-              onmouseover="this.style.background='rgba(var(--deep-rgb), .25)'" onmouseout="this.style.background='var(--deep-t12)'">
-              ${icone('lendas','ic-sm')} Ver Livro das Lendas completo
-            </button>
-          </div>
-        </div>
-
-        <!-- ═══ ABA: USUÁRIO — o jogador real por trás do personagem, não o personagem ═══ -->
-        <div class="livro-tab-pane" id="livro-pane-usuario">
-          <div id="usuario-perfil-area" class="livro-section">
-            <span class="livro-area-empty">Carregando...</span>
-          </div>
-          <div class="livro-section">
-            <div class="livro-section-title">${icone('banner','ic-sm')} Personagens Vinculados</div>
-            <div id="usuario-personagens-vinculados">
-              <span class="livro-area-empty">Carregando...</span>
-            </div>
           </div>
         </div>
 
@@ -7505,48 +7556,38 @@ function _mudarAbaLivro(aba, btn) {
 // Calcula e exibe a posição do personagem no ranking geral, dentro da
 // própria aba "Ranking" do Grimório — usa o cache já carregado em
 // _lendasFichas quando disponível, evitando nova leitura ao Firestore.
+// Enriquece a Faixa de Prestígio com a posição no ranking, a pontuação e o
+// atributo mais forte do personagem. Roda após a montagem do perfil, usando o
+// cache _lendasFichas já carregado. Se o cache não existir (perfil aberto sem
+// passar pelo Livro das Lendas), a faixa permanece com Nível/Núcleos — um
+// estado válido, nunca quebrado.
 function _carregarResumoRankingLivro(f) {
-  const container = document.getElementById('livro-ranking-resumo');
-  if (!container) return;
   const fonte = (_lendasFichas && _lendasFichas.length) ? _lendasFichas : null;
-  if (!fonte) {
-    container.innerHTML = `<span class="livro-area-empty">Abra o Livro das Lendas para ver o ranking completo.</span>`;
-    return;
-  }
+  if (!fonte) return;
   const ordenados = [...fonte].sort((a,b) => (b.score||0) - (a.score||0));
   const idx = ordenados.findIndex(x => x.user === f.user && x.nomePersonagem === f.nomePersonagem);
-  if (idx === -1) {
-    container.innerHTML = `<span class="livro-area-empty">Personagem ainda não indexado no ranking.</span>`;
-    return;
-  }
+  if (idx === -1) return; // personagem ainda não indexado — faixa fica como está
   const posicao = idx + 1;
   const total = ordenados.length;
 
-  // ── Chips de estatísticas rápidas — mesma classe .lenda-meta-chip já
-  // usada nos cards do Livro das Lendas, pra manter a identidade visual.
-  const chips = [
-    { ic: 'heart',     val: f.curtidas ?? 0,  label: f.curtidas === 1 ? 'Curtida' : 'Curtidas' },
-    { ic: 'core',      val: f.nucleos ?? 0,   label: f.nucleos === 1 ? 'Núcleo' : 'Núcleos' },
-    { ic: 'medal',     val: f.vitorias ?? 0,  label: f.vitorias === 1 ? 'Vitória' : 'Vitórias' },
-  ].map(c => `<span class="lenda-meta-chip">${icone(c.ic,'ic-sm')} ${c.val} ${c.label}</span>`).join('');
+  // Pilares numéricos da faixa: revela Posição e Pontuação (antes ocultos).
+  const posEl   = document.getElementById('livro-prestige-pos');
+  const posVal  = document.getElementById('livro-prestige-pos-val');
+  const scoreEl = document.getElementById('livro-prestige-score');
+  const scoreVal= document.getElementById('livro-prestige-score-val');
+  if (posEl && posVal)   { posVal.textContent = '#' + posicao; posEl.style.display = ''; }
+  if (scoreEl && scoreVal){ scoreVal.textContent = f.score ?? (ordenados[idx].score || 0); scoreEl.style.display = ''; }
 
-  // ── Destaque de atributo: em qual atributo este personagem é mais forte,
-  // e em que posição ele fica especificamente NESSE atributo (não no geral).
-  // Dá a mesma sensação de "build" que rankings de jogos competitivos têm.
-  const destaque = _calcularDestaqueAtributoLivro(f, fonte);
-
-  container.innerHTML = `
-    <div class="livro-ranking-posicao">
-      <span class="livro-ranking-numero">#${posicao}</span>
-      <span class="livro-ranking-total">de ${total} Despertos</span>
-    </div>
-    <div class="livro-ranking-score">${icone('core','ic-sm')} Pontuação: <strong>${f.score ?? (ordenados[idx].score || 0)}</strong></div>
-    <div class="livro-ranking-chips">${chips}</div>
-    ${destaque ? `
-    <div class="livro-area-card livro-ranking-destaque">
-      ${icone(destaque.ic,'ic-sm')} Atributo mais forte: <strong>${destaque.nome} (${destaque.valor})</strong>
-      — <span class="livro-ranking-destaque-pos">#${destaque.posicao} de ${destaque.total}</span> nesse atributo
-    </div>` : ''}`;
+  // Linha extra: atributo mais forte (sensação de "build" de jogo competitivo)
+  // + atalho para o Livro das Lendas completo (substitui a antiga aba Ranking).
+  const extra = document.getElementById('livro-prestige-extra');
+  if (extra) {
+    const destaque = _calcularDestaqueAtributoLivro(f, fonte);
+    extra.innerHTML = `
+      ${destaque ? `<span>${icone(destaque.ic,'ic-sm')} Mais forte em <strong>${destaque.nome}</strong> <span class="pos">#${destaque.posicao} de ${destaque.total}</span></span>` : ''}
+      <a class="livro-prestige-link" onclick="document.getElementById('livro-overlay').remove();navTo('secao-ranking')">${icone('lendas','ic-sm')} Ver Livro das Lendas completo</a>`;
+    extra.style.display = '';
+  }
 }
 
 // Em qual dos 6 atributos este personagem tem o maior valor, e em que
