@@ -1629,7 +1629,7 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   box-shadow: 0 12px 40px rgba(0,0,0,.7), 0 0 30px var(--deep-t12);
 }
 
-/* WALLPAPER do cartão */
+/* WALLPAPER do cartão (capa) */
 .lenda-card-wallpaper {
   position: absolute; inset: 0; z-index: 0;
   background-size: cover; background-position: center top;
@@ -1638,19 +1638,33 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 }
 .lenda-card:hover .lenda-card-wallpaper { opacity: .6; }
 
-/* GIF overlay para poder */
-.lenda-card-gif {
+/* GIF de poder — efeito de fundo restrito à ÁREA DA CAPA. Antes ele cobria
+   o cartão inteiro (inset:0) e "vazava" por trás da foto principal, competindo
+   com ela. Agora fica num wrapper recortado (.lenda-card-gif-clip) que exclui
+   exatamente o retângulo onde a foto está, então o GIF só aparece ao redor —
+   nunca sobre — o retrato do personagem. */
+.lenda-card-gif-clip {
   position: absolute; inset: 0; z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
+  pointer-events: none; overflow: hidden;
+  /* Recorte padrão (desktop): a foto fica centrada no topo do card — ver
+     .lenda-avatar-wrap. Os valores abaixo casam com a posição/tamanho dela
+     (78px + margem) para abrir um "buraco" exato nesse retângulo. */
+  clip-path: polygon(
+    0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+    calc(50% - 41px) 28px, calc(50% - 41px) 110px,
+    calc(50% + 41px) 110px, calc(50% + 41px) 28px, calc(50% - 41px) 28px
+  );
+}
+.lenda-card-gif {
+  position: absolute; inset: 0;
 }
 .lenda-card-gif img {
   width: 100%; height: 100%; object-fit: cover;
-  opacity: .08;
+  opacity: .16;
   mix-blend-mode: screen;
   transition: opacity .3s;
 }
-.lenda-card:hover .lenda-card-gif img { opacity: .14; }
+.lenda-card:hover .lenda-card-gif img { opacity: .26; }
 
 /* Gradiente de overlay acima do wallpaper */
 .lenda-card-overlay {
@@ -1871,6 +1885,15 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
 
   /* Overlay e wallpaper mantidos, rank seal no canto da foto */
   .lenda-card-wallpaper { border-radius: 0; }
+
+  /* GIF: no layout mobile a foto é uma coluna full-bleed de 90px à esquerda
+     (ver .lenda-avatar-wrap acima) — o recorte do desktop (retângulo central)
+     não se aplica. Aqui o "buraco" é a faixa esquerda inteira, então o GIF
+     só aparece na metade direita do card (atrás do nome/meta), nunca sobre
+     a foto. */
+  .lenda-card-gif-clip {
+    clip-path: polygon(90px 0, 100% 0, 100% 100%, 90px 100%);
+  }
 
   /* Área do rank: fica sobre a foto à esquerda */
   .lenda-card-rank {
@@ -5922,7 +5945,7 @@ function renderizarCartoes(fichas, aba) {
     card.innerHTML = `
       <div class="lenda-card" role="button" tabindex="0">
         ${capaUrl ? `<div class="lenda-card-wallpaper" style="background-image:url('${_escUrl(capaUrl)}')"></div>` : ''}
-        ${p.gifPoder ? `<div class="lenda-card-gif"><img src="${_escUrl(p.gifPoder)}" alt="" onerror="this.style.display='none'"></div>` : ''}
+        ${p.gifPoder ? `<div class="lenda-card-gif-clip"><div class="lenda-card-gif"><img src="${_escUrl(p.gifPoder)}" alt="" onerror="this.parentElement.parentElement.style.display='none'"></div></div>` : ''}
         <div class="lenda-card-overlay"></div>
         <span class="lenda-card-rank ${posClass}">${posLabel}</span>
         ${f.faccao ? `<span class="lenda-card-faccao-badge">${_escHtml(f.faccao)}</span>` : ''}
