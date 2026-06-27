@@ -1738,6 +1738,11 @@ body.modo-editor .sidebar-nav-item .btn-edit-nav { opacity: 1; pointer-events: a
   margin: 1.75rem 0 .8rem;
   height: 82px; /* altura fixa = avatar + bordas */
   flex-shrink: 0;
+  /* Acima da camada escura (overlay z-index 2). Quando o avatar estava dentro
+     do .lenda-card-body ele já herdava z-index 3; ao virar filho direto do
+     card (layout de fileira no mobile) perdeu o empilhamento e o overlay
+     passou a cobri-lo, deixando a foto "translúcida". Restaurado aqui. */
+  position: relative; z-index: 3;
 }
 .lenda-avatar {
   width: 78px; height: 78px;
@@ -5895,6 +5900,12 @@ function renderizarCartoes(fichas, aba) {
     const p = _personalizacoes[pid] || {};
     const tema = p.tema || 'sangue';
     const wp = WALLPAPERS.find(w => w.id === p.wallpaper);
+    // Capa do card: usa a MESMA resolução do banner do Grimório — capa
+    // customizada enviada pelo jogador (wallpaperUrl) tem prioridade; se não
+    // houver, cai no wallpaper de preset. Antes o card só mostrava preset,
+    // então quem subia uma capa própria via "ela aparecer no perfil mas NÃO
+    // no card do ranking — parecia que a capa não tinha sido salva.
+    const capaUrl = p.wallpaperUrl || (wp ? wp.url : '');
 
     const avatarHtml = f.foto
       ? `<div class="lenda-avatar-frame"><img class="lenda-avatar" src="${_escUrl(f.foto)}" alt="${_escHtml(f.nome)}" onerror="this.parentElement.innerHTML='<div class=\\'lenda-avatar-placeholder\\'>⚔</div>'"></div>`
@@ -5910,7 +5921,7 @@ function renderizarCartoes(fichas, aba) {
     card.className = `lenda-card-outer tema-${tema}`;
     card.innerHTML = `
       <div class="lenda-card" role="button" tabindex="0">
-        ${wp ? `<div class="lenda-card-wallpaper" style="background-image:url('${wp.url}')"></div>` : ''}
+        ${capaUrl ? `<div class="lenda-card-wallpaper" style="background-image:url('${_escUrl(capaUrl)}')"></div>` : ''}
         ${p.gifPoder ? `<div class="lenda-card-gif"><img src="${_escUrl(p.gifPoder)}" alt="" onerror="this.style.display='none'"></div>` : ''}
         <div class="lenda-card-overlay"></div>
         <span class="lenda-card-rank ${posClass}">${posLabel}</span>
