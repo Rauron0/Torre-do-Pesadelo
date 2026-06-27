@@ -9360,6 +9360,110 @@ function criarNovoPersonagem() {
 //   Bônus de recursos: bonusPV, bonusSTA, bonusPE, bonusCA
 //   Derivados:        pvBase, staBase, maestria, attrMod (perícias)
 //   Funções:          floor(), ceil(), round()
+
+// ─── Validação robusta de fórmulas ───────────────────────────────────────
+// Variáveis que QUALQUER fórmula pode usar (união de todos os contextos de
+// cálculo). Um identificador fora desta lista faz avaliarFormula() bloquear
+// a fórmula e devolver 0 — foi exatamente isso que zerava as perícias quando
+// uma fórmula salva pelo GM usava um nome de variável inexistente.
+const _FORMULA_FUNCS_OK = ['floor','ceil','round','abs','min','max','sqrt','pow'];
+const _FORMULA_VARS_OK = new Set([
+  'forca','destreza','vigor','intelecto','alma','carisma','nivel',
+  'modForca','modDestreza','modVigor','modIntelecto','modAlma','modCarisma',
+  'aFor','aDes','aVig','aInt','aAlm','aCar',
+  'mFor','mDes','mVig','mInt','mAlm','mCar',
+  'bonusPV','bonusSTA','bonusPE','bonusCA',
+  'maestria','pvBase','staBase','attrMod'
+]);
+// Contextos de teste para validar fórmulas. São DOIS cenários reais:
+//  1) personagem competente (modificadores +2, nível 5) — pega fórmulas que
+//     zeram por construção (termos que se cancelam) ou não dão número finito.
+//  2) personagem "cru" com TODOS os modificadores ZERO (Atributo 10, nível 1)
+//     — é o caso real mais comum e o que mais quebra fórmulas com divisão por
+//     modificador (ex.: "x / modCarisma" estoura quando Carisma = 10). Uma
+//     fórmula só é considerada sã se devolve número finito em AMBOS.
+function _formulaProbeCtxs() {
+  const fns = { floor:Math.floor, ceil:Math.ceil, round:Math.round, abs:Math.abs, min:Math.min, max:Math.max, sqrt:Math.sqrt, pow:Math.pow };
+  return [
+    {
+      forca:14,destreza:14,vigor:14,intelecto:14,alma:14,carisma:14,nivel:5,
+      modForca:2,modDestreza:2,modVigor:2,modIntelecto:2,modAlma:2,modCarisma:2,
+      aFor:14,aDes:14,aVig:14,aInt:14,aAlm:14,aCar:14,
+      mFor:2,mDes:2,mVig:2,mInt:2,mAlm:2,mCar:2,
+      bonusPV:0,bonusSTA:0,bonusPE:0,bonusCA:0,
+      maestria:3,pvBase:50,staBase:50,attrMod:2, ...fns
+    },
+    {
+      forca:10,destreza:10,vigor:10,intelecto:10,alma:10,carisma:10,nivel:1,
+      modForca:0,modDestreza:0,modVigor:0,modIntelecto:0,modAlma:0,modCarisma:0,
+      aFor:10,aDes:10,aVig:10,aInt:10,aAlm:10,aCar:10,
+      mFor:0,mDes:0,mVig:0,mInt:0,mAlm:0,mCar:0,
+      bonusPV:0,bonusSTA:0,bonusPE:0,bonusCA:0,
+      maestria:2,pvBase:10,staBase:10,attrMod:0, ...fns
+    },
+  ];
+}
+// Compat: alguns trechos antigos podem chamar _formulaProbeCtx() (singular).
+function _formulaProbeCtx() { return _formulaProbeCtxs()[0]; }
+// Fórmulas OFICIAIS de perícia — fonte única da verdade. Usadas como padrão
+// em getFormulas() e como fallback de render quando a fórmula salva está
+// quebrada, garantindo que nenhuma perícia fique zerada por fórmula ruim.
+const _PER_OFICIAL = {
+  'per-base': 'attrMod + floor(nivel / 2)',
+  'per-mt':   'attrMod + floor(nivel / 2) + maestria',
+  'per-es':   'attrMod + floor(nivel / 2) + floor(maestria * 1.5)',
+};
+// Retorna true se a fórmula está quebrada: vazia, não-string, com algum
+// identificador desconhecido, sem o token exigido (ex.: perícia sem attrMod),
+// que não resulta num número finito no teste, OU (para perícias) que dá um
+// bônus não-positivo num personagem competente — sinal de fórmula que zera
+// por construção (variável que sempre vale 0, termos que se cancelam, etc.).
+function _formulaQuebrada(expr, tokenExigido) {
+  if (typeof expr !== 'string' || expr.trim() === '') return true;
+  const ids = expr.match(/[a-zA-Z_$][a-zA-Z0-9_$]*/g) || [];
+  for (const id of ids) {
+    if (!_FORMULA_VARS_OK.has(id) && _FORMULA_FUNCS_OK.indexOf(id) === -1) return true;
+  }
+  if (tokenExigido && ids.indexOf(tokenExigido) === -1) return true;
+  // Testa a fórmula em TODOS os cenários (competente + cru com mods 0). Usa o
+  // modo estrito do avaliador para enxergar Infinity/NaN (divisão por zero),
+  // que no modo normal viraria 0 silencioso e passaria despercebido.
+  const probes = _formulaProbeCtxs();
+  for (let pi = 0; pi < probes.length; pi++) {
+    const probe = avaliarFormula(expr, probes[pi], true);
+    if (!Number.isFinite(probe)) return true;
+    // Só exigimos bônus POSITIVO no cenário competente (pi 0). No cenário cru
+    // (todos os modificadores 0, nível 1) um bônus 0 pode ser legítimo.
+    if (tokenExigido === 'attrMod' && pi === 0 && probe <= 0) return true;
+  }
+  return false;
+}
+
+// Avalia o bônus de uma perícia com rede de segurança dupla: se a fórmula
+// configurada pelo GM estiver quebrada (token inválido, variável inexistente
+// ou resultado não-positivo no teste), cai na fórmula OFICIAL em vez de
+// exibir "+0". É o que impede uma fórmula ruim salva na nuvem de zerar as
+// perícias de todo o grupo, independente da auto-correção em getFormulas().
+function _bonusPericiaSafe(formulaCfg, formulaKey, ctx, attrMod) {
+  const oficial = _PER_OFICIAL[formulaKey] || formulaCfg;
+  // 1) Fórmula detectavelmente quebrada (token inválido, sem attrMod, estoura
+  //    ou zera num dos cenários de teste) → usa a oficial direto.
+  if (_formulaQuebrada(formulaCfg, 'attrMod')) {
+    return avaliarFormula(oficial, { ...ctx, attrMod });
+  }
+  // 2) Rede de segurança em tempo de render: mesmo passando na validação, a
+  //    fórmula pode zerar/estourar para ESTE personagem (ex.: divisão por um
+  //    modificador que vale 0 nesta ficha). Como _bonusPericiaSafe só roda
+  //    para perícias TREINADAS (slot de Maestria/Especialização), um bônus
+  //    <= 0 aqui é praticamente sempre sinal de fórmula quebrada para este
+  //    caso — então, se a oficial daria um valor positivo, usamos a oficial.
+  //    Isso impede de vez que uma perícia treinada apareça zerada na tela.
+  const cfgVal = avaliarFormula(formulaCfg, { ...ctx, attrMod });
+  if (Number.isFinite(cfgVal) && cfgVal > 0) return cfgVal;
+  const ofiVal = avaliarFormula(oficial, { ...ctx, attrMod });
+  return (ofiVal > cfgVal) ? ofiVal : cfgVal;
+}
+
 function getFormulas() {
   const def = {
     // Fórmulas oficiais Torre do Pesadelo
@@ -9371,11 +9475,8 @@ function getFormulas() {
     init:       'modDestreza',
     // Maestria = 1 + ⌈nível÷4⌉  (mínimo 2, máximo 6 no nível 20)
     maestria:   '1 + ceil(nivel / 4)',
-    'per-base': 'attrMod + floor(nivel / 2)',
-    // Maestria:      attrMod + ⌊nível÷2⌋ + maestria
-    'per-mt':   'attrMod + floor(nivel / 2) + maestria',
-    // Especialização: attrMod + ⌊nível÷2⌋ + ⌊maestria × 1.5⌋
-    'per-es':   'attrMod + floor(nivel / 2) + floor(maestria * 1.5)',
+    // Perícias: fonte única em _PER_OFICIAL (base / maestria / especialização)
+    ..._PER_OFICIAL,
   };
   let saved = {};
   try {
@@ -9412,23 +9513,24 @@ function getFormulas() {
     salvarFormulas(merged);
   }
 
-  // ─── Auto-correção: fórmulas de perícia corrompidas ───
-  // Garante que per-mt e per-es seguem o padrão oficial.
-  const perMtNorm = typeof merged['per-mt'] === 'string' ? merged['per-mt'].replace(/\s+/g,'') : '';
-  const perEsNorm = typeof merged['per-es'] === 'string' ? merged['per-es'].replace(/\s+/g,'') : '';
-  // Fórmulas antigas/inválidas: sem metade do nível, ou com proficiencia, ou variante depreciada
-  const perMtInvalido = perMtNorm !== '' && !/floor\(nivel/.test(perMtNorm);
-  const perEsInvalido = perEsNorm !== '' && !/floor\(nivel/.test(perEsNorm);
-  if (perMtInvalido) {
-    console.warn('[Fórmulas] per-mt corrompido, restaurando padrão. Anterior:', merged['per-mt']);
-    merged['per-mt'] = def['per-mt'];
-    salvarFormulas(merged);
-  }
-  if (perEsInvalido) {
-    console.warn('[Fórmulas] per-es corrompido, restaurando padrão. Anterior:', merged['per-es']);
-    merged['per-es'] = def['per-es'];
-    salvarFormulas(merged);
-  }
+  // ─── Auto-correção robusta: garante que TODA fórmula existe e funciona ───
+  // Substitui a verificação frágil anterior (que só olhava se a string
+  // continha "floor(nivel" — restaurava fórmulas válidas por engano e deixava
+  // passar fórmulas quebradas com nomes de variável inexistentes). Agora cada
+  // fórmula é checada de fato: precisa ser string não-vazia, usar só
+  // variáveis/funções conhecidas e dar número finito. As de perícia ainda
+  // precisam conter attrMod (bônus de perícia sem o modificador do atributo
+  // está sempre errado). Fórmulas customizadas VÁLIDAS são preservadas.
+  let _formulasCorrigidas = false;
+  Object.keys(def).forEach(key => {
+    const exigeAttrMod = (key === 'per-base' || key === 'per-mt' || key === 'per-es') ? 'attrMod' : null;
+    if (_formulaQuebrada(merged[key], exigeAttrMod)) {
+      console.warn('[Fórmulas] "' + key + '" inválida/ausente — restaurando padrão. Anterior:', merged[key]);
+      merged[key] = def[key];
+      _formulasCorrigidas = true;
+    }
+  });
+  if (_formulasCorrigidas) salvarFormulas(merged);
 
   return merged;
 }
@@ -9443,9 +9545,7 @@ function restaurarFormulasPadrao() {
     ca:         '10 + modDestreza + ceil(modVigor / 2) + bonusCA',
     init:       'modDestreza',
     maestria:   '1 + ceil(nivel / 4)',
-    'per-base': 'attrMod + floor(nivel / 2)',
-    'per-mt':   'attrMod + floor(nivel / 2) + maestria',
-    'per-es':   'attrMod + floor(nivel / 2) + floor(maestria * 1.5)',
+    ..._PER_OFICIAL,
   };
   salvarFormulas(def);
   carregarFormulaEditor();
@@ -9481,6 +9581,11 @@ async function carregarFormulasDaNuvem() {
         salvarFormulas(f);
       }
       localStorage.setItem('tp_formulas', JSON.stringify(f));
+      // Dispara a auto-correção robusta agora: se a nuvem trouxe alguma
+      // fórmula quebrada (perícia zerada, variável inexistente etc.),
+      // getFormulas() a conserta e re-sobe a versão corrigida pra nuvem,
+      // beneficiando todo o grupo na próxima leitura.
+      getFormulas();
       console.log('[Firestore] Fórmulas carregadas da nuvem.');
     }
   } catch(e) { console.warn('[Firestore] Erro ao carregar fórmulas:', e); }
@@ -9532,9 +9637,14 @@ function _atualizarModInline(user, sigla) {
   if (input && modEl) modEl.textContent = fmtMod(getMod(input.value));
 }
 
-function avaliarFormula(expr, ctx) {
+function avaliarFormula(expr, ctx, _strict) {
   // Parser seguro: substitui variáveis e funções math whitelisted, executa via Function.
   // Chaves mais longas são substituídas PRIMEIRO para evitar matches parciais.
+  // _strict (usado só pela validação): em vez de devolver 0 quando a fórmula
+  // falha/estoura, devolve NaN — assim _formulaQuebrada distingue "fórmula que
+  // dá zero de verdade" de "fórmula que quebrou" (ex.: divisão por modificador
+  // que vale 0 nesta ficha). No uso normal (sem _strict) o retorno continua 0.
+  const _FAIL = _strict ? NaN : 0;
   const FUNCS = ['floor','ceil','round','abs','min','max','sqrt','pow'];
   try {
     // Exclui funções e valores não-numéricos do contexto de variáveis
@@ -9553,7 +9663,7 @@ function avaliarFormula(expr, ctx) {
       .replace(/[\d\s\.\+\-\*\/\%\(\)\,]/g, '');
     if (clean.length > 0) {
       console.warn('[avaliarFormula] Bloqueada — tokens inválidos:', expr, '| restante:', clean);
-      return 0;
+      return _FAIL;
     }
 
     // 2) Substitui variáveis pelos valores numéricos (do nome mais longo ao mais curto)
@@ -9579,7 +9689,7 @@ function avaliarFormula(expr, ctx) {
     const finalCheck = safeExpr.replace(/Math\.(floor|ceil|round|abs|min|max|sqrt|pow)/g, '0');
     if (/[a-zA-Z_$]/.test(finalCheck)) {
       console.warn('[avaliarFormula] Bloqueada após substituição:', expr, '->', safeExpr);
-      return 0;
+      return _FAIL;
     }
 
     // eslint-disable-next-line no-new-func
@@ -9592,12 +9702,12 @@ function avaliarFormula(expr, ctx) {
     // fórmula — silenciosamente, sem nenhum erro visível no console.
     if (!Number.isFinite(resultado)) {
       console.warn('[avaliarFormula] Resultado não-finito (Infinity/NaN) — fórmula provavelmente tem divisão por zero:', expr, '->', resultado);
-      return 0;
+      return _FAIL;
     }
     return resultado;
   } catch(e) {
     console.warn('[avaliarFormula] Erro:', expr, e);
-    return 0;
+    return _FAIL;
   }
 }
 
@@ -10522,10 +10632,10 @@ function _renderTodasPericias() {
     const attrMod = attrMap[p.attr] ?? 0;
     let bonus, selo = '';
     if (comEspecializacao.has(p.nome)) {
-      bonus = avaliarFormula(f['per-es'], { ...ctx, attrMod });
+      bonus = _bonusPericiaSafe(f['per-es'], 'per-es', ctx, attrMod);
       selo = `<span class="pericias-todas-badge es">Es</span>`;
     } else if (comMaestria.has(p.nome)) {
-      bonus = avaliarFormula(f['per-mt'], { ...ctx, attrMod });
+      bonus = _bonusPericiaSafe(f['per-mt'], 'per-mt', ctx, attrMod);
       selo = `<span class="pericias-todas-badge mt">Mt</span>`;
     } else {
       bonus = attrMod;
@@ -10577,7 +10687,7 @@ function _renderSlots(tipo, total) {
       // valor era sempre calculado com a matemática oficial fixa direto no
       // código — então qualquer fórmula customizada salva no Editor de
       // Fórmulas era silenciosamente ignorada e nunca refletia na ficha.
-      const val = avaliarFormula(f[formulaKey], { ...ctx, attrMod });
+      const val = _bonusPericiaSafe(f[formulaKey], formulaKey, ctx, attrMod);
       bonus = fmtMod(Math.round(val));
     }
 
@@ -10610,7 +10720,14 @@ function _getCalcCtx() {
   const modForca    = getMod(forca),    modDestreza = getMod(destreza), modVigor    = getMod(vigor);
   const modIntelecto= getMod(intelecto),modAlma     = getMod(alma),     modCarisma  = getMod(carisma);
 
-  const maestria = Math.max(2, avaliarFormula(f['maestria'], { nivel, floor: Math.floor, ceil: Math.ceil, round: Math.round }));
+  // Maestria avaliada com contexto completo (nível + atributos + modificadores),
+  // não só 'nivel': assim uma fórmula de Maestria customizada que use mods não
+  // some silenciosamente para o mínimo. O padrão usa apenas nivel.
+  const maestria = Math.max(2, avaliarFormula(f['maestria'], {
+    nivel, forca, destreza, vigor, intelecto, alma, carisma,
+    modForca, modDestreza, modVigor, modIntelecto, modAlma, modCarisma,
+    floor: Math.floor, ceil: Math.ceil, round: Math.round
+  }));
 
   const base = {
     forca, destreza, vigor, intelecto, alma, carisma, nivel,
@@ -10647,7 +10764,7 @@ function abrirSeletorPericia(tipo, slotIdx) {
     // em _renderSlots(). Antes havia até uma variável 'formula' calculada
     // aqui e nunca usada; o bônus mostrado no seletor sempre vinha de um
     // cálculo fixo, ignorando qualquer customização do GM.
-    const val = avaliarFormula(f[formulaKey], { ...ctx, attrMod });
+    const val = _bonusPericiaSafe(f[formulaKey], formulaKey, ctx, attrMod);
     return `<div class="pericias-dropdown-item" onclick="selecionarPericia('${tipo}',${slotIdx},'${p.nome}','${p.attr}')">
       <span class="pericias-dropdown-item-attr">${p.attr}</span>
       <span class="pericias-dropdown-item-nome">${p.nome}</span>
