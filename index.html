@@ -847,6 +847,7 @@ tr:hover td { background:rgba(var(--deep-rgb), .05); }
 .save-btn:hover { background:var(--accent-light); }
 .save-status { font-size:.8rem; color:var(--text-muted); }
 .save-status.saved { color:#5cad7a; }
+.save-status.erro { color:#d9a441; }
 
 /* TOOLTIP */
 .info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:var(--deep-t20); border:1px solid var(--accent); color:var(--accent-light); font-size:.62rem; cursor:pointer; vertical-align:middle; margin-left:4px; font-style:normal; font-family:serif; position:relative; }
@@ -6371,7 +6372,17 @@ async function carregarRanking() {
       // ═══ FALLBACK EXTRA: varredura da coleção fichas ═══
       // Captura personagens que existem em fichas/ mas NÃO estão em chars/
       // (ex: personagens criados antes do sistema de lista, ou por GMs).
-      if (window.collection && window.getDocs) {
+      //
+      // CUSTO: travado para GM/ADM (podeMigrarOutros). Só quem pode migrar
+      // precisa varrer a coleção `fichas` inteira atrás desses órfãos — a
+      // escrita de migração já é GM/ADM-only, então para um jogador comum
+      // essa varredura só geraria a leitura da base de fichas inteira sem
+      // nenhum ganho (ele não migra ninguém). O jogador comum confia no
+      // rankingGlobal; um personagem órfão entra lá assim que um GM/ADM
+      // abrir o Livro das Lendas uma vez. A milhares de personagens, isso é
+      // a diferença entre 1 leitura de coleção por sessão e ler todas as
+      // fichas por sessão para cada jogador.
+      if (podeMigrarOutros && window.collection && window.getDocs) {
         try {
           const fichasSnap = await window.getDocs(window.collection(window.db, 'fichas'));
           for (const docSnap of fichasSnap.docs) {
@@ -6859,6 +6870,9 @@ async function publicarPost(pid, authorUser, authorPersonagem) {
     console.warn('[Publicacoes] Erro ao publicar:', e);
     _diag('publicarPost(' + pid + ')', e);
     if (btn) { btn.disabled = false; btn.textContent = 'Publicar'; }
+    // Feedback honesto: a publicação falhou (sem rede/permissão). O texto e o
+    // anexo continuam no formulário, então o usuário pode tentar de novo.
+    alert('Não foi possível publicar agora. Verifique sua conexão e tente novamente — seu texto continua aqui.');
   }
 }
 
@@ -7015,6 +7029,9 @@ async function enviarComentario(postId) {
   } catch(e) {
     console.warn('[Publicacoes] Erro ao comentar:', e);
     _diag('enviarComentario(' + postId + ')', e);
+    // Feedback honesto: o comentário não foi enviado. O texto não é limpo no
+    // catch, então continua no campo para o usuário tentar de novo.
+    alert('Não foi possível enviar o comentário. Verifique sua conexão e tente novamente.');
   }
 }
 
@@ -8637,6 +8654,17 @@ function atualizarFichaHero() {
   _atualizarResumosFichaExpand();
 }
 
+// Versão com debounce de atualizarFichaHero(), usada APENAS no caminho de
+// digitação (salvarLocal). Colapsa rajadas de teclas num único rebuild do
+// hero ~250ms após a última tecla. Os demais chamadores (carregar/trocar de
+// personagem, alterar recursos) continuam usando atualizarFichaHero() direto
+// para refletir na hora.
+let _heroUpdateTimer = null;
+function atualizarFichaHeroDebounced() {
+  clearTimeout(_heroUpdateTimer);
+  _heroUpdateTimer = setTimeout(atualizarFichaHero, 250);
+}
+
 
 // Campos NARRATIVOS — apenas o próprio player pode editar
 const CAMPOS_NARRATIVOS = ['f-aparencia','f-roupas','r-tracos','r-ideais','r-ligacoes','r-defeitos','r-historia','r-eventos','r-npcs','f-cabelos','f-olhos','f-pele','f-genero','f-idade','f-altura','f-peso','f-frase','f-descricao-publica','soc-historia','soc-objetivos','soc-filosofia','soc-feitos','soc-conquistas','soc-titulos','soc-aliados','soc-rivais','soc-pactos','soc-mentores','soc-timeline'];
@@ -9097,6 +9125,27 @@ async function migrarDocsPersonagem(user, nomeAntigo, novo) {
       console.log('[Ranking] rankingGlobal migrado:', rankAntigoId, '->', rankNovoId);
     }
   } catch(e) { console.warn('[Personagem] Erro ao migrar rankingGlobal:', e); }
+
+  try {
+    // Personalizações (tema, wallpaper, capa customizada, GIFs de poder).
+    // Mesma chave _fsDocId(user, personagem) das demais — sem migrar aqui, o
+    // personagem renomeado perdia a aparência (capa/tema/GIFs ficavam órfãos
+    // sob o nome antigo). Mesmo padrão get→set→delete dos blocos acima.
+    const persoAntigoId = _fsDocId(user, nomeAntigo);
+    const persoNovoId   = _fsDocId(user, novo);
+    const persoSnap = await window.getDoc(window.doc(window.db, 'personalizacoes', persoAntigoId));
+    if (persoSnap.exists()) {
+      const data = persoSnap.data();
+      await window.setDoc(window.doc(window.db, 'personalizacoes', persoNovoId), data);
+      if (window.deleteDoc) await window.deleteDoc(window.doc(window.db, 'personalizacoes', persoAntigoId));
+      // Mantém o cache em memória coerente para o render imediato pós-rename.
+      if (typeof _personalizacoes === 'object' && _personalizacoes) {
+        _personalizacoes[persoNovoId] = data;
+        delete _personalizacoes[persoAntigoId];
+      }
+      console.log('[Personagem] personalizacoes migrada:', persoAntigoId, '->', persoNovoId);
+    }
+  } catch(e) { console.warn('[Personagem] Erro ao migrar personalizacoes:', e); }
 }
 
 // ─── SLUG SEGURO PARA IDs DE PERSONAGEM ───
@@ -11086,7 +11135,7 @@ function _fsDocId(user, personagem) {
 async function salvarFichaFirestore(user, dados) {
   if (!window.db || !window.doc || !window.setDoc) {
     console.warn('[Firestore] SDK não disponível ainda, pulando salvamento na nuvem.');
-    return;
+    return false; // não salvou na nuvem — caller deve avisar
   }
   const persoNome = personagemAtual || '_default';
   const docId = _fsDocId(user, persoNome);
@@ -11099,11 +11148,15 @@ async function salvarFichaFirestore(user, dados) {
       personagem: persoNome
     });
     console.log('[Firestore] Ficha salva:', docId);
-    // Atualiza coleção rankingGlobal para evitar N×M leituras no ranking
+    // Atualiza coleção rankingGlobal para evitar N×M leituras no ranking.
+    // (updateRankingEntry tem try/catch próprio — falha dele não derruba o
+    // salvamento da ficha, que é o que importa para "salvo na nuvem".)
     await updateRankingEntry(userNorm, persoNome, dados, _fotoPrincipal || null);
+    return true; // ficha gravada com sucesso
   } catch(e) {
     _diag('salvarFichaFirestore(' + docId + ')', e);
     console.error('[Firestore] Erro ao salvar ficha:', e);
+    return false; // falhou — caller mostra aviso em vez de "Salvo na nuvem"
   }
 }
 
@@ -11393,13 +11446,27 @@ function salvarLocal(targetUser) {
   localStorage.setItem('ficha_' + u + '_' + personagemAtual, JSON.stringify(dados));
   const el = document.getElementById('save-status');
   if (el) { el.innerHTML = icone('edit','ic-sm')+' Editando…'; el.className = 'save-status'; }
-  // Atualiza hero em tempo real
-  atualizarFichaHero();
+  // Atualiza hero em tempo real — porém com debounce: digitar num campo de
+  // texto chama salvarLocal() a cada tecla, e atualizarFichaHero() reconstrói
+  // o DOM inteiro do hero (innerHTML). Reconstruir por tecla causava travamento
+  // ao digitar (sobretudo em campos longos como "história", que nem mexem no
+  // hero). O cache local acima continua síncrono (rede de segurança); só a
+  // prévia visual do hero é adiada ~250ms após a última tecla — imperceptível.
+  atualizarFichaHeroDebounced();
   // Debounce: salva na nuvem 1.5s após última edição
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async () => {
-    await salvarFichaFirestore(u, dados);
-    if (el) { el.innerHTML = icone('cloud','ic-sm')+' Salvo na nuvem'; el.className = 'save-status saved'; }
+    const ok = await salvarFichaFirestore(u, dados);
+    if (!el) return;
+    if (ok) {
+      el.innerHTML = icone('cloud','ic-sm')+' Salvo na nuvem'; el.className = 'save-status saved';
+    } else {
+      // Falha real na nuvem (sem rede/permissão/quota). NÃO mentir "salvo na
+      // nuvem" — o dado está seguro no cache local (síncrono), mas o usuário
+      // precisa saber que a sincronização não aconteceu. A próxima edição
+      // tentará de novo automaticamente (este setTimeout roda a cada save).
+      el.innerHTML = icone('info','ic-sm')+' Salvo só neste dispositivo'; el.className = 'save-status erro';
+    }
   }, 1500);
 }
 
@@ -11793,7 +11860,7 @@ async function gmTrocarPersonagem(user) {
   }
   if (!Object.keys(d).length) {
     const raw = localStorage.getItem('ficha_' + user + '_' + novoPerso);
-    if (raw) d = JSON.parse(raw);
+    if (raw) d = _parseJSONSafe(raw, {});
   }
   localStorage.setItem('ficha_' + user + '_' + novoPerso, JSON.stringify(d));
   container.innerHTML = gerarCamposInline(user, 'gm');
@@ -12050,7 +12117,7 @@ async function admTrocarPersonagem(user) {
   }
   if (!Object.keys(d).length) {
     const raw = localStorage.getItem('ficha_' + user + '_' + novoPerso);
-    if (raw) d = JSON.parse(raw);
+    if (raw) d = _parseJSONSafe(raw, {});
   }
   localStorage.setItem('ficha_' + user + '_' + novoPerso, JSON.stringify(d));
   container.innerHTML = gerarCamposInline(user, 'adm');
